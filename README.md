@@ -1,2 +1,2 @@
 # READCOM.Core.Delphi
-READ-COM Core package for Delphi
+[READ-COM](https://github.com/zoomicon/READCOM_App) Core package for Delphi
