@@ -1,29 +1,29 @@
 {
-  "package": {
-    "name": "READCOM.Core",
-    "version": "1.0",
+  "name": "READCOM.Core",
+  "version": "3.0",
 
-    "description": "READ-COM Core",
+  "description": "READ-COM Core",
 
-    "author": "George Birbilis - Zoomicon.com",
-    "license": "MIT",
+  "author": "George Birbilis - Zoomicon.com",
+  "license": "MIT",
     
-    "dependencies": {
-        "github.com/zoomicon/zoomicon.generics.delphi": ">=1.0.0",
-        "github.com/zoomicon/zoomicon.media.fmx.delphi": ">=1.1.0"
-    },
+  "dependencies": {
+    "github.com/zoomicon/zoomicon.generics.delphi": ">=3.0.0",
+    "github.com/zoomicon/zoomicon.media.fmx.delphi": ">=3.0.0"
+  },
 
-    "repository": {
-      "type": "git",
-      "url": "https://github.com/Zoomicon/READCOM.Core.Delphi"
-    },
-    "main": "Source/READCOM.Core.dproj",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Zoomicon/READCOM.Core.Delphi"
+  },
 
-    "projects": [
-      "Source/READCOM.Core.dproj"
-    ],
-    "files": [
-      "Source/**/*.pas"
-    ]
-  }
+  "main": "Source/READCOM.Core.dproj",
+
+  "projects": [
+    "Source/READCOM.Core.dproj"
+  ],
+
+  "files": [
+    "Source/**/*.pas"
+  ]
 }
