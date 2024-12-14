@@ -1,0 +1,36 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{435D30BD-ECCE-40D1-A041-F14D4CAAFDC8}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Source\READCOM.Core.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="READCOM_Core">
+        <MSBuild Projects="Source\READCOM.Core.dproj"/>
+    </Target>
+    <Target Name="READCOM_Core:Clean">
+        <MSBuild Projects="Source\READCOM.Core.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="READCOM_Core:Make">
+        <MSBuild Projects="Source\READCOM.Core.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="READCOM_Core"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="READCOM_Core:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="READCOM_Core:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
