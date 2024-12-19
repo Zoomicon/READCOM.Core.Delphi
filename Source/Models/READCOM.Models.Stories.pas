@@ -40,6 +40,8 @@ interface
 
     TStoryMode = (AnimatedStoryMode, InteractiveStoryMode, GuidedInteractiveStoryMode, EditMode);
 
+    {$region 'IStory'}
+
     IStory = interface
       ['{3A6CAD51-3787-4D18-9DA7-A07895BC4661}']
       procedure ZoomTo(const StoryItem: IStoryItem = nil); //ZoomTo(nil) zooms to all content
@@ -82,8 +84,16 @@ interface
       property ActiveStoryItem: IStoryItem read GetActiveStoryItem write SetActiveStoryItem;
     end;
 
+    {$endregion}
+
+    {$region 'IStoryItemFactory'}
+
     IStoryItemFactory = IFactory<IStoryItem>;
     IStoryItemFactoryRegistry = IFactoryRegistry<String, IStoryItem>;
+
+    {$endregion}
+
+    {$region 'IStoryItem'}
 
     IStoryItem = interface(IStoreable)
       ['{238909DD-45E6-463A-9698-C7C6DC1A6DFE}']
@@ -256,6 +266,29 @@ interface
       property StoryItem: IStoryItem read GetStoryItem write SetStoryItem; //stored false
     end;
 
+    {$endregion}
+
+    {$region 'IImageStoryItem'}
+
+    IImageStoryItem = interface(IStoryItem)
+      ['{26111D6E-A587-4AB5-8CC9-84269C2719DC}']
+
+      //--- Methods ---
+      {Image}
+      function GetImage: TImage;
+      procedure SetImage(const Value: TImage); overload;
+      procedure SetImage(const Value: TBitmap); overload;
+      procedure SetImage(const Value: TBitmapSurface); overload;
+
+      {SVGText}
+      function GetSVGText: String;
+      procedure SetSVGText(const Value: String);
+
+      //--- Properties ---
+      property Image: TImage read GetImage write SetImage; //stored StoreBitmap //default nil
+      property SVGText: String read GetSVGText write SetSVGText; //stored FStoreSVG;
+    end;
+
     IImageStoryItemOptions = interface(IStoryItemOptions)
       ['{DA637418-9648-48C7-A0CB-7475CAFECBAE}']
 
@@ -267,34 +300,9 @@ interface
       property ImageStoryItem: IImageStoryItem read GetImageStoryItem write SetImageStoryItem; //stored false
     end;
 
-    ITextStoryItemOptions = interface(IStoryItemOptions)
-      ['{EF0EF86E-7050-435F-81DC-4828A9FD8101}']
+    {$endregion}
 
-      {TextStoryItem}
-      function GetTextStoryItem: ITextStoryItem;
-      procedure SetTextStoryItem(const Value: ITextStoryItem);
-
-      //-- Properties --
-      property TextStoryItem: ITextStoryItem read GetTextStoryItem write SetTextStoryItem; //stored false
-    end;
-
-    IImageStoryItem = interface(IStoryItem)
-      ['{26111D6E-A587-4AB5-8CC9-84269C2719DC}']
-
-      //--- Methods ---
-      {Image}
-      function GetImage: TImage;
-      procedure SetImage(const Value: TImage); overload;
-      procedure SetImage(const Value: TBitmapSurface); overload;
-
-      {SVGText}
-      function GetSVGText: String;
-      procedure SetSVGText(const Value: String);
-
-      //--- Properties ---
-      property Image: TImage read GetImage write SetImage; //stored StoreBitmap //default nil
-      property SVGText: String read GetSVGText write SetSVGText; //stored FStoreSVG;
-    end;
+    {$region 'IAudioStoryItem'}
 
     IAudioStoryItem = interface(IStoryItem)
       ['{5C29ED8A-C6D1-47C2-A8F8-F41249C5846B}']
@@ -328,6 +336,10 @@ interface
       property PlayOnce: Boolean read IsPlayOnce write SetPlayOnce;
       property Audio: IMediaPlayer read GetAudio write SetAudio; //stored false
     end;
+
+    {$endregion}
+
+    {$region 'ITextStoryItem'}
 
     ITextStoryItem = interface(IStoryItem)
     ['{A05D85F0-F7F6-4EA1-8D4F-0C6FF7BEA572}']
@@ -364,6 +376,19 @@ interface
     property Font: TFont read GetFont write SetFont; //sets font size, font family (typeface), font style (bold, italic, underline, strikeout)
     property HorzAlign: TTextAlign read GetHorzAlign write SetHorzAlign; //default TTextAlign.Center
   end;
+
+    ITextStoryItemOptions = interface(IStoryItemOptions)
+      ['{EF0EF86E-7050-435F-81DC-4828A9FD8101}']
+
+      {TextStoryItem}
+      function GetTextStoryItem: ITextStoryItem;
+      procedure SetTextStoryItem(const Value: ITextStoryItem);
+
+      //-- Properties --
+      property TextStoryItem: ITextStoryItem read GetTextStoryItem write SetTextStoryItem; //stored false
+    end;
+
+    {$endregion}
 
 implementation
 

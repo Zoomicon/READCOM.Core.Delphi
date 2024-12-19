@@ -1,6 +1,6 @@
 {
   "name": "READCOM.Core",
-  "version": "3.0",
+  "version": "3.1",
 
   "description": "READ-COM Core",
 
@@ -9,7 +9,7 @@
     
   "dependencies": {
     "github.com/zoomicon/zoomicon.generics.delphi": ">=3.0.0",
-    "github.com/zoomicon/zoomicon.media.fmx.delphi": ">=3.0.0"
+    "github.com/zoomicon/zoomicon.media.fmx.delphi": ">=3.2.0"
   },
 
   "repository": {
