@@ -35,6 +35,7 @@ requires
 
 contains
   READCOM.Models in 'Models\READCOM.Models.pas',
-  READCOM.Models.Stories in 'Models\READCOM.Models.Stories.pas';
+  READCOM.Models.Stories in 'Models\READCOM.Models.Stories.pas',
+  READCOM.Factories.StoryItemFactory in 'Factories\READCOM.Factories.StoryItemFactory.pas';
 
 end.

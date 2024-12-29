@@ -9,6 +9,7 @@ interface
     System.Classes, //for TStream
     System.Generics.Collections, //for TList
     System.UITypes, //for TAlphaColor
+    System.SysUtils, //for TBytes
     //
     FMX.Clipboard, //for IFMXExtendedClipboardService
     FMX.Controls, //for TControl
@@ -155,6 +156,10 @@ interface
       function GetPreviousSiblingStoryPoint: IStoryItem;
       function GetNextSiblingStoryPoint: IStoryItem;
 
+      {Content}
+      function GetContent: TBytes;
+      procedure SetContent(const Value: TBytes);
+
       {AllText}
       function GetAllText: TStrings;
       procedure SetAllText(const Value: TStrings);
@@ -225,6 +230,7 @@ interface
       property StoryPoint: Boolean read IsStoryPoint write SetStoryPoint; //default false
       property PreviousStoryPoint: IStoryItem read GetPreviousStoryPoint; //stored false
       property NextStoryPoint: IStoryItem read GetNextStoryPoint; //stored false
+      property Content: TBytes read GetContent write SetContent; //default nil
       property AllText: TStrings read GetAllText write SetAllText; //stored false //Note: used to replace Text at applicable items in StoryItem's whole subtree (to be used recursively)
       property ForegroundColor: TAlphaColor read GetForegroundColor write SetForegroundColor; //default TAlphaColorRec.Null
       property BackgroundColor: TAlphaColor read GetBackgroundColor write SetBackgroundColor; //default TAlphaColorRec.Null

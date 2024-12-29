@@ -161,6 +161,7 @@
         <DCCReference Include="Zoomicon.Media.FMX.dcp"/>
         <DCCReference Include="Models\READCOM.Models.pas"/>
         <DCCReference Include="Models\READCOM.Models.Stories.pas"/>
+        <DCCReference Include="Factories\READCOM.Factories.StoryItemFactory.pas"/>
         <None Include="..\boss.json"/>
         <None Include="boss.json"/>
         <BuildConfiguration Include="Base">
@@ -200,7 +201,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="..\..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\23.0\Bpl\READCOM.Core.bpl" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\23.0\Bpl\READCOM.Core.bpl" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>READCOM.Core.bpl</RemoteName>
                         <Overwrite>true</Overwrite>
