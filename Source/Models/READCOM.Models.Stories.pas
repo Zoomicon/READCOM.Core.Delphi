@@ -160,6 +160,10 @@ interface
       function GetContent: TBytes;
       procedure SetContent(const Value: TBytes);
 
+      {ContentExt}
+      function GetContentExt: String;
+      procedure SetContentExt(const Value: String);
+
       {AllText}
       function GetAllText: TStrings;
       procedure SetAllText(const Value: TStrings);
@@ -231,6 +235,7 @@ interface
       property PreviousStoryPoint: IStoryItem read GetPreviousStoryPoint; //stored false
       property NextStoryPoint: IStoryItem read GetNextStoryPoint; //stored false
       property Content: TBytes read GetContent write SetContent; //default nil
+      property ContentExt: String read GetContentExt write SetContentExt; //default ''
       property AllText: TStrings read GetAllText write SetAllText; //stored false //Note: used to replace Text at applicable items in StoryItem's whole subtree (to be used recursively)
       property ForegroundColor: TAlphaColor read GetForegroundColor write SetForegroundColor; //default TAlphaColorRec.Null
       property BackgroundColor: TAlphaColor read GetBackgroundColor write SetBackgroundColor; //default TAlphaColorRec.Null
