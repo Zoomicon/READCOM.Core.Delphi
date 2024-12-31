@@ -79,4 +79,4 @@ __recovery/
 
 # Boss dependency manager vendor folder https://github.com/HashLoad/boss
 modules/
-Source/boss-lock.json
+/Source/boss-lock.json
