@@ -36,6 +36,8 @@ requires
 contains
   READCOM.Models in 'Models\READCOM.Models.pas',
   READCOM.Models.Stories in 'Models\READCOM.Models.Stories.pas',
-  READCOM.Factories.StoryItemFactory in 'Factories\READCOM.Factories.StoryItemFactory.pas';
+  READCOM.Factories.StoryItemFactory in 'Factories\READCOM.Factories.StoryItemFactory.pas',
+  READCOM.Resources.Icons in 'Resources\READCOM.Resources.Icons.pas' {Icons: TDataModule},
+  READCOM.Resources.Themes in 'Resources\READCOM.Resources.Themes.pas' {Themes: TDataModule};
 
 end.

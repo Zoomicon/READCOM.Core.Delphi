@@ -162,6 +162,16 @@
         <DCCReference Include="Models\READCOM.Models.pas"/>
         <DCCReference Include="Models\READCOM.Models.Stories.pas"/>
         <DCCReference Include="Factories\READCOM.Factories.StoryItemFactory.pas"/>
+        <DCCReference Include="Resources\READCOM.Resources.Icons.pas">
+            <Form>Icons</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="Resources\READCOM.Resources.Themes.pas">
+            <Form>Themes</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
         <None Include="..\boss.json"/>
         <None Include="boss.json"/>
         <BuildConfiguration Include="Base">
