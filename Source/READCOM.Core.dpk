@@ -30,8 +30,10 @@ package READCOM.Core;
 requires
   rtl,
   fmx,
+  {$IF DEFINED(MSWINDOWS)}
   SVGImage32Package,
   SVGIconImageListFMX,
+  {$ENDIF}
   Zoomicon.Generics,
   Zoomicon.Media.FMX;
 

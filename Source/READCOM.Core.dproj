@@ -157,8 +157,6 @@
         </DelphiCompile>
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="fmx.dcp"/>
-        <DCCReference Include="SVGImage32Package.dcp"/>
-        <DCCReference Include="SVGIconImageListFMX.dcp"/>
         <DCCReference Include="Zoomicon.Generics.dcp"/>
         <DCCReference Include="Zoomicon.Media.FMX.dcp"/>
         <DCCReference Include="Models\READCOM.Models.pas"/>
@@ -189,7 +187,14 @@
             <FormType>fmx</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
+        <DCCReference Include="Views\Dialogs\READCOM.Views.Dialogs.AllText.pas">
+            <Form>AllTextFrame</Form>
+            <FormType>fmx</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
         <None Include="..\boss.json"/>
+        <None Include="..\README.md"/>
+        <None Include="..\LICENSE.txt"/>
         <None Include="boss.json"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
