@@ -30,14 +30,17 @@ package READCOM.Core;
 requires
   rtl,
   fmx,
-  Zoomicon.Generics,
-  Zoomicon.Media.FMX;
+  Zoomicon.Media.FMX,
+  Zoomicon.Generics;
 
 contains
   READCOM.Models in 'Models\READCOM.Models.pas',
   READCOM.Models.Stories in 'Models\READCOM.Models.Stories.pas',
   READCOM.Factories.StoryItemFactory in 'Factories\READCOM.Factories.StoryItemFactory.pas',
   READCOM.Resources.Icons in 'Resources\READCOM.Resources.Icons.pas' {Icons: TDataModule},
-  READCOM.Resources.Themes in 'Resources\READCOM.Resources.Themes.pas' {Themes: TDataModule};
+  READCOM.Resources.Themes in 'Resources\READCOM.Resources.Themes.pas' {Themes: TDataModule},
+  READCOM.Views.Prompts.Lock in 'Views\Prompts\READCOM.Views.Prompts.Lock.pas' {LockFrame: TFrame},
+  READCOM.Views.Prompts.Rotate in 'Views\Prompts\READCOM.Views.Prompts.Rotate.pas' {RotateFrame: TFrame},
+  READCOM.Views.Prompts.Wait in 'Views\Prompts\READCOM.Views.Prompts.Wait.pas' {WaitFrame: TFrame};
 
 end.
