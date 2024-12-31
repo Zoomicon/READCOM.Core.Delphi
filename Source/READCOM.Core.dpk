@@ -30,8 +30,10 @@ package READCOM.Core;
 requires
   rtl,
   fmx,
-  Zoomicon.Media.FMX,
-  Zoomicon.Generics;
+  SVGImage32Package,
+  SVGIconImageListFMX,
+  Zoomicon.Generics,
+  Zoomicon.Media.FMX;
 
 contains
   READCOM.Models in 'Models\READCOM.Models.pas',
@@ -41,6 +43,7 @@ contains
   READCOM.Resources.Themes in 'Resources\READCOM.Resources.Themes.pas' {Themes: TDataModule},
   READCOM.Views.Prompts.Lock in 'Views\Prompts\READCOM.Views.Prompts.Lock.pas' {LockFrame: TFrame},
   READCOM.Views.Prompts.Rotate in 'Views\Prompts\READCOM.Views.Prompts.Rotate.pas' {RotateFrame: TFrame},
-  READCOM.Views.Prompts.Wait in 'Views\Prompts\READCOM.Views.Prompts.Wait.pas' {WaitFrame: TFrame};
+  READCOM.Views.Prompts.Wait in 'Views\Prompts\READCOM.Views.Prompts.Wait.pas' {WaitFrame: TFrame},
+  READCOM.Views.Dialogs.AllText in 'Views\Dialogs\READCOM.Views.Dialogs.AllText.pas' {AllTextFrame: TFrame};
 
 end.

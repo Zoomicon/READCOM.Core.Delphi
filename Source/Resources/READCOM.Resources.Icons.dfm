@@ -6,6 +6,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'Edit'
         SVGText = 
@@ -50,6 +51,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'reverse'
         SVGText = 
@@ -69,6 +71,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'play'
         SVGText = 
@@ -88,7 +91,8 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Width = 26
+            Width = 87
+            Height = 109
           end>
         IconName = 'Diagram'
         SVGText = 
@@ -104,6 +108,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'TargetArrow'
         SVGText = 
@@ -157,6 +162,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'Anchor'
         SVGText = 
@@ -182,6 +188,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'OpenFileFolder'
         SVGText = 
@@ -217,6 +224,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 22
           end>
         IconName = 'Save'
         SVGText = 
@@ -249,6 +257,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'Delete'
         SVGText = 
@@ -283,6 +292,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'GlobeWithMeridians'
         SVGText = 
@@ -311,6 +321,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'Plus'
         SVGText = 
@@ -350,6 +361,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'Camera'
         SVGText = 
@@ -408,6 +420,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'PaperA4'
         SVGText = 
@@ -429,6 +442,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'Home'
         SVGText = 
@@ -456,6 +470,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'Signpost'
         SVGText = 
@@ -485,6 +500,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'Info'
         SVGText = 
@@ -509,6 +525,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'Questionmark'
         SVGText = 
@@ -548,6 +565,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'CopyAction'
         SVGText = 
@@ -582,6 +600,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'PasteAction'
         SVGText = 
@@ -631,6 +650,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'FlipHorizontally'
         SVGText = 
@@ -666,6 +686,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'FlipVertically'
         SVGText = 
@@ -701,6 +722,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'ThoughtEllipsis'
         SVGText = 
@@ -728,6 +750,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'Timer'
         SVGText = 
@@ -759,6 +782,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'FramedPicture'
         SVGText = 
@@ -801,6 +825,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'READ-COM square rounded border'
         SVGText = 
@@ -883,6 +908,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'Scissors'
         SVGText = 
@@ -952,6 +978,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'Sun'
         SVGText = 
@@ -989,6 +1016,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'Tag'
         SVGText = 
@@ -1027,6 +1055,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'Edit grayscale'
         SVGText = 
@@ -1072,6 +1101,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'Gear8Teeth'
         SVGText = 
@@ -1128,6 +1158,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'Magnet'
         SVGText = 
@@ -1162,6 +1193,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'Hourglass'
         SVGText = 
@@ -1222,6 +1254,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'LockClosed'
         SVGText = 
@@ -1254,6 +1287,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'LockOpen'
         SVGText = 
@@ -1283,6 +1317,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'Obstacle'
         SVGText = 
@@ -1331,6 +1366,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'RotateCounterClockwise'
         SVGText = 
@@ -1375,6 +1411,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 22
           end>
         IconName = 'Close'
         SVGText = 
@@ -1392,6 +1429,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'TextAlignCenter'
         SVGText = 
@@ -1455,6 +1493,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'TextAlignLeft_SVGrepo_7743'
         SVGText = 
@@ -1491,6 +1530,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'TextAlignRight_SVGrepo_39363'
         SVGText = 
@@ -1527,6 +1567,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'B_Bold_SVGrepo_137945'
         SVGText = 
@@ -1560,6 +1601,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'I_Italics_SVGrepo_325311'
         SVGText = 
@@ -1576,6 +1618,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'U_Underline_SVGrepo_156702'
         SVGText = 
@@ -1607,6 +1650,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'Strikeout_Text_SVGrepo_372684'
         SVGText = 
@@ -1645,6 +1689,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
+            Size = 136
           end>
         IconName = 'FullScreen_SVGrepo_505892'
         SVGText = 
@@ -1662,160 +1707,160 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'Edit'
-            SourceRect.Right = 120.000000000000000000
-            SourceRect.Bottom = 120.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'reverse'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'play'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Diagram'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 109.000000000000000000
+            SourceRect.Bottom = 109.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'TargetArrow'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Anchor'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'OpenFileFolder'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Save'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 22.000000000000000000
+            SourceRect.Bottom = 22.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Delete'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'GlobeWithMeridians'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Plus'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Camera'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'PaperA4'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Home'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Signpost'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Info'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Questionmark'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'CopyAction'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'PasteAction'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'FlipHorizontally'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
@@ -1854,174 +1899,166 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'READ-COM square rounded border'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Scissors'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Sun'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Tag'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Edit grayscale'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Gear8Teeth'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Magnet'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Hourglass'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'LockClosed'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'LockOpen'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Obstacle'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'RotateCounterClockwise'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Close'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 22.000000000000000000
+            SourceRect.Bottom = 22.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'TextAlignCenter'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'TextAlignLeft_SVGrepo_7743'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'TextAlignRight_SVGrepo_39363'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'B_Bold_SVGrepo_137945'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'I_Italics_SVGrepo_325311'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'U_Underline_SVGrepo_156702'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Strikeout_Text_SVGrepo_372684'
-            SourceRect.Right = 120.000000000000000000
-            SourceRect.Bottom = 120.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'FullScreen_SVGrepo_505892'
-            SourceRect.Right = 64.000000000000000000
-            SourceRect.Bottom = 64.000000000000000000
-          end>
-      end
-      item
-        Layers = <
-          item
-            Name = 'Item 0'
             SourceRect.Right = 136.000000000000000000
             SourceRect.Bottom = 136.000000000000000000
           end>
