@@ -30,22 +30,30 @@ package READCOM.Core;
 requires
   rtl,
   fmx,
-  {$IF DEFINED(MSWINDOWS)}
-  SVGImage32Package,
-  SVGIconImageListFMX,
-  {$ENDIF}
   Zoomicon.Generics,
-  Zoomicon.Media.FMX;
+  Zoomicon.Helpers.FMX,
+  Zoomicon.Helpers.RTL,
+  Zoomicon.Introspection.FMX,
+  Zoomicon.Manipulation.FMX,
+  Zoomicon.Media.FMX,
+  Zoomicon.ZUI.FMX,
+  ObjectDebuggerFMX;
 
 contains
   READCOM.Models in 'Models\READCOM.Models.pas',
   READCOM.Models.Stories in 'Models\READCOM.Models.Stories.pas',
   READCOM.Factories.StoryItemFactory in 'Factories\READCOM.Factories.StoryItemFactory.pas',
-  READCOM.Resources.Icons in 'Resources\READCOM.Resources.Icons.pas' {Icons: TDataModule},
-  READCOM.Resources.Themes in 'Resources\READCOM.Resources.Themes.pas' {Themes: TDataModule},
+  READCOM.Views.StoryItems.StoryItem in 'Views\StoryItems\READCOM.Views.StoryItems.StoryItem.pas' {StoryItem: TFrame},
+  READCOM.Views.StoryItems.ImageStoryItem in 'Views\StoryItems\READCOM.Views.StoryItems.ImageStoryItem.pas' {ImageStoryItem: TFrame},
+  READCOM.Views.StoryItems.TextStoryItem in 'Views\StoryItems\READCOM.Views.StoryItems.TextStoryItem.pas' {TextStoryItem: TFrame},
   READCOM.Views.Prompts.Lock in 'Views\Prompts\READCOM.Views.Prompts.Lock.pas' {LockFrame: TFrame},
   READCOM.Views.Prompts.Rotate in 'Views\Prompts\READCOM.Views.Prompts.Rotate.pas' {RotateFrame: TFrame},
   READCOM.Views.Prompts.Wait in 'Views\Prompts\READCOM.Views.Prompts.Wait.pas' {WaitFrame: TFrame},
-  READCOM.Views.Dialogs.AllText in 'Views\Dialogs\READCOM.Views.Dialogs.AllText.pas' {AllTextFrame: TFrame};
+  READCOM.Views.Dialogs.AllText in 'Views\Dialogs\READCOM.Views.Dialogs.AllText.pas' {AllTextFrame: TFrame},
+  READCOM.Views.Options.StoryItemOptions in 'Views\Options\READCOM.Views.Options.StoryItemOptions.pas' {StoryItemOptions: TFrame},
+  READCOM.Views.Options.TextStoryItemOptions in 'Views\Options\READCOM.Views.Options.TextStoryItemOptions.pas' {TextStoryItemOptions: TFrame},
+  READCOM.Views.Options.ImageStoryItemOptions in 'Views\Options\READCOM.Views.Options.ImageStoryItemOptions.pas' {ImageStoryItemOptions: TFrame},
+  READCOM.Resources.Icons in 'Resources\READCOM.Resources.Icons.pas' {Icons: TDataModule},
+  READCOM.Resources.Themes in 'Resources\READCOM.Resources.Themes.pas' {Themes: TDataModule};
 
 end.

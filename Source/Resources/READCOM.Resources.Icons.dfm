@@ -224,7 +224,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 22
+            Size = 136
           end>
         IconName = 'Save'
         SVGText = 
@@ -361,7 +361,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'Camera'
         SVGText = 
@@ -1055,7 +1055,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'Edit grayscale'
         SVGText = 
@@ -1411,7 +1411,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 22
+            Size = 136
           end>
         IconName = 'Close'
         SVGText = 
@@ -1429,7 +1429,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'TextAlignCenter'
         SVGText = 
@@ -1493,7 +1493,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'TextAlignLeft_SVGrepo_7743'
         SVGText = 
@@ -1530,7 +1530,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'TextAlignRight_SVGrepo_39363'
         SVGText = 
@@ -1567,7 +1567,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'B_Bold_SVGrepo_137945'
         SVGText = 
@@ -1601,7 +1601,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'I_Italics_SVGrepo_325311'
         SVGText = 
@@ -1618,7 +1618,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'U_Underline_SVGrepo_156702'
         SVGText = 
@@ -1650,7 +1650,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'Strikeout_Text_SVGrepo_372684'
         SVGText = 
@@ -1763,8 +1763,8 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'Save'
-            SourceRect.Right = 22.000000000000000000
-            SourceRect.Bottom = 22.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
@@ -1795,8 +1795,8 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'Camera'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
@@ -1931,8 +1931,8 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'Edit grayscale'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
@@ -1995,64 +1995,64 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'Close'
-            SourceRect.Right = 22.000000000000000000
-            SourceRect.Bottom = 22.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'TextAlignCenter'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'TextAlignLeft_SVGrepo_7743'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'TextAlignRight_SVGrepo_39363'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'B_Bold_SVGrepo_137945'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'I_Italics_SVGrepo_325311'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'U_Underline_SVGrepo_156702'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Strikeout_Text_SVGrepo_372684'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item

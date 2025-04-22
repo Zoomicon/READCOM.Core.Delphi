@@ -1,29 +1,24 @@
 {
-  "name": "READCOM.Core",
-  "version": "3.7",
+	"name": "READCOM.Core",
+	"version": "3.8",
 
-  "description": "READ-COM Core",
+	"description": "READ-COM Core",
 
-  "author": "George Birbilis - Zoomicon.com",
-  "license": "MIT",
-    
-  "dependencies": {
-    "github.com/zoomicon/zoomicon.generics.delphi": ">=3.0.0",
-    "github.com/zoomicon/zoomicon.media.fmx.delphi": ">=3.10.0"
-  },
+	"author": "George Birbilis - Zoomicon.com",
+	"license": "MIT",
 
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Zoomicon/READCOM.Core.Delphi"
-  },
-
-  "main": "Source/READCOM.Core.dproj",
-
-  "projects": [
-    "Source/READCOM.Core.dproj"
-  ],
-
-  "files": [
-    "Source/**/*.pas"
-  ]
+	"homepage": "",
+	"mainsrc": "",
+	"projects": [
+		"Source/READCOM.Core.dproj"
+	],
+	"dependencies": {
+		"github.com/zoomicon/zoomicon.generics.delphi": ">=3.0.0",
+		"github.com/zoomicon/zoomicon.helpers.rtl.delphi": ">=3.2.0",
+		"github.com/zoomicon/zoomicon.helpers.fmx.delphi": ">=3.2.0",
+		"github.com/zoomicon/zoomicon.introspection.fmx.delphi": ">=3.3.0",
+		"github.com/zoomicon/zoomicon.manipulation.fmx.delphi": ">=3.0.0",
+		"github.com/zoomicon/zoomicon.media.fmx.delphi": ">=4.2.0",
+		"github.com/zoomicon/zoomicon.zui.fmx.delphi": ">=3.0.0"
+	}
 }

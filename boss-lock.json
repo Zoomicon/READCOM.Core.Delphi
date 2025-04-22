@@ -1,0 +1,37 @@
+{
+	"hash": "b3d827e1e5e1fab7dfd5a4526238a14b",
+	"updated": "2025-03-10T15:31:52.8956704+02:00",
+	"installedModules": {
+		"github.com/zoomicon/zoomicon.generics.delphi": {
+			"name": "zoomicon.generics.delphi",
+			"version": "3.0",
+			"hash": "e81dcd17cc5db10bb5c27edc4d5a3b3e",
+			"artifacts": {
+				"dcp": [
+					"Zoomicon.Generics.bpi",
+					"Zoomicon.Generics.dcp",
+					"Zoomicon.Generics.lib"
+				],
+				"dcu": [
+					"Zoomicon.Generics.Collections.dcu",
+					"Zoomicon.Generics.Factories.dcu",
+					"Zoomicon.Generics.Functors.dcu",
+					"Zoomicon.Generics.Registries.dcu"
+				],
+				"bpl": [
+					"Zoomicon.Generics.bpl"
+				]
+			},
+			"failed": true,
+			"changed": false
+		},
+		"github.com/zoomicon/zoomicon.media.fmx.delphi": {
+			"name": "zoomicon.media.fmx.delphi",
+			"version": "3.10",
+			"hash": "dc8a150482b5f5d97e3e97f594cc2358",
+			"artifacts": {},
+			"failed": false,
+			"changed": false
+		}
+	}
+}
