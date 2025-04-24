@@ -31,14 +31,14 @@ requires
   rtl,
   fmx,
   FrameStandPackage_11_1,
-  ObjectDebuggerFMX,
-  Zoomicon.Generics,
-  Zoomicon.Helpers.FMX,
-  Zoomicon.Helpers.RTL,
   Zoomicon.Introspection.FMX,
-  Zoomicon.Manipulation.FMX,
   Zoomicon.Media.FMX,
-  Zoomicon.ZUI.FMX;
+  Zoomicon.Helpers.FMX{BOSS},
+  ObjectDebuggerFMX{BOSS},
+  Zoomicon.Manipulation.FMX{BOSS},
+  Zoomicon.ZUI.FMX{BOSS},
+  Zoomicon.Generics{BOSS},
+  Zoomicon.Helpers.RTL{BOSS};
 
 contains
   READCOM.Resources.Icons in 'Resources\READCOM.Resources.Icons.pas' {Icons: TDataModule},

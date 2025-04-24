@@ -19,18 +19,18 @@ interface
     //
     FMX.MultiView, SubjectStand, FrameStand,
     //
-    Zoomicon.Media.FMX.ModalFrame, //for TModalFrame (used to reference the About dialog)
+    Zoomicon.Media.FMX.ModalFrame, //for TModalFrameClass (used to reference the class for the About dialog)
     READCOM.Resources.Icons; //for Icons.SVGIconImageList
   {$endregion}
 
-  type
+  var
+    AboutFrameClass: TModalFrameClass;
 
+  type
     TEditModeChangedEvent = procedure (Sender: TObject; const Value: Boolean) of object;
     TStructureVisibleChangedEvent = procedure (Sender: TObject; const Value: Boolean) of object;
     TTargetsVisibleChangedEvent = procedure (Sender: TObject; const Value: Boolean) of object;
     TUseStoryTimerChangedEvent = procedure (Sender: TObject; const Value: Boolean) of object;
-
-    TModalFrameClass = class of TModalFrame; //TODO: move to Zoomicon.Media.FMX.ModalFrame.pas?
 
     TStoryHUD = class(TFrame)
       btnPrevious: TSpeedButton;
@@ -103,7 +103,6 @@ interface
       procedure btnToggleFullscreenClick(Sender: TObject);
 
     protected
-      FAboutFrameClass: TModalFrameClass;
       FMultiViewOpenedWidth: Single;
 
       FEditMode: Boolean;
@@ -292,7 +291,7 @@ implementation
 
   procedure TStoryHUD.actionAboutExecute(Sender: TObject);
   begin
-    FAboutFrameClass.ShowModal(Application.MainForm); //has [X] button to close itself
+    AboutFrameClass.ShowModal(Application.MainForm); //has [X] button to close itself
   end;
 
   {$endregion}

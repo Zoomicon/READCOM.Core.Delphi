@@ -5,9 +5,11 @@ unit READCOM.App.Main;
 
 interface
   uses
-    System.Math; //for Min
+    System.Math, //for Min
+    //
+    Zoomicon.Media.FMX.ModalFrame; //for TModalFrameClass
 
-  procedure Main;
+  procedure Main(const TheAboutFrameClass: TModalFrameClass);
   procedure ShowHelp;
 
   var
@@ -32,6 +34,7 @@ implementation
     //
     READCOM.Models, //for DEFAULT_THUMB_WIDTH, DEFAULT_THUMB_HEIGHT, DEFAULT_HTML_IMAGE_WIDTH, DEFAULT_HTML_IMAGE_HEIGHT
     READCOM.Views.Main,
+    READCOM.Views.HUD, //for AboutFrameClass
     READCOM.Resources.Icons, //for TIcons
     READCOM.Resources.Themes, //for TThemes
     READCOM.App.Messages;
@@ -85,8 +88,10 @@ implementation
     Application.OpenURL(URL_HELP);
   end;
 
-  procedure Main;
+  procedure Main(const TheAboutFrameClass: TModalFrameClass);
   begin
+    READCOM.Views.HUD.AboutFrameClass := TheAboutFrameClass;
+
     CheckSafeMode; //must do before Application.Initialize //this also configures Graphics settings (e.g. when SHIFT key isn't held down at startup, replaces FMX rendering engine with Skia, disables Skia rasterizer, uses Metal on OS-X/iOS, uses Vulkan on Windows/Android)
 
     Randomize; //initializes the built-in random number generator with a random value (obtained from the system clock)
