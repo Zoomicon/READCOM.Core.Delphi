@@ -220,8 +220,9 @@ implementation
     READCOM.App.Main, //for StorySource
     READCOM.App.Messages,
     READCOM.Resources.Themes, //for Themes.LightTheme, Themes.DarkTheme
-    READCOM.Views.StoryItems.ImageStoryItem, //for TImageStoryItem
-    READCOM.Views.StoryItems.TextStoryItem, //for TTextStoryItem
+    READCOM.Views.StoryItems.ImageStoryItem, //for TImageStoryItem (for AddImageStoryItem action)
+    READCOM.Views.StoryItems.TextStoryItem, //for TTextStoryItem (for AddTextStoryItem action)
+    READCOM.Views.StoryItems.AudioStoryItem, //for TAudioStoryItem (needed so that custom apps don't need to use this unit explicitly)
     READCOM.Views.Dialogs.AllText, //for TAllTextFrame
     READCOM.Views.Prompts.Wait, //for TWaitFrame
     READCOM.Views.Prompts.Lock, //for TLockFrame
