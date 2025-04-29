@@ -27,6 +27,8 @@ package READCOM.Core;
 {$ENDIF IMPLICITBUILDING}
 {$IMPLICITBUILD ON}
 
+//Dependencies: see <DEPENDENCIES.md>
+
 requires
   rtl,
   fmx,
