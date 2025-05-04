@@ -158,14 +158,14 @@
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="fmx.dcp"/>
         <DCCReference Include="FrameStandPackage_11_1.dcp"/>
-        <DCCReference Include="Zoomicon.Introspection.FMX.dcp"/>
-        <DCCReference Include="Zoomicon.Media.FMX.dcp"/>
-        <DCCReference Include="Zoomicon.Helpers.FMX.dcp"/>
         <DCCReference Include="ObjectDebuggerFMX.dcp"/>
-        <DCCReference Include="Zoomicon.Manipulation.FMX.dcp"/>
-        <DCCReference Include="Zoomicon.ZUI.FMX.dcp"/>
         <DCCReference Include="Zoomicon.Generics.dcp"/>
         <DCCReference Include="Zoomicon.Helpers.RTL.dcp"/>
+        <DCCReference Include="Zoomicon.Helpers.FMX.dcp"/>
+        <DCCReference Include="Zoomicon.Introspection.FMX.dcp"/>
+        <DCCReference Include="Zoomicon.Manipulation.FMX.dcp"/>
+        <DCCReference Include="Zoomicon.Media.FMX.dcp"/>
+        <DCCReference Include="Zoomicon.ZUI.FMX.dcp"/>
         <DCCReference Include="Resources\READCOM.Resources.Icons.pas">
             <Form>Icons</Form>
             <FormType>dfm</FormType>
@@ -242,6 +242,7 @@
         <None Include="..\LICENSE.txt"/>
         <None Include="..\README.md"/>
         <None Include="boss.json"/>
+        <None Include="..\DEPENDENCIES.md"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

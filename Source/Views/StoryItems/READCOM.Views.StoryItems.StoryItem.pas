@@ -503,7 +503,7 @@ implementation
   {$endregion}
 
   procedure TStoryItem.DoAddObject(const AObject: TFmxObject);
-    procedure AddToStoryItems;
+    procedure CheckAddToStoryItems;
     var StoryItem: IStoryItem;
     begin
       if Supports(AObject, IStoryItem, StoryItem) then
@@ -513,7 +513,7 @@ implementation
       end;
     end;
 
-    procedure AddToAudioStoryItems;
+    procedure CheckAddToAudioStoryItems;
     var AudioStoryItem: IAudioStoryItem;
     begin
       if Supports(AObject, IAudioStoryItem, AudioStoryItem) then
@@ -522,8 +522,8 @@ implementation
 
   begin
     inherited;
-    AddToStoryItems;
-    AddToAudioStoryItems;
+    CheckAddToStoryItems;
+    CheckAddToAudioStoryItems;
   end;
 
   procedure TStoryItem.DoInsertObject(Index: Integer; const AObject: TFmxObject);
@@ -543,24 +543,24 @@ implementation
 
   procedure TStoryItem.DoRemoveObject(const AObject: TFmxObject);
 
-    procedure RemoveFromStoryItems;
+    procedure CheckRemoveFromStoryItems;
     var StoryItem: IStoryItem;
     begin
       if Supports(AObject, IStoryItem, StoryItem) then
         FStoryItems.Remove(StoryItem);
     end;
 
-    procedure RemoveFromAudioStoryItems;
+    procedure CheckRemoveFromAudioStoryItems;
     var AudioStoryItem: IAudioStoryItem;
     begin
       if Supports(AObject, IAudioStoryItem, AudioStoryItem) then
-        FStoryItems.Remove(AudioStoryItem);
+        FAudioStoryItems.Remove(AudioStoryItem);
     end;
 
   begin
     inherited;
-    RemoveFromStoryItems;
-    RemoveFromAudioStoryItems; //not checking if item was removed from StoryItems, since it may just implement IAudioStoryItem without implementing IStoryItem in Delphi (which follows COM practice), even though IAudioStoryItem extends IStoryItem
+    CheckRemoveFromStoryItems;
+    CheckRemoveFromAudioStoryItems; //not checking if item was removed from StoryItems, since it may just implement IAudioStoryItem without implementing IStoryItem in Delphi (which follows COM practice), even though IAudioStoryItem extends IStoryItem
   end;
 
   procedure TStoryItem.SetParent(const Value: TFmxObject);

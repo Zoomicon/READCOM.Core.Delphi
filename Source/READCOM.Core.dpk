@@ -33,14 +33,14 @@ requires
   rtl,
   fmx,
   FrameStandPackage_11_1,
-  Zoomicon.Introspection.FMX,
-  Zoomicon.Media.FMX,
-  Zoomicon.Helpers.FMX{BOSS},
   ObjectDebuggerFMX{BOSS},
-  Zoomicon.Manipulation.FMX{BOSS},
-  Zoomicon.ZUI.FMX{BOSS},
   Zoomicon.Generics{BOSS},
-  Zoomicon.Helpers.RTL{BOSS};
+  Zoomicon.Helpers.RTL{BOSS},
+  Zoomicon.Helpers.FMX{BOSS},
+  Zoomicon.Introspection.FMX{BOSS},
+  Zoomicon.Manipulation.FMX{BOSS},
+  Zoomicon.Media.FMX{BOSS},
+  Zoomicon.ZUI.FMX{BOSS};
 
 contains
   READCOM.Resources.Icons in 'Resources\READCOM.Resources.Icons.pas' {Icons: TDataModule},
