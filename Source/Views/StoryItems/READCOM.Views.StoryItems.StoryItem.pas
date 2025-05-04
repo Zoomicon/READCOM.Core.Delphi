@@ -352,7 +352,7 @@ implementation
     //
     Zoomicon.Generics.Collections, //for TObjectListEx
     Zoomicon.Helpers.RTL.ComponentHelpers, //for TComponent.FindSafeName
-    Zoomicon.Helpers.RTL.StreamHelpers, //for TStream.ReadComponent
+    Zoomicon.Helpers.RTL.StreamHelpers, //for TStream.ReadComponent, TStream.SkipBOM_UTF8, TStream.PeekString
     Zoomicon.Helpers.RTL.StringsHelpers, //for TStrings.GetLines
     //Zoomicon.Helpers.FMX.Forms.ApplicationHelper, //for IsURI
     Zoomicon.Introspection.FMX.Debugging, //for Log
@@ -1934,44 +1934,31 @@ implementation
     end;
   end;
 
-  {$region 'Stream Helpers' - //TODO: move to Zoomicon.Helpers.RTL.Delphi}
-
-  function Stream_PeekBytes(Stream: TStream; NumBytes: Integer): TBytes;
-  var
-    OldPos: Int64;
-  begin
-    SetLength(Result, NumBytes);
-    OldPos := Stream.Position;  // Save current position
-
-    if (Stream.Size - OldPos) >= NumBytes then
-      Stream.ReadBuffer(Result[0], NumBytes);
-
-    Stream.Position := OldPos;  // Restore position
-  end;
-
-  function Stream_PeekString(Stream: TStream; NumBytes: Integer; Encoding: TEncoding = nil): string;
-  var
-    Bytes: TBytes;
-  begin
-    if Encoding = nil then
-      Encoding := TEncoding.UTF8;  // Default to UTF-8
-
-    Bytes := Stream_PeekBytes(Stream, NumBytes);  // Use byte peek function
-    Result := Encoding.GetString(Bytes);  // Convert to string
-  end;
-
-  {$endregion}
-
-  const READCOM_TEXT_PREAMBLE = 'object ';
-
   /// Load from Stream
   function TStoryItem.Load(const Stream: TStream; const ContentFormat: String = EXT_READCOM; const CreateNew: Boolean = false): TObject;
+    const
+      READCOM_TEXT_PREAMBLE = 'object ';
+      //READCOM_BIN_PREAMBLE = 'TPF0'#21; //TPF0 may mean Turbo Pascal Form, version 0, while #21=NAK
+
+    function Stream_StartsWith(const Stream: TStream; const Preamble: String): Boolean;
+    begin
+      result := Stream.PeekString(length(Preamble)) = Preamble;
+    end;
+
   begin
     if ContentFormat = EXT_READCOM then //descendents should override this method to handle more ContentFormat (file extensions) values and call inherited if there's any they can't handle (e.g. to handle EXT_READCOM)
-      if  (Stream_PeekString(Stream,  length(READCOM_TEXT_PREAMBLE)) = READCOM_TEXT_PREAMBLE) then
+    begin
+      Stream.SkipBOM_UTF8; //Skip UTF8 BOM if existing
+
+      if Stream_StartsWith(Stream, READCOM_TEXT_PREAMBLE) then
         Result := LoadReadCom(Stream, CreateNew).View //.READCOM Text Format Preamble found
-      else
+
+      else //if Stream_StartsWith(Stream, READCOM_BIN_PREAMBLE) then //NOTE: ASSUMING IT'S A DELPHI SERIALIZED OBJECT IN BINARY (THIS IS SAFER IN CASE DELPHI'S BINARY FORMAT SUPPORTS MULTIPLE VERSIONS/PREAMBLES IN THE FUTURE)
         Result := LoadReadComBin(Stream, CreateNew).View //text format preamble not found, load as binary
+
+      //else //NOTE: USE THIS IF CHECK FOR READCOM_BIN_PREAMBLE IS ADDED
+      //  raise EInvalidOperation.Create(MSG_READCOM_FILE_CORRUPTED); //NOTE: MSG_READCOM_FILE_CORRUPTED IS NOT YET DEFINED, COULD ADD WITH MSG_CONTENT_FORMAT_NOT_SUPPORTED
+    end
 
     else
       raise EInvalidOperation.CreateFmt(MSG_CONTENT_FORMAT_NOT_SUPPORTED, [ContentFormat]);
