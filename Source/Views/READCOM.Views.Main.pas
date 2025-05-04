@@ -746,9 +746,15 @@ implementation
 
   procedure TMainForm.HUDactionSaveExecute(Sender: TObject);
   begin
-    //HUD.actionSaveExecute(Sender);
+    try
+      TWaitFrame.ShowModal(Self); //TODO: should move these into Options pane save, but have to make sure we can get the root/active form from there to pass as the parent parameter
 
-    RootStoryItem.Options.ActSave;
+      //HUD.actionSaveExecute(Sender);
+      RootStoryItem.Options.ActSave;
+
+    finally
+      TWaitFrame.ShowModal(Self, false);
+    end;
   end;
 
   {$endregion}
@@ -1228,7 +1234,9 @@ implementation
     if Stream.Size > 0 then
     begin
       try
+        TWaitFrame.ShowModal(Self);
         RootStoryItemView := TStoryItem.LoadNew(Stream, EXT_READCOM); //a new instance of the TStoryItem descendent serialized in the Stream will be created //only set RootStoryItemView (this affects RootStoryItem too)
+        TWaitFrame.ShowModal(Self, false);
 
         if ActivateHome then
           ActivateHomeStoryItem;
@@ -1261,15 +1269,15 @@ implementation
   function TMainForm.LoadFromUrl(const Url: String): Boolean; //TODO: should add LoadFromUrl and AddFromUrl to TStoryItem too
   begin
     try
-      TWaitFrame.ShowModal(Self);
+      //TWaitFrame.ShowModal(Self);
 
       TURLStream.Create(Url,
-        procedure(AStream: TStream)
+        procedure(AStream: TStream) //assuming this gets called while downloading, not AFTER download. Else need to show Wait frame beforehand
         begin
           Log('Started download');
           LoadFromStream(AStream); //probably it can start loading while the content is coming
           Log('Finished download');
-          TWaitFrame.ShowModal(Self, false);
+          //TWaitFrame.ShowModal(Self, false);
           StorySource := Url;
         end,
         true, //ASynchronizeProvide: call the anonymous proc (AProvider parameter) in the context of the main thread //IMPORTANT (if not done various AV errors occur later: we shouldn't touch the UI from other than the main thread)
@@ -1280,7 +1288,7 @@ implementation
     except
       on e: Exception do
       begin
-        TWaitFrame.ShowModal(Self, false);
+        //TWaitFrame.ShowModal(Self, false);
         ShowMessageFmt(ERR_DOWNLOAD, [e.Message]);
         result := false; //probably no network connection etc.
       end;
@@ -1308,6 +1316,7 @@ implementation
     begin
       Name := 'SavedState.readcom';
       StoragePath := TPath.GetHomePath;
+      //TODO: LoadFromStream will show a WaitFrame, but could pass it some optional param to show a SplashFrame instead
       result := LoadFromStream(Stream, false); //don't ActivateHome, keep last Active one (needed in case the OS brought down the app and need to continue from where we were from saved state)
       StorySource := StoragePath;
     end;
@@ -1322,6 +1331,7 @@ implementation
         if Stream.Size > 0 then
         begin
           try
+            //TODO: why not use LoadFromStream? (would show a WaitFrame, but could pass it some optional param to show a SplashFrame instead)
             RootStoryItemView := TStoryItem.LoadNew(Stream, EXT_READCOM); //a new instance of the TStoryItem descendent serialized in the Stream will be created //only set RootStoryItemView (this affects RootStoryItem too)
             result := true;
           except
@@ -1354,15 +1364,18 @@ implementation
       var TheRootStoryItemView := RootStoryItemView;
       if Assigned(TheRootStoryItemView) then
         try
+          TWaitFrame.ShowModal(Self);
           TheRootStoryItemView.Save(Stream); //default file format is EXT_READCOM
+          TWaitFrame.ShowModal(Self, false);
         except
           on E: Exception do
             begin
             Stream.Clear; //clear stream in case it got corrupted
+            TWaitFrame.ShowModal(Self, false);
             Log(E);
             ShowException(E, @TMainForm.SaveCurrentState);
             end;
-        end;
+        end
     end;
   end;
 

@@ -1320,10 +1320,10 @@ implementation
     var TargetsWithTags: TListEx<IStoryItem> := nil;
     try
       MoveablesWithTags := GetTagged(false); //non-anchored with tags
-      Log('MoveablesWithTags.Count=%d', [MoveablesWithTags.Count]);
+      //Log('MoveablesWithTags.Count=%d', [MoveablesWithTags.Count]);
 
       TargetsWithTags := GetTagged(true); //anchored with tags (targets)
-      Log('TargetsWithTags.Count=%d', [TargetsWithTags.Count]);
+      //Log('TargetsWithTags.Count=%d', [TargetsWithTags.Count]);
 
       Result :=
         TargetsWithTags.All( //looping over all targets, not over moveables since we'll remove every matched moveables (a moveable can be matched to a single target, but a target can be matched to multiple moveables)
@@ -1341,7 +1341,7 @@ implementation
                  LTarget.View.BoundsRect.Contains(LMoveable.View.BoundsRect.CenterPoint) then
               begin
                 MoveablesWithTags.RemoveItem(LMoveable, TDirection.FromEnd);
-                Log('Tag match: "%s" and "%s"', [LTarget.Tags, LMoveable.Tags]);
+                //Log('Tag match: "%s" and "%s"', [LTarget.Tags, LMoveable.Tags]);
                 Result := true; //a Target has to be matched by at least one Moveable (but need to check and remove all from the MoveablesWithTags list to see when finished if any moveables have been left unmatched to any targets)
               end;
             end;
@@ -2027,7 +2027,7 @@ implementation
       FreeAndNil(BinStream);
     end;
 
-    Log(result);
+    //Log(result); //result can be quite big, uncomment only if having issues with saving (including copy-paste)
   end;
 
   /// Save to Text Stream
