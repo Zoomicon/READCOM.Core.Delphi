@@ -1867,6 +1867,7 @@ implementation
     end;
   end;
 
+  /// Load from Text String
   function TStoryItem.LoadFromString(const Data: String; const CreateNew: Boolean = false): TObject;
   begin
     var StrStream: TStringStream := nil; //local vars not auto-initialized, safeguarding FreeAndNil
@@ -1887,6 +1888,7 @@ implementation
     end;
   end;
 
+  /// Load from Text Stream
   function TStoryItem.LoadReadCom(const Stream: TStream; const CreateNew: Boolean = false): IStoryItem;
   begin
     var reader: TStreamReader := nil; //local vars not auto-initialized, safeguarding FreeAndNil
@@ -1898,6 +1900,7 @@ implementation
     end;
   end;
 
+  /// Load from Binary Stream
   function TStoryItem.LoadReadComBin(const Stream: TStream; const CreateNew: Boolean = false): IStoryItem; //TODO: could make this return TObject to support loading any Delphi object stream
 
     procedure RemoveStoryItems; //TODO: add to IStoryItem and implement at TStoryItem level?
@@ -1931,14 +1934,50 @@ implementation
     end;
   end;
 
+  {$region 'Stream Helpers' - //TODO: move to Zoomicon.Helpers.RTL.Delphi}
+
+  function Stream_PeekBytes(Stream: TStream; NumBytes: Integer): TBytes;
+  var
+    OldPos: Int64;
+  begin
+    SetLength(Result, NumBytes);
+    OldPos := Stream.Position;  // Save current position
+
+    if (Stream.Size - OldPos) >= NumBytes then
+      Stream.ReadBuffer(Result[0], NumBytes);
+
+    Stream.Position := OldPos;  // Restore position
+  end;
+
+  function Stream_PeekString(Stream: TStream; NumBytes: Integer; Encoding: TEncoding = nil): string;
+  var
+    Bytes: TBytes;
+  begin
+    if Encoding = nil then
+      Encoding := TEncoding.UTF8;  // Default to UTF-8
+
+    Bytes := Stream_PeekBytes(Stream, NumBytes);  // Use byte peek function
+    Result := Encoding.GetString(Bytes);  // Convert to string
+  end;
+
+  {$endregion}
+
+  const READCOM_TEXT_PREAMBLE = 'object ';
+
+  /// Load from Stream
   function TStoryItem.Load(const Stream: TStream; const ContentFormat: String = EXT_READCOM; const CreateNew: Boolean = false): TObject;
   begin
     if ContentFormat = EXT_READCOM then //descendents should override this method to handle more ContentFormat (file extensions) values and call inherited if there's any they can't handle (e.g. to handle EXT_READCOM)
-      Result := LoadReadCom(Stream, CreateNew).View
+      if  (Stream_PeekString(Stream,  length(READCOM_TEXT_PREAMBLE)) = READCOM_TEXT_PREAMBLE) then
+        Result := LoadReadCom(Stream, CreateNew).View //.READCOM Text Format Preamble found
+      else
+        Result := LoadReadComBin(Stream, CreateNew).View //text format preamble not found, load as binary
+
     else
       raise EInvalidOperation.CreateFmt(MSG_CONTENT_FORMAT_NOT_SUPPORTED, [ContentFormat]);
   end;
 
+  /// Load from Filepath
   function TStoryItem.Load(const Filepath: String; const CreateNew: Boolean = false): TObject;
   begin
     var InputFileStream: TFileStream := nil; //local vars not auto-initialized, safeguarding FreeAndNil
@@ -1950,6 +1989,7 @@ implementation
     end;
   end;
 
+  /// Load from Clipboard
   function TStoryItem.Load(const Clipboard: IFMXExtendedClipboardService; const CreateNew: Boolean = false): TObject;
   begin
     //TODO: how do we check for other opaque file formats (filepath?) on clipboard?
@@ -1979,6 +2019,7 @@ implementation
               FILTER_HTML;
   end;
 
+  /// Save to Text String
   function TStoryItem.SaveToString: String;
   begin
     var BinStream: TMemoryStream := nil; //local vars not auto-initialized, safeguarding FreeAndNil
@@ -2002,7 +2043,8 @@ implementation
     Log(result);
   end;
 
-  procedure TStoryItem.SaveReadCom(const Stream: TStream);
+  /// Save to Text Stream
+  procedure TStoryItem.SaveReadCom(const Stream: TStream); //uses SaveToString which calls SaveReadComBin and then coverts to String
   begin
     var writer: TStreamWriter := nil; //local vars not auto-initialized, safeguarding FreeAndNil
     try
@@ -2013,7 +2055,8 @@ implementation
     end;
   end;
 
-  procedure TStoryItem.SaveReadComBin(const Stream: TStream); //also called by SaveToString
+  /// Save to Binary Stream
+  procedure TStoryItem.SaveReadComBin(const Stream: TStream); //also called by SaveToString (and thus by SaveReadCom too), so we only need to do any saving preActions/postActions once here
   begin
     if Assigned(FOptions) then FOptions.HidePopup; //Must hide options popup else the TCustomPopupForm FMX is using gets serialized with the StoryItem //Note: don't use Options property to avoid constructing popup
 
@@ -2027,18 +2070,25 @@ implementation
     end;
   end;
 
+  /// Save to Stream
   procedure TStoryItem.Save(const Stream: TStream; const ContentFormat: String = EXT_READCOM);
   begin
     if ContentFormat = EXT_READCOM then
-      SaveReadCom(Stream)
+      if isShiftKeyPressed then
+        SaveReadCom(Stream) //save in verbose text format only if SHIFT key is held down
+      else
+        SaveReadComBin(Stream) //since version 0.7.8 storing in binary format by default
+
     (* //TODO: maybe also support saving to HTML stream (with images encoded inside it). In that case should have separate content filter though for self-contained HTML, since we now check for EXT_HTML at Save(Filepath), since that needs the filepath to save the images externally to the HTML
     else if ContentFormat = EXT_HTML then
       SaveHTML(Stream)
     *)
+
     else
       raise EInvalidOperation.CreateFmt(MSG_CONTENT_FORMAT_NOT_SUPPORTED, [ContentFormat]);
   end;
 
+  /// Save to Filepath
   procedure TStoryItem.Save(const Filepath: String);
   begin
     var OutputFileStream: TFileStream := nil; //local vars not auto-initialized, safeguarding FreeAndNil
@@ -2056,6 +2106,7 @@ implementation
     end;
   end;
 
+  /// Save Thumbnail Image
   procedure TStoryItem.SaveThumbnail(const Filepath: String; const MaxWidth: Integer = DEFAULT_THUMB_WIDTH; const MaxHeight: Integer = DEFAULT_THUMB_HEIGHT);
   begin
     const LPreviousActiveStoryItem = ActiveStoryItem; //TODO: remove when thumb generation is fixed and does't need to activate storyitem first
@@ -2078,6 +2129,7 @@ implementation
     //);
   end;
 
+  /// Export to HTML Stream (with external images)
   procedure TStoryItem.SaveHTML(const Stream: TStream; const ImagesPath: String; const MaxImageWidth: Integer = DEFAULT_HTML_IMAGE_WIDTH; const MaxImageHeight: Integer = DEFAULT_HTML_IMAGE_HEIGHT);
     var LHTMLWriter: TStreamWriter;
 
@@ -2147,6 +2199,7 @@ implementation
     end;
   end;
 
+  /// Save to HTML Filepath
   procedure TStoryItem.SaveHTML(const Filepath: String; const MaxImageWidth: Integer = DEFAULT_HTML_IMAGE_WIDTH; const MaxImageHeight: Integer = DEFAULT_HTML_IMAGE_HEIGHT);
   begin
     var LHtmlFileStream: TFileStream := nil; //local vars not auto-initialized, safeguarding FreeAndNil
