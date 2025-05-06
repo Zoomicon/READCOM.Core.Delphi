@@ -231,6 +231,36 @@ implementation
 
   {$R *.fmx}
 
+
+  {$region 'DoWithWaitPrompt' //TODO: move to a TWaitFrame class method (say TWaitFrame.Do)}
+
+  procedure DoWithWaitPrompt(const Action: TProc; ParentForm: TFmxObject = nil);
+  begin
+    if ParentForm = nil then
+      ParentForm := Application.MainForm;
+
+    TThread.Synchronize(nil, //TODO: move this into ShowModal? (when closing it does ForceQueue, maybe when opening it should always do Thread.Synchrnonize)
+      procedure
+      begin
+        TWaitFrame.ShowModal(ParentForm);
+      end
+    ); //needed so that the UI refreshes to show the wait prompt
+
+    try
+      TThread.Synchronize(nil,
+        procedure()
+        begin
+          Action();
+        end
+      );
+
+    finally
+      TWaitFrame.ShowModal(ParentForm, false); //this is the last command so doesn't need a TThread.Synchronize, UI will refresh after the event handler returns and hide the wait prompt
+    end;
+  end;
+
+  {$endregion}
+
   {$REGION 'Init / Destroy'}
 
   procedure TMainForm.FormCreate(Sender: TObject);
@@ -282,7 +312,13 @@ implementation
     //ZoomFrame.ScrollBox.AniCalculations.AutoShowing := true; //fade the toolbars when not active //TODO: doesn't work with direct mouse drags near the bottom and right edges (scrollbars do show when scrolling e.g. with mousewheel) since there's other HUD content above them (the navigation and the edit sidebar panes)
 
     Application.OnIdle := Idle;
-    LoadAtStartup;
+
+    DoWithWaitPrompt(
+      procedure
+      begin
+        LoadAtStartup;
+      end
+    );
 
     InitObjectDebugger(MainForm);
   end;
@@ -569,7 +605,8 @@ implementation
   begin
     var activeItem := ActiveStoryItem;
     if Assigned(activeItem) then
-      if activeItem.TagsMatched then //also checking if Tags are matched (all moveables with Tags are over non-moveables with same Tags and vice-versa) to proceed
+      if ((StoryMode = EditMode) and FShiftDown) or //in Edit mode only, SHIFT key held down bypasses tags-matched check and forces proceeding to NextStoryPoint
+         (activeItem.TagsMatched) then //also checking if Tags are matched (all moveables with Tags are over non-moveables with same Tags and vice-versa) to proceed
         SetActiveStoryItemIfAssigned(activeItem.NextStoryPoint)
       else
         TLockFrame.ShowModal(Self); //warn user that they can't proceed (till Tags are matched)
@@ -727,34 +764,37 @@ implementation
 
   procedure TMainForm.HUDactionLoadExecute(Sender: TObject);
   begin
-    //HUD.actionLoadExecute(Sender);
+    DoWithWaitPrompt(
+      procedure
+      begin
+        //HUD.actionLoadExecute(Sender);
 
-    var TempStoryItem := TStoryItem.Create(nil); //using TempStoryItem of TStoryItem type to show generic file dialog filter
-    try
-      var Filename := TempStoryItem.Options.ActLoad_GetFilename; //assuming this is blocking action
-      if (Filename <> '') then
-        begin
-          if LoadFromFile(Filename) then //Note: just doing RootStoryItemView := TStoryItem.LoadNew(Filename) wouldn't work do font resizing since that won't do StartInitialZoomTimer
-            ActivateHomeStoryItem; //set the HomeStoryItem (if not any the RootStoryItem will have been set as such by SetRootStoryView) to active (not doing this when loading saved app state)
+        var TempStoryItem := TStoryItem.Create(nil); //using TempStoryItem of TStoryItem type to show generic file dialog filter
+        try
+          var Filename := TempStoryItem.Options.ActLoad_GetFilename; //assuming this is blocking action
+          if (Filename <> '') then
+            begin
+              if LoadFromFile(Filename) then //Note: just doing RootStoryItemView := TStoryItem.LoadNew(Filename) wouldn't work do font resizing since that won't do StartInitialZoomTimer
+                ActivateHomeStoryItem; //set the HomeStoryItem (if not any the RootStoryItem will have been set as such by SetRootStoryView) to active (not doing this when loading saved app state)
 
-          //TODO: OLD-CODE-LINE-REMOVE? //RootStoryItemView := RootStoryItemView; //repeat calculations to adapt ZoomFrame.ScaledLayout size //TODO: when RootStoryItemViewResized starts working this shouldn't be needed here anymore
+              //TODO: OLD-CODE-LINE-REMOVE? //RootStoryItemView := RootStoryItemView; //repeat calculations to adapt ZoomFrame.ScaledLayout size //TODO: when RootStoryItemViewResized starts working this shouldn't be needed here anymore
+            end;
+        finally
+          FreeAndNil(TempStoryItem);
         end;
-    finally
-      FreeAndNil(TempStoryItem);
-    end;
+      end
+    );
   end;
 
   procedure TMainForm.HUDactionSaveExecute(Sender: TObject);
   begin
-    try
-      TWaitFrame.ShowModal(Self); //TODO: should move these into Options pane save, but have to make sure we can get the root/active form from there to pass as the parent parameter
-
-      //HUD.actionSaveExecute(Sender);
-      RootStoryItem.Options.ActSave;
-
-    finally
-      TWaitFrame.ShowModal(Self, false);
-    end;
+    DoWithWaitPrompt(
+      procedure
+      begin
+        //HUD.actionSaveExecute(Sender);
+        RootStoryItem.Options.ActSave; //this shows a file dialog
+      end
+    );
   end;
 
   {$endregion}
@@ -1222,6 +1262,7 @@ implementation
 
   procedure TMainForm.LoadAtStartup;
   begin
+    //assuming short-circuit boolean evaluation below
     if (not LoadCommandLineParameter) and
        (not LoadSavedState) and
        (not LoadDefaultDocument) then //Note: if it keeps on failing at load comment out the if check for one run of NewRootStoryItem //TODO: shouldn't need to do that
@@ -1234,9 +1275,7 @@ implementation
     if Stream.Size > 0 then
     begin
       try
-        TWaitFrame.ShowModal(Self);
         RootStoryItemView := TStoryItem.LoadNew(Stream, EXT_READCOM); //a new instance of the TStoryItem descendent serialized in the Stream will be created //only set RootStoryItemView (this affects RootStoryItem too)
-        TWaitFrame.ShowModal(Self, false);
 
         if ActivateHome then
           ActivateHomeStoryItem;
@@ -1269,15 +1308,18 @@ implementation
   function TMainForm.LoadFromUrl(const Url: String): Boolean; //TODO: should add LoadFromUrl and AddFromUrl to TStoryItem too
   begin
     try
-      //TWaitFrame.ShowModal(Self);
+      TWaitFrame.ShowModal(Self);
 
       TURLStream.Create(Url,
         procedure(AStream: TStream) //assuming this gets called while downloading, not AFTER download. Else need to show Wait frame beforehand
         begin
-          Log('Started download');
-          LoadFromStream(AStream); //probably it can start loading while the content is coming
-          Log('Finished download');
-          //TWaitFrame.ShowModal(Self, false);
+          try
+            Log('Started download');
+            LoadFromStream(AStream); //probably it can start loading while the content is coming
+            Log('Finished download');
+          finally
+            TWaitFrame.ShowModal(Self, false);
+          end;
           StorySource := Url;
         end,
         true, //ASynchronizeProvide: call the anonymous proc (AProvider parameter) in the context of the main thread //IMPORTANT (if not done various AV errors occur later: we shouldn't touch the UI from other than the main thread)
@@ -1288,8 +1330,9 @@ implementation
     except
       on e: Exception do
       begin
-        //TWaitFrame.ShowModal(Self, false);
+        TWaitFrame.ShowModal(Self, false);
         ShowMessageFmt(ERR_DOWNLOAD, [e.Message]);
+        Log(e);
         result := false; //probably no network connection etc.
       end;
     end;
@@ -1316,7 +1359,6 @@ implementation
     begin
       Name := 'SavedState.readcom';
       StoragePath := TPath.GetHomePath;
-      //TODO: LoadFromStream will show a WaitFrame, but could pass it some optional param to show a SplashFrame instead
       result := LoadFromStream(Stream, false); //don't ActivateHome, keep last Active one (needed in case the OS brought down the app and need to continue from where we were from saved state)
       StorySource := StoragePath;
     end;
@@ -1331,7 +1373,7 @@ implementation
         if Stream.Size > 0 then
         begin
           try
-            //TODO: why not use LoadFromStream? (would show a WaitFrame, but could pass it some optional param to show a SplashFrame instead)
+            //TODO: why not use LoadFromStream?
             RootStoryItemView := TStoryItem.LoadNew(Stream, EXT_READCOM); //a new instance of the TStoryItem descendent serialized in the Stream will be created //only set RootStoryItemView (this affects RootStoryItem too)
             result := true;
           except
@@ -1364,14 +1406,11 @@ implementation
       var TheRootStoryItemView := RootStoryItemView;
       if Assigned(TheRootStoryItemView) then
         try
-          TWaitFrame.ShowModal(Self);
           TheRootStoryItemView.Save(Stream); //default file format is EXT_READCOM
-          TWaitFrame.ShowModal(Self, false);
         except
           on E: Exception do
             begin
             Stream.Clear; //clear stream in case it got corrupted
-            TWaitFrame.ShowModal(Self, false);
             Log(E);
             ShowException(E, @TMainForm.SaveCurrentState);
             end;
@@ -1381,8 +1420,13 @@ implementation
 
   procedure TMainForm.FormSaveState(Sender: TObject);
   begin
-    HUD.EditMode := false; //make sure we exit EditMode, else child items of ActiveStoryItem are saved as disabled
-    SaveCurrentState;
+    //DoWithWaitPrompt( //TODO: causes error, not using for now
+      //procedure
+      begin
+        HUD.EditMode := false; //make sure we exit EditMode, else child items of ActiveStoryItem are saved as disabled
+        SaveCurrentState;
+      end
+    //);
   end;
 
   {$endregion}
@@ -1427,7 +1471,7 @@ implementation
     CheckSaveHtml;
   end;
 
-  procedure TMainForm.CheckReplaceStoryAllText;
+  procedure TMainForm.CheckReplaceStoryAllText; //TODO: what's this for?
   begin
     (* //TODO
     if LoadAllText or SaveAllText and (StorySource <> '') then

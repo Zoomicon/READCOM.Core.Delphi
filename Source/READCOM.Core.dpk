@@ -1,3 +1,7 @@
+//Description: READ-COM Core Library
+//Source: https://github.com/Zoomicon/READCOM.Core.Delphi
+//Author: George Birbilis (https://zoomicon.com)
+
 package READCOM.Core;
 
 {$R *.res}

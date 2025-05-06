@@ -6,6 +6,9 @@
         <Projects Include="Source\READCOM.Core.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="Demo\READCOM.Core.Demo.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -23,14 +26,23 @@
     <Target Name="READCOM_Core:Make">
         <MSBuild Projects="Source\READCOM.Core.dproj" Targets="Make"/>
     </Target>
+    <Target Name="READCOM_Core_Demo">
+        <MSBuild Projects="Demo\READCOM.Core.Demo.dproj"/>
+    </Target>
+    <Target Name="READCOM_Core_Demo:Clean">
+        <MSBuild Projects="Demo\READCOM.Core.Demo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="READCOM_Core_Demo:Make">
+        <MSBuild Projects="Demo\READCOM.Core.Demo.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="READCOM_Core"/>
+        <CallTarget Targets="READCOM_Core;READCOM_Core_Demo"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="READCOM_Core:Clean"/>
+        <CallTarget Targets="READCOM_Core:Clean;READCOM_Core_Demo:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="READCOM_Core:Make"/>
+        <CallTarget Targets="READCOM_Core:Make;READCOM_Core_Demo:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
