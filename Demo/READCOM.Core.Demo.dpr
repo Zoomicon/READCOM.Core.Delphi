@@ -2,6 +2,9 @@
 //Source: https://github.com/Zoomicon/READCOM.Core.Delphi
 //Author: George Birbilis (https://zoomicon.com)
 
+//Has dependencies set for debugging READCOM.Core (same BOSS package dependencies at boss.json as READCOM.Core and extra unit search paths pointing directly to READCOM.Core Source folder)
+//For dependencies in custom apps see READCOM_App GitHub repository instead (they just need a boss.json that points to READCOME.Core.Delphi repository)
+
 program READCOM.Core.Demo;
 
    //for Windows resources added via Resources and Images (includes 'Default.readcom' startup story document)
