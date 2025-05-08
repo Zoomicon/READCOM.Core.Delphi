@@ -28,6 +28,7 @@ interface
     FMX.Layouts,
     FMX.Clipboard, //for IFMXExtendedClipboardService
     //
+    Zoomicon.Media.FMX.Models, //for IClipboardEnabled
     Zoomicon.Media.FMX.MediaDisplay, //for TMediaDisplay (Glyph)
     //
     READCOM.Models, //for IClipboardEnabled, IStoreable, EXT_READCOM

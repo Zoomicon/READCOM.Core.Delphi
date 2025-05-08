@@ -19,6 +19,7 @@ interface
     //
     FMX.SVGIconImage,
     //
+    Zoomicon.Media.FMX.Models, //for IClipboardEnabled, EXT_XX constants
     Zoomicon.Media.FMX.MediaDisplay, //for TMediaDisplay (Glyph)
     Zoomicon.Manipulation.FMX.CustomManipulator, //for TCustomManipulator
     Zoomicon.Helpers.FMX.Controls.ControlHelper, //for TControl.SelectNext //MUST DECLARE BEFORE Zoomicon.Puzzler.Classes
@@ -265,6 +266,7 @@ interface
       function SaveToString: String; virtual;
       procedure Save(const Stream: TStream; const ContentFormat: String = EXT_READCOM); overload; virtual;
       procedure Save(const Filepath: String); overload; virtual;
+      procedure Save(const Clipboard: IFMXExtendedClipboardService); overload;
       procedure SaveThumbnail(const Filepath: String; const MaxWidth: Integer = DEFAULT_THUMB_WIDTH; const MaxHeight: Integer = DEFAULT_THUMB_HEIGHT); virtual;
       procedure SaveHTML(const Stream: TStream; const ImagesPath: String; const MaxImageWidth: Integer = DEFAULT_HTML_IMAGE_WIDTH; const MaxImageHeight: Integer = DEFAULT_HTML_IMAGE_HEIGHT); overload;
       procedure SaveHTML(const Filepath: String; const MaxImageWidth: Integer = DEFAULT_HTML_IMAGE_WIDTH; const MaxImageHeight: Integer = DEFAULT_HTML_IMAGE_HEIGHT); overload;
@@ -356,7 +358,6 @@ implementation
     Zoomicon.Helpers.RTL.StringsHelpers, //for TStrings.GetLines
     //Zoomicon.Helpers.FMX.Forms.ApplicationHelper, //for IsURI
     Zoomicon.Introspection.FMX.Debugging, //for Log
-    Zoomicon.Media.FMX.Models, //for EXT_XX constants
     //
     READCOM.Factories.StoryItemFactory, //for StoryItemFactories, AddStoryItemFileFilter, StoryItemFileFilters
     READCOM.Views.Options.StoryItemOptions; //for TStoryItemOptions
@@ -1599,10 +1600,10 @@ implementation
   end;
 
   procedure TStoryItem.Copy;
-  var svc: IFMXExtendedClipboardService;
+  var Clipboard: IFMXExtendedClipboardService;
   begin
-    if TPlatformServices.Current.SupportsPlatformService(IFMXExtendedClipboardService, Svc) then
-      Svc.SetText(SaveToString);
+    if TPlatformServices.Current.SupportsPlatformService(IFMXExtendedClipboardService, Clipboard) then
+      Save(Clipboard);
   end;
 
   procedure TStoryItem.Paste;
@@ -2091,6 +2092,11 @@ implementation
     finally
       FreeAndNil(OutputFileStream);
     end;
+  end;
+
+  procedure TStoryItem.Save(const Clipboard: IFMXExtendedClipboardService);
+  begin
+    Clipboard.SetText(SaveToString);
   end;
 
   /// Save Thumbnail Image

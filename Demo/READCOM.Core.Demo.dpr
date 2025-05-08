@@ -24,4 +24,3 @@ begin
   Main(TAboutFrame);
 end.
 
-

@@ -15,7 +15,9 @@ interface
     FMX.Graphics, //for TFont
     FMX.Objects, //for TImage
     FMX.Surfaces, //for TBitmapSurface
-    FMX.Types; //for TTextAlign
+    FMX.Types, //for TTextAlign
+    //
+    Zoomicon.Media.FMX.Models; //for IClipboardEnabled
   {$endregion}
 
   {$region 'Storage' ------------------------------------------------------------}
@@ -46,14 +48,6 @@ interface
 
   type
 
-    IClipboardEnabled = interface
-      ['{FDD22AC7-873A-4127-B200-E99DB4F2DEBF}']
-      procedure Delete;
-      procedure Cut; //does Copy, then Delete
-      procedure Copy;
-      procedure Paste;
-    end;
-
     IStoreable = interface(IClipboardEnabled)
       ['{A08F7880-FBE5-40C5-B695-FF0F3A18EF3E}']
       //--- Methods ---
@@ -75,6 +69,7 @@ interface
       function SaveToString: String;
       procedure Save(const Stream: TStream; const ContentFormat: String = EXT_READCOM); overload;
       procedure Save(const Filepath: String); overload;
+      procedure Save(const Clipboard: IFMXExtendedClipboardService); overload;
       procedure SaveThumbnail(const Filepath: String; const MaxWidth: Integer = DEFAULT_THUMB_WIDTH; const MaxHeight: Integer = DEFAULT_THUMB_HEIGHT); //TODO: should make constants
       procedure SaveHTML(const Stream: TStream; const ImagesPath: String; const MaxImageWidth: Integer = DEFAULT_HTML_IMAGE_WIDTH; const MaxImageHeight: Integer = DEFAULT_HTML_IMAGE_HEIGHT); overload;
       procedure SaveHTML(const Filepath: String; const MaxImageWidth: Integer = DEFAULT_HTML_IMAGE_WIDTH; const MaxImageHeight: Integer = DEFAULT_HTML_IMAGE_HEIGHT); overload;

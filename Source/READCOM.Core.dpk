@@ -32,7 +32,6 @@ package READCOM.Core;
 {$IMPLICITBUILD ON}
 
 //Dependencies: see <DEPENDENCIES.md>
-
 requires
   rtl,
   fmx,
@@ -69,4 +68,5 @@ contains
   READCOM.App.Messages in 'App\READCOM.App.Messages.pas';
 
 end.
+
 
