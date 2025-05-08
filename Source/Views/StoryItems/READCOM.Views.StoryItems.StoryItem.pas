@@ -357,7 +357,7 @@ implementation
     Zoomicon.Helpers.RTL.StreamHelpers, //for TStream.ReadComponent, TStream.SkipBOM_UTF8, TStream.PeekString
     Zoomicon.Helpers.RTL.StringsHelpers, //for TStrings.GetLines
     //Zoomicon.Helpers.FMX.Forms.ApplicationHelper, //for IsURI
-    Zoomicon.Introspection.FMX.Debugging, //for Log
+    Zoomicon.Introspection.FMX.Debugging, //for Log, IsShiftKeyPressed
     //
     READCOM.Factories.StoryItemFactory, //for StoryItemFactories, AddStoryItemFileFilter, StoryItemFileFilters
     READCOM.Views.Options.StoryItemOptions; //for TStoryItemOptions
@@ -1925,7 +1925,13 @@ implementation
       RemoveStoryItems; //remove existing children
     end;
 
+    //var LOldBoundsRect := Self.BoundsRect; //keep current bounds
     var obj := Stream.ReadComponent(Instance, ReaderError);
+    if Assigned(Instance) //if replaced current StoryPoint's state (thus also loaded saved location and size)...
+       and (not IsShiftKeyPressed) //...and not SHIFT pressed...
+    then
+      ;//BoundsRect := LOldBoundsRect; //...restore previous bounds //TODO: doesn't seem to work correctly
+
     if obj is TStoryItem then //at current implementation only supporting TStoryItems
       Result := obj as IStoryItem //note that we have overriden ReadState so that it can set a custom Reader error handler to ignore specific deprecated properties, but that won't work by itself (so passing ErrorHandler here too via TStreamErrorHelper.CreateComponent method) if "CreateNew=true" is used, since we pass nil in that case so ReadState is called on TComponent, not on TStoryItem
     else
