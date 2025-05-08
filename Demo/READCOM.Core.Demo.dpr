@@ -5,6 +5,10 @@
 //Has dependencies set for debugging READCOM.Core (same BOSS package dependencies at boss.json as READCOM.Core and extra unit search paths pointing directly to READCOM.Core Source folder)
 //For dependencies in custom apps see READCOM_App GitHub repository instead (they just need a boss.json that points to READCOME.Core.Delphi repository)
 
+//WARNING:
+//BOSS update commnand corrupts modules\Zoomicon.Manipulation.FMX.Delphi\Zoomicon.Manipulation.FMX.dpk and .dproj files (they exists twice, in both Source and Demo subfolders).
+//Must repair it by copying correct files from https://github.com/Zoomicon/Zoomicon.Manipulation.FMX.Delphi/Source before building (else implicit units and packages will be added which will corrupt the project)
+
 program READCOM.Core.Demo;
 
   {$R *.dres} //for Windows resources added via Resources and Images (includes 'Default.readcom' startup story document)
