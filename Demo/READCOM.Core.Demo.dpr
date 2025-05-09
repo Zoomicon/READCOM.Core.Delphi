@@ -8,6 +8,7 @@
 //WARNING:
 //BOSS update commnand corrupts modules\zoomicon.introspection.fmx.delphi\Source\Zoomicon.Introspection.FMX.dpk (they exist twice, in both Source and Demo subfolders).
 //Must repair by copying correct files from https://github.com/Zoomicon/Zoomicon.Introspection.FMX.Delphi/Source before building (else implicit units and packages will be added which will corrupt the project)
+//Will also need to restore READCOM.Core.dpk from version control since items get removed from its "requires" clause
 
 program READCOM.Core.Demo;
 
