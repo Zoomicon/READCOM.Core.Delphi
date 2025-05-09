@@ -6,7 +6,7 @@
 //For dependencies in custom apps see READCOM_App GitHub repository instead (they just need a boss.json that points to READCOME.Core.Delphi repository)
 
 //WARNING:
-//BOSS update commnand corrupts modules\Zoomicon.Introspection.FMX.Delphi\Zoomicon.Introspection.FMX.dpk (they exist twice, in both Source and Demo subfolders).
+//BOSS update commnand corrupts modules\zoomicon.introspection.fmx.delphi\Source\Zoomicon.Introspection.FMX.dpk (they exist twice, in both Source and Demo subfolders).
 //Must repair by copying correct files from https://github.com/Zoomicon/Zoomicon.Introspection.FMX.Delphi/Source before building (else implicit units and packages will be added which will corrupt the project)
 
 program READCOM.Core.Demo;

@@ -479,7 +479,6 @@ implementation
 
   procedure TMainForm.SetActiveStoryItem(const Value: IStoryItem);
   begin
-    TStoryItem.ActiveStoryItem := nil; //this will make sure the assignment to Value will then trigger "ActiveStoryItemChanged" class event
     TStoryItem.ActiveStoryItem := Value;
   end;
 
@@ -552,7 +551,10 @@ implementation
         StructureView.SelectedObject := StoryItem; //Change StructureView selection (ONLY WHEN StructureView is visible)
     end
     else
-      StructureView.SelectedObject := nil;
+      if HUD.StructureVisible //Clear StructureView selection (ONLY WHEN StructureView is visible)
+         and Assigned(StructureView) //when app is getting destroyed this will return nil
+      then
+        StructureView.SelectedObject := nil;
 
     //HUD.actionDelete.Visible := (ActiveStoryItem.View <> RootStoryItem.View); //doesn't seem to work (neither HUD.btnDelete.Visible does), but have implemented delete of RootStoryItem as a call to actionNew.Execute instead
 
@@ -633,6 +635,8 @@ implementation
     result := FStoryMode;
   end;
 
+  /// Get or Create StructureView
+  /// note: when app is getting destroyed this will return nil
   function TMainForm.GetStructureView: TStructureView;
   begin
     if not Assigned (FStructureViewFrameInfo) then
@@ -649,8 +653,9 @@ implementation
         else
           FilterMode := tfPrune;
 
-        DragDropReorder := (StoryMode = EditMode); //allow moving items in the structure view to change parent or add to same parent again to change their Z-order
-        DragDropReparent := (StoryMode = EditMode); //allow reparenting //TODO: should do after listening to some event so that the control is scaled/repositioned to show in their parent (note that maybe we should also have parent story items clip their children, esp if their panels)
+        var isEditMode := (StoryMode = EditMode);
+        DragDropReorder := isEditMode; //allow moving items in the structure view to change parent or add to same parent again to change their Z-order
+        DragDropReparent := isEditMode; //allow reparenting //TODO: should do after listening to some event so that the control is scaled/repositioned to show in their parent (note that maybe we should also have parent story items clip their children, esp if their panels)
         DragDropSelectTarget := true; //always select (make active / zoom to) the Target StoryItem after a drag-drop operation in the structure view
 
         OnSelection := StructureViewSelection;
@@ -658,7 +663,10 @@ implementation
       end;
     end;
 
-    result := FStructureViewFrameInfo.Frame;
+    if Assigned(FStructureViewFrameInfo) then //if we've managed to create a StructureView in a TFrameStand
+      result := FStructureViewFrameInfo.Frame
+    else
+      result := nil; //failed to create a StructureView in a TFrameStand (e.g. when app is getting destroyed)
   end;
 
   procedure TMainForm.SetStoryMode(const Value: TStoryMode);

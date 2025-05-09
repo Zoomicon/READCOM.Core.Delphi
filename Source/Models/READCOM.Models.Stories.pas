@@ -100,6 +100,11 @@ interface
       ['{238909DD-45E6-463A-9698-C7C6DC1A6DFE}']
 
       //--- Methods ---
+
+      {Lifetime management}
+      procedure Reset;
+
+      {Audio}
       procedure PlayRandomAudioStoryItem;
 
       {View}

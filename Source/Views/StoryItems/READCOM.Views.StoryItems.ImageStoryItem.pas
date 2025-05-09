@@ -85,7 +85,9 @@ interface
       //procedure Resize; override; //TODO: remove (see comments in implementation)
 
     public
+      {Lifetime management}
       constructor Create(AOwner: TComponent); override;
+      procedure Reset; override;
 
       {$region 'IStoreable'}
       function GetLoadFilesFilter: String; override;
@@ -143,6 +145,15 @@ implementation
     Glyph.Visible := true;
     SetGlyphZorder;
 
+    FDummyImage := TImage.Create(Self);
+  end;
+
+  procedure TImageStoryItem.Reset;
+  begin
+    inherited;
+
+    SVGText := '';
+    Image := nil;
     FDummyImage := TImage.Create(Self);
   end;
 

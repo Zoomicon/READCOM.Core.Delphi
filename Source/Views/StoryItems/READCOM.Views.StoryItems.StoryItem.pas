@@ -227,12 +227,15 @@ interface
       procedure WriteContent(Stream: TStream);
 
     public
+      {Lifetime management}
       constructor Create(AOwner: TComponent); overload; override;
       constructor Create(AOwner: TComponent; const AName: String); reintroduce; overload; virtual; //TODO: see why if we don't define "reintroduce" we're getting message "[dcc32 Warning] READCOM.Views.StoryItems.StoryItem.pas(148): W1010 Method 'Create' hides virtual method of base type 'TCustomManipulator'" even though "virtual" was added here (ancestor has no such constructor to use "override" instead)
       destructor Destroy; override;
+      procedure Reset; virtual;
 
       //procedure Paint; override; //TODO: not doing any custom drawing like target lines
 
+      {Audio}
       procedure PlayRandomAudioStoryItem;
 
       {IClipboardEnabled}
@@ -464,6 +467,23 @@ implementation
     HomeStoryItem := nil;
   end;
 
+  procedure TStoryItem.Reset;
+
+    procedure RemoveStoryItemViews; //TODO: add to IStoryItem and implement at TStoryItem level?
+    begin
+      var StoryItemViews: TObjectListEx<TStoryItem> := nil; //local vars not auto-initialized, safeguarding FreeAndNil
+      try
+        StoryItemViews := TObjectListEx<TControl>.GetAllClass<TStoryItem>(Controls); //TODO: make some reusable property?
+        StoryItemViews.FreeAll; //this will end up having RemoveObject called for each StoryItem (which will also remove from StoryItems and AudioStoryItems [if it is such] lists)
+      finally
+        FreeAndNil(StoryItemViews);
+      end;
+    end;
+
+  begin
+    RemoveStoryItemViews;
+  end;
+
   destructor TStoryItem.Destroy;
   begin
     //TODO: Zoomicon.Puzzler unused for now// Target := nil;
@@ -503,7 +523,7 @@ implementation
 
   {$endregion}
 
-  procedure TStoryItem.DoAddObject(const AObject: TFmxObject);
+  procedure TStoryItem.DoAddObject(const AObject: TFmxObject); //TODO: this doesn't do the side-effects that Add(IStoryItem) does, doesn't set TAlignLayout.Scale
     procedure CheckAddToStoryItems;
     var StoryItem: IStoryItem;
     begin
@@ -527,7 +547,7 @@ implementation
     CheckAddToAudioStoryItems;
   end;
 
-  procedure TStoryItem.DoInsertObject(Index: Integer; const AObject: TFmxObject);
+  procedure TStoryItem.DoInsertObject(Index: Integer; const AObject: TFmxObject); //TODO: this doesn't do the side-effects that Add(IStoryItem) does, doesn't set TAlignLayout.Scale
   begin
     inherited;
 
@@ -765,7 +785,8 @@ implementation
 
   function TStoryItem.IsActive: Boolean;
   begin
-    Result := Assigned(FActiveStoryItem) and (FActiveStoryItem.View = Self);
+    Result := Assigned(TStoryItem.FActiveStoryItem) and
+              (TStoryItem.FActiveStoryItem.View = Self);
   end;
 
   procedure TStoryItem.SetActive(const Value: Boolean);
@@ -782,7 +803,7 @@ implementation
       PlayRandomAudioStoryItem; //TODO: maybe should play AudioStoryItems in the order they exist in their parent StoryItem (but would need to remember last one played in that case which may be problematic if they are reordered etc.)
       //PlayNextAudioStoryItem;
     end
-    else //make inactive
+    else //make inactive //Note: since we would have exited if Value hadn't changed, if we've reached here this means we were the ActiveStoryItem
       FActiveStoryItem := nil;
 
     ActiveChanged;
@@ -811,7 +832,8 @@ implementation
     if Assigned(FOnActiveChanged) then
       FOnActiveChanged(Self);
 
-    if IsActive and Assigned(FOnActiveStoryItemChanged) then //fire class-level event only for the now active StoryItem
+    if (not Assigned(ActiveStoryItem) or IsActive)
+       and Assigned(FOnActiveStoryItemChanged) then //fire class-level event only for the now active StoryItem, or if none is set to active
       FOnActiveStoryItemChanged(Self);
   end;
 
@@ -1630,6 +1652,7 @@ implementation
     if Clipboard.HasText then
     begin
       var LText := Trim(Clipboard.GetText); //Trimming since we may have pasted an indented object from a .readcom file or some SVG markup with extra spaces before and after
+      //TODO: Skip UTF-8 BOM bytemark if any
       if LText.StartsWith('object ') then //ignore if not Delphi serialization format (its text-based form), handle other text at descendents like TextStoryItem //TODO: add method to check if text contains object
         FileExt := EXT_READCOM
       else if LText.StartsWith('<svg ') and LText.EndsWith('</svg>') then
@@ -1903,41 +1926,47 @@ implementation
 
   /// Load from Binary Stream
   function TStoryItem.LoadReadComBin(const Stream: TStream; const CreateNew: Boolean = false): IStoryItem; //TODO: could make this return TObject to support loading any Delphi object stream
-
-    procedure RemoveStoryItems; //TODO: add to IStoryItem and implement at TStoryItem level?
-    begin
-      var StoryItemViews: TObjectListEx<TStoryItem> := nil; //local vars not auto-initialized, safeguarding FreeAndNil
-      try
-        StoryItemViews := TObjectListEx<TControl>.GetAllClass<TStoryItem>(Controls); //TODO: make some reusable property?
-        StoryItemViews.FreeAll; //this will end up having RemoveObject called for each StoryItem (which will also remove from StoryItems and AudioStoryItems [if it is such] lists)
-      finally
-        FreeAndNil(StoryItemViews);
-      end;
-    end;
-
   var Instance: TStoryItem;
   begin
     if CreateNew then
       Instance := nil //create new StoryItem
     else
     begin
-      Instance := Self; //load state to this StoryItem
-      RemoveStoryItems; //remove existing children
+      Instance := Self; //load state to this StoryItem //WARNING: this will only allow loading state from a saved instance of the same class
+      Reset; //clear state (including removing existing children)
     end;
 
-    //var LOldBoundsRect := Self.BoundsRect; //keep current bounds
-    var obj := Stream.ReadComponent(Instance, ReaderError);
-    if Assigned(Instance) //if replaced current StoryPoint's state (thus also loaded saved location and size)...
-       and (not IsShiftKeyPressed) //...and not SHIFT pressed...
-    then
-      ;//BoundsRect := LOldBoundsRect; //...restore previous bounds //TODO: doesn't seem to work correctly
+    var wasActive := Active;
+    try
+      if Assigned(Instance) then //only when replacing an object
+        ActiveStoryItem := ParentStoryItem; //deactivate (using Active := False doesn't seem to work and results in leaving garbage persistent dashed border)
 
-    if obj is TStoryItem then //at current implementation only supporting TStoryItems
-      Result := obj as IStoryItem //note that we have overriden ReadState so that it can set a custom Reader error handler to ignore specific deprecated properties, but that won't work by itself (so passing ErrorHandler here too via TStreamErrorHelper.CreateComponent method) if "CreateNew=true" is used, since we pass nil in that case so ReadState is called on TComponent, not on TStoryItem
-    else
-    begin
-      FreeAndNil(obj);
-      raise Exception.Create('Object is not a StoryItem');
+      FIgnoreActiveStoryItemChanges := true; //ignore changes to ActiveStoryItem while loading children since "Active" is persisted property //Note: must do after setting Active property
+
+      var LOldBoundsRect := Self.BoundsRect; //keep current bounds
+
+      var obj := Stream.ReadComponent(Instance, ReaderError);
+
+       //TODO: doesn't seem to work correctly, removed
+      if Assigned(Instance) //if replaced current StoryPoint's state (thus also loaded saved location and size)...
+         and (not IsShiftKeyPressed) //...and not SHIFT pressed...
+      then
+      begin
+        Align := TAlignLayout.Scale; //IMPORTANT: adjust when parent resizes (TODO: isn't this property storable? If we've chosen to not store it, need to always set it) //Note: we set it at Add, but when replacing instance no Add is done
+        BoundsRect := LOldBoundsRect; //...restore previous bounds
+      end;
+
+      if obj is TStoryItem then //at current implementation only supporting TStoryItems
+        Result := obj as IStoryItem //note that we have overriden ReadState so that it can set a custom Reader error handler to ignore specific deprecated properties, but that won't work by itself (so passing ErrorHandler here too via TStreamErrorHelper.CreateComponent method) if "CreateNew=true" is used, since we pass nil in that case so ReadState is called on TComponent, not on TStoryItem
+      else
+      begin
+        FreeAndNil(obj);
+        raise Exception.Create('Object is not a StoryItem');
+      end;
+
+    finally
+      FIgnoreActiveStoryItemChanges := false;
+      Active := wasActive; //must do after setting FIgnoreActiveStoryItemChanges to false
     end;
   end;
 
@@ -1958,7 +1987,7 @@ implementation
       Stream.SkipBOM_UTF8; //Skip UTF8 BOM if existing
 
       if Stream_StartsWith(Stream, READCOM_TEXT_PREAMBLE) then
-        Result := LoadReadCom(Stream, CreateNew).View //.READCOM Text Format Preamble found
+        Result := LoadReadCom(Stream, CreateNew).View //.READCOM Text Format Preamble found //Note: this calls LoadReadComBin and then converts to String
 
       else //if Stream_StartsWith(Stream, READCOM_BIN_PREAMBLE) then //NOTE: ASSUMING IT'S A DELPHI SERIALIZED OBJECT IN BINARY (THIS IS SAFER IN CASE DELPHI'S BINARY FORMAT SUPPORTS MULTIPLE VERSIONS/PREAMBLES IN THE FUTURE)
         Result := LoadReadComBin(Stream, CreateNew).View //text format preamble not found, load as binary
