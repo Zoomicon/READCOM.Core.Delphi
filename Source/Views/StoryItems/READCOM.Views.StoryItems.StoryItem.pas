@@ -948,7 +948,7 @@ implementation
         if rootStoryItem.StoryPoint then //if RootStoryItem is a StoryPoint return that
           exit(rootStoryItem)
         else
-          exit(rootStoryItem.PreviousStoryPoint); //return last StoryPoint found (checking from RootStoryItem)
+          exit(rootStoryItem.GetLastChildStoryPoint); //return last StoryPoint child (if any) //TODO: maybe instead should return last StoryPoint found (checking from RootStoryItem)
     end;
 
     //If we're the topmost StoryPoint
