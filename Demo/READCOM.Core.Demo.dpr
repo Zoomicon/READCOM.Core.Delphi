@@ -20,7 +20,7 @@ program READCOM.Core.Demo;
     READCOM.App.Main,
     READCOM.Core.Demo.Messages in 'READCOM.Core.Demo.Messages.pas',
     READCOM.Core.Demo.Views.Dialogs.About in 'Views\Dialogs\READCOM.Core.Demo.Views.Dialogs.About.pas' {AboutFrame: TFrame},
-    Zoomicon.Media.FMX.ModalFrame in 'modules\zoomicon.media.fmx.delphi\Source\Zoomicon.Media.FMX.ModalFrame.pas' {ModalFrame: TFrame};
+    Zoomicon.Media.FMX.ModalFrame in 'modules\zoomicon.media.fmx.delphi\Source\Zoomicon.Media.FMX.ModalFrame.pas' {ModalFrame: TFrame}; //needed for opening the demo's about dialog in the IDE
   {$endregion}
 
   {$R *.res} //for Windows App metadata defined via Project Options (App Icon, Versioning Info)

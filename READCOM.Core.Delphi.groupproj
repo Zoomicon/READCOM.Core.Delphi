@@ -7,7 +7,7 @@
             <Dependencies/>
         </Projects>
         <Projects Include="Demo\READCOM.Core.Demo.dproj">
-            <Dependencies>Source\READCOM.Core.dproj</Dependencies>
+            <Dependencies/>
         </Projects>
     </ItemGroup>
     <ProjectExtensions>
@@ -26,13 +26,13 @@
     <Target Name="READCOM_Core:Make">
         <MSBuild Projects="Source\READCOM.Core.dproj" Targets="Make"/>
     </Target>
-    <Target Name="READCOM_Core_Demo" DependsOnTargets="READCOM.Core">
+    <Target Name="READCOM_Core_Demo">
         <MSBuild Projects="Demo\READCOM.Core.Demo.dproj"/>
     </Target>
-    <Target Name="READCOM_Core_Demo:Clean" DependsOnTargets="READCOM.Core:Clean">
+    <Target Name="READCOM_Core_Demo:Clean">
         <MSBuild Projects="Demo\READCOM.Core.Demo.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="READCOM_Core_Demo:Make" DependsOnTargets="READCOM.Core:Make">
+    <Target Name="READCOM_Core_Demo:Make">
         <MSBuild Projects="Demo\READCOM.Core.Demo.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">

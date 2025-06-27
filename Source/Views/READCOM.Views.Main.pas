@@ -39,6 +39,7 @@ interface
       //Initialiation
       procedure FormCreate(Sender: TObject);
       procedure FormDestroy(Sender: TObject);
+      procedure FormShow(Sender: TObject);
 
       //State saving
       procedure FormSaveState(Sender: TObject);
@@ -80,13 +81,14 @@ interface
       procedure HUDcomboBackColorChange(Sender: TObject);
 
       //Options action
+      procedure ShowActiveStoryItemOptions;
       procedure HUDactionOptionsExecute(Sender: TObject);
 
       //Scaling
       procedure FormResize(Sender: TObject);
 
-      procedure FormShow(Sender: TObject);
-    procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
+      //Keyboard
+      procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
 
     protected
       FShiftDown: Boolean; //set by event handlers for OnFormKeyDown, OnFormKeyUp to monitor SHIFT key standalone presses
@@ -155,6 +157,9 @@ interface
       procedure ZoomTo(const StoryItem: IStoryItem = nil); //ZoomTo(nil) zooms to all content
       procedure ZoomToActiveStoryPointOrHome;
 
+      {Scaling}
+      procedure RootStoryItemViewResized(Sender: TObject);
+
       {StoryMode}
       function GetStoryMode: TStoryMode;
       procedure SetStoryMode(const Value: TStoryMode);
@@ -163,9 +168,8 @@ interface
       function GetStructureView: TStructureView;
       procedure StructureViewShowFilter(Sender: TObject; const TheObject: TObject; var ShowObject: Boolean);
       procedure StructureViewSelection(Sender: TObject; const Selection: TObject);
+      procedure StructureViewContextMenu(Sender: TObject; const Selection: TObject);
       procedure UpdateStructureView;
-
-      procedure RootStoryItemViewResized(Sender: TObject);
 
       {HUD}
       procedure HUDEditModeChanged(Sender: TObject; const Value: Boolean);
@@ -323,20 +327,14 @@ implementation
     InitObjectDebugger(MainForm);
   end;
 
-  procedure TMainForm.FormShow(Sender: TObject);
-  begin
-    //NOP
-  end;
-
   procedure TMainForm.FormDestroy(Sender: TObject);
   begin
     HUD.MultiViewFrameStand.CloseAll;
   end;
 
-  procedure TMainForm.FormResize(Sender: TObject);
+  procedure TMainForm.FormShow(Sender: TObject);
   begin
-    ZoomToActiveStoryPointOrHome; //keep the Active StoryPoint or Home in view
-    CheckProperOrientation;
+    //NOP
   end;
 
   {$ENDREGION}
@@ -422,12 +420,6 @@ implementation
     end;
 
     UpdateStructureView;
-  end;
-
-  procedure TMainForm.RootStoryItemViewResized(Sender: TObject); //TODO: this doesn't seem to get called (needed for AutoSize of RootStoryItemView to work)
-  begin
-    RootStoryItemView := RootStoryItemView; //repeat calculations to adapt ZoomFrame.ScaledLayout size (this keeps the zoom to fit the new size of the RootStoryItem, plus updates StructureView if open)
-    //ZoomTo; //Zoom to the root //doesn't seem to do it
   end;
 
   {$endregion}
@@ -659,6 +651,7 @@ implementation
         DragDropSelectTarget := true; //always select (make active / zoom to) the Target StoryItem after a drag-drop operation in the structure view
 
         OnSelection := StructureViewSelection;
+        OnContextMenu := StructureViewContextMenu;
         OnShowFilter := StructureViewShowFilter;
       end;
     end;
@@ -1007,10 +1000,15 @@ implementation
 
   {$region 'Options action'}
 
-  procedure TMainForm.HUDactionOptionsExecute(Sender: TObject);
+  procedure TMainForm.ShowActiveStoryItemOptions;
   begin
     if Assigned(ActiveStoryItem) then
       ActiveStoryItem.Options.ShowPopup;
+  end;
+
+  procedure TMainForm.HUDactionOptionsExecute(Sender: TObject);
+  begin
+    ShowActiveStoryItemOptions;
   end;
 
   {$endregion}
@@ -1105,6 +1103,16 @@ implementation
     ActiveStoryItem := TStoryItem(Selection); //Make active (may also zoom to it) - assuming this is a TStoryItem since StructureView was filtering for such class //also accepts "nil" (for no selection)
   end;
 
+  procedure TMainForm.StructureViewContextMenu(Sender: TObject; const Selection: TObject);
+  begin
+    if Assigned(Selection) then
+    begin
+      ActiveStoryItem := TStoryItem(Selection); //Make active (may also zoom to it) - assuming this is a TStoryItem since StructureView was filtering for such class //also accepts "nil" (for no selection)
+      //TODO: check that ContextMenu event is indeed called before Selection, in which case it is indeed best to make the item active first
+      ShowActiveStoryItemOptions;
+    end;
+  end;
+
   {$endregion}
 
   {$region 'Timer'}
@@ -1159,6 +1167,22 @@ implementation
   procedure TMainForm.HUDactionNextExecute(Sender: TObject);
   begin
     ActivateNextStoryPoint;
+  end;
+
+  {$endregion}
+
+  {$region 'Scaling'}
+
+  procedure TMainForm.FormResize(Sender: TObject);
+  begin
+    ZoomToActiveStoryPointOrHome; //keep the Active StoryPoint or Home in view
+    CheckProperOrientation;
+  end;
+
+  procedure TMainForm.RootStoryItemViewResized(Sender: TObject); //TODO: this doesn't seem to get called (needed for AutoSize of RootStoryItemView to work)
+  begin
+    RootStoryItemView := RootStoryItemView; //repeat calculations to adapt ZoomFrame.ScaledLayout size (this keeps the zoom to fit the new size of the RootStoryItem, plus updates StructureView if open)
+    //ZoomTo; //Zoom to the root //doesn't seem to do it
   end;
 
   {$endregion}

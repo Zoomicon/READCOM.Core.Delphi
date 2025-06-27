@@ -42,12 +42,12 @@ requires
   fmx,
   FrameStandPackage_11_1,
   ObjectDebuggerFMX{BOSS},
+  Zoomicon.Media.FMX{BOSS},
   Zoomicon.Generics{BOSS},
   Zoomicon.Helpers.RTL{BOSS},
   Zoomicon.Helpers.FMX{BOSS},
   Zoomicon.Introspection.FMX{BOSS},
   Zoomicon.Manipulation.FMX{BOSS},
-  Zoomicon.Media.FMX{BOSS},
   Zoomicon.ZUI.FMX{BOSS};
 
 contains
