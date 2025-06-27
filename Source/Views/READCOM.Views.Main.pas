@@ -1002,7 +1002,7 @@ implementation
 
   procedure TMainForm.ShowActiveStoryItemOptions;
   begin
-    if Assigned(ActiveStoryItem) then
+    if Assigned(ActiveStoryItem) and (StoryMode = EditMode) then
       ActiveStoryItem.Options.ShowPopup;
   end;
 
