@@ -2,11 +2,6 @@
 //Source: https://github.com/Zoomicon/READCOM.Core.Delphi
 //Author: George Birbilis (https://zoomicon.com)
 
-//WARNING:
-//BOSS update commnand corrupts modules\Zoomicon.Introspection.FMX.Delphi\Zoomicon.Introspection.FMX.dpk (they exist twice, in both Source and Demo subfolders).
-//Must repair by copying correct files from https://github.com/Zoomicon/Zoomicon.Introspection.FMX.Delphi/Source before building (else implicit units and packages will be added which will corrupt the project)
-//Will also need to restore READCOM.Core.dpk from version control since items get removed from its "requires" clause
-
 package READCOM.Core;
 
 {$R *.res}

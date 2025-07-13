@@ -5,11 +5,6 @@
 //Has dependencies set for debugging READCOM.Core (same BOSS package dependencies at boss.json as READCOM.Core and extra unit search paths pointing directly to READCOM.Core Source folder)
 //For dependencies in custom apps see READCOM_App GitHub repository instead (they just need a boss.json that points to READCOME.Core.Delphi repository)
 
-//WARNING:
-//BOSS update commnand corrupts modules\zoomicon.introspection.fmx.delphi\Source\Zoomicon.Introspection.FMX.dpk (they exist twice, in both Source and Demo subfolders).
-//Must repair by copying correct files from https://github.com/Zoomicon/Zoomicon.Introspection.FMX.Delphi/Source before building (else implicit units and packages will be added which will corrupt the project)
-//Will also need to restore READCOM.Core.dpk from version control since items get removed from its "requires" clause
-
 program READCOM.Core.Demo;
 
   {$R *.dres} //for Windows resources added via Resources and Images (includes 'Default.readcom' startup story document)
