@@ -32,10 +32,11 @@ type
     btnToggleHome: TSpeedButton;
     btnToggleStoryPoint: TSpeedButton;
     btnToggleAnchored: TSpeedButton;
+    btnToggleTags: TSpeedButton;
     btnToggleActionURL: TSpeedButton;
+    btnToggleFactory: TSpeedButton;
     btnLoad: TSpeedButton;
     btnSave: TSpeedButton;
-    btnToggleTags: TSpeedButton;
     Background: TRectangle;
     btnToggleSnapping: TSpeedButton;
     Layout: TFlowLayout;
@@ -44,8 +45,9 @@ type
     procedure actionToggleStoryPointExecute(Sender: TObject);
     procedure actionToggleSnappingExecute(Sender: TObject);
     procedure actionToggleAnchoredExecute(Sender: TObject);
-    procedure actionChangeUrlActionExecute(Sender: TObject);
     procedure actionChangeTagsExecute(Sender: TObject);
+    procedure actionChangeUrlActionExecute(Sender: TObject);
+    procedure actionChangeFactoryCapacityExecute(Sender: TObject);
     procedure actionLoadExecute(Sender: TObject);
     procedure actionSaveExecute(Sender: TObject);
 
@@ -71,8 +73,9 @@ type
     function ActLoad_GetFilename: String;
     function ActLoad: Boolean;
     function ActSave: Boolean;
-    procedure ActChangeUrl;
     procedure ActChangeTags;
+    procedure ActChangeActionUrl;
+    procedure ActChangeFactoryCapacity;
 
     property Popup: TPopup read FPopup write FPopup stored false;
 
@@ -123,8 +126,9 @@ begin
     btnToggleStoryPoint.IsPressed := StoryPoint;
     btnToggleSnapping.IsPressed := Snapping;
     btnToggleAnchored.IsPressed := Anchored;
-    btnToggleActionURL.IsPressed := (UrlAction <> '');
     btnToggleTags.IsPressed := (Tags <> '');
+    btnToggleActionURL.IsPressed := (UrlAction <> '');
+    btnToggleFactory.IsPressed := (FactoryCapacity <> 0);
 
     {$IF DEFINED(ANDROID) OR DEFINED(IOS)}
     btnLoad.Visible := false; //TODO: implement some simple Load file dialog for mobile devices (flat list of documents). Should have some button to delete files too
@@ -195,6 +199,23 @@ begin
   end;
 end;
 
+procedure TStoryItemOptions.ActChangeTags;
+begin
+  TDialogServiceAsync.InputQuery(STR_TAGS, [STR_TAGS], [StoryItem.GetTags],
+    procedure(const AResult: TModalResult; const AValues: array of string)
+    begin
+      if (AResult = mrOk) then
+      begin
+        var LTags := Trim(AValues[0]);
+        StoryItem.Tags := LTags;
+        btnToggleTags.IsPressed := (LTags <> '');
+      end;
+      //ShowPopup; //TODO: doesn't work (popup gets hidden after OK/Cancel). Probably it is executed at other thread (and ignore), haven't tried telling it to do from the UI thread, or try else with a timeout to do it a moment later
+    end
+  );
+  //ShowPopup; //see comment above //doesn't work either (popup shown in the background but closes after OK/Cancel at input prompt)
+end;
+
 procedure TStoryItemOptions.ActChangeUrl;
 begin
   TDialogServiceAsync.InputQuery(STR_URL, [STR_URL], [StoryItem.GetUrlAction],
@@ -212,16 +233,17 @@ begin
   //ShowPopup; //see comment above //doesn't work either (popup shown in the background but closes after OK/Cancel at input prompt)
 end;
 
-procedure TStoryItemOptions.ActChangeTags;
+procedure TStoryItemOptions.ActChangeFactoryCapacity;
 begin
-  TDialogServiceAsync.InputQuery(STR_TAGS, [STR_TAGS], [StoryItem.GetTags],
+  TDialogServiceAsync.InputQuery(STR_URL, [STR_URL], [StoryItem.GetFactoryCapacity.ToString],
     procedure(const AResult: TModalResult; const AValues: array of string)
     begin
       if (AResult = mrOk) then
       begin
-        var LTags := Trim(AValues[0]);
-        StoryItem.Tags := LTags;
-        btnToggleTags.IsPressed := (LTags <> '');
+        var LFactoryCapacity: Integer := 0;
+        TryStrToInt(AValues[0], LFactoryCapacity); //ignoring any parsing error, will default to 0 (non-factory behaviour)
+        StoryItem.SetFactoryCapacity(LFactoryCapacity);
+        btnToggleFactory.IsPressed := (LFactoryCapacity <> 0);
       end;
       //ShowPopup; //TODO: doesn't work (popup gets hidden after OK/Cancel). Probably it is executed at other thread (and ignore), haven't tried telling it to do from the UI thread, or try else with a timeout to do it a moment later
     end
@@ -255,14 +277,19 @@ begin
   //ShowPopup; //show popup again to make the toggle evident
 end;
 
-procedure TStoryItemOptions.actionChangeUrlActionExecute(Sender: TObject);
-begin
-  actChangeUrl;
-end;
-
 procedure TStoryItemOptions.actionChangeTagsExecute(Sender: TObject);
 begin
   actChangeTags;
+end;
+
+procedure TStoryItemOptions.actionChangeUrlActionExecute(Sender: TObject);
+begin
+  actChangeActionUrl;
+end;
+
+procedure TStoryItemOptions.actionChangeFactoryCapacityExecute(Sender: TObject);
+begin
+  actChangeFactoryCapacity;
 end;
 
 procedure TStoryItemOptions.actionLoadExecute(Sender: TObject);

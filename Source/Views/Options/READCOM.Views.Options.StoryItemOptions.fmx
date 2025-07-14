@@ -1,11 +1,11 @@
 object StoryItemOptions: TStoryItemOptions
-  Size.Width = 520.000000000000000000
+  Size.Width = 590.000000000000000000
   Size.Height = 64.000000000000000000
   Size.PlatformDefault = False
   object Background: TRectangle
     Align = Contents
     Fill.Color = claLightgoldenrodyellow
-    Size.Width = 520.000000000000000000
+    Size.Width = 590.000000000000000000
     Size.Height = 64.000000000000000000
     Size.PlatformDefault = False
   end
@@ -26,7 +26,7 @@ object StoryItemOptions: TStoryItemOptions
   end
   object Layout: TFlowLayout
     Align = Contents
-    Size.Width = 520.000000000000000000
+    Size.Width = 590.000000000000000000
     Size.Height = 64.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 16
@@ -39,7 +39,7 @@ object StoryItemOptions: TStoryItemOptions
       Margins.Top = 4.000000000000000000
       Margins.Right = 4.000000000000000000
       Margins.Bottom = 4.000000000000000000
-      Size.Width = 512.000000000000000000
+      Size.Width = 581.000000000000000000
       Size.Height = 56.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 12
@@ -148,6 +148,23 @@ object StoryItemOptions: TStoryItemOptions
         Text = 'Change URL Action'
         TextSettings.Trimming = None
         OnClick = actionChangeUrlActionExecute
+      end
+      object btnToggleFactory: TSpeedButton
+        StaysPressed = True
+        Align = Client
+        Anchors = []
+        Hint = 
+          'Set action URL'#13#13'Defines URL to be opened in web browser when the' +
+          ' Active StoryItem is clicked in non-Edit mode'
+        Images = Icons.SVGIconImageList
+        ImageIndex = 45
+        Size.Width = 64.000000000000000000
+        Size.Height = 57.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'actiontoolbutton'
+        Text = 'Change URL Action'
+        TextSettings.Trimming = None
+        OnClick = actionChangeFactoryCapacityExecute
       end
       object btnLoad: TSpeedButton
         Action = actionLoad

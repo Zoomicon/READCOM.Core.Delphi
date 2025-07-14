@@ -6,52 +6,50 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'Edit'
         SVGText = 
           '<svg id="emoji" viewBox="0 0 72 72" xmlns="http://www.w3.org/200' +
-          '0/svg">'#10'  <g id="color">'#10'    <polygon fill="#FCEA2B" stroke="#FC' +
-          'EA2B" stroke-linecap="round" stroke-linejoin="round" stroke-mite' +
-          'rlimit="10" stroke-width="1.8" points="35.25,12 46.375,23.25 46.' +
-          '375,62 13,62 13,12"/>'#10'    <polygon fill="#F1B31C" stroke="#F1B31' +
-          'C" stroke-linecap="round" stroke-linejoin="round" stroke-miterli' +
-          'mit="10" stroke-width="1.8" points="15.688,62 12.625,62 46.375,6' +
-          '2 46.375,36.625 20.9375,62"/>'#10'    <polygon fill="#FFFFFF" stroke' +
-          '="none" stroke-linecap="round" stroke-linejoin="round" stroke-mi' +
-          'terlimit="10" stroke-width="2" points="34,49 34,54 39,54 63,30 5' +
-          '8,25"/>'#10'  </g>'#10'  <g id="hair"/>'#10'  <g id="skin"/>'#10'  <g id="skin-s' +
-          'hadow"/>'#10'  <g id="line">'#10'    <polyline fill="none" stroke="#0000' +
+          '0/svg">'#13#10'  <g id="color">'#13#10'    <polygon fill="#FCEA2B" stroke="#' +
+          'FCEA2B" stroke-linecap="round" stroke-linejoin="round" stroke-mi' +
+          'terlimit="10" stroke-width="1.8" points="35.25,12 46.375,23.25 4' +
+          '6.375,62 13,62 13,12"/>'#13#10'    <polygon fill="#F1B31C" stroke="#F1' +
+          'B31C" stroke-linecap="round" stroke-linejoin="round" stroke-mite' +
+          'rlimit="10" stroke-width="1.8" points="15.688,62 12.625,62 46.37' +
+          '5,62 46.375,36.625 20.9375,62"/>'#13#10'    <polygon fill="#FFFFFF" st' +
+          'roke="none" stroke-linecap="round" stroke-linejoin="round" strok' +
+          'e-miterlimit="10" stroke-width="2" points="34,49 34,54 39,54 63,' +
+          '30 58,25"/>'#13#10'  </g>'#13#10'  <g id="hair"/>'#13#10'  <g id="skin"/>'#13#10'  <g id' +
+          '="skin-shadow"/>'#13#10'  <g id="line">'#13#10'    <polyline fill="none" str' +
+          'oke="#000000" stroke-linecap="round" stroke-linejoin="round" str' +
+          'oke-miterlimit="10" stroke-width="2" points="46.375,30.9999 46.3' +
+          '75,23.25 35.125,23.25 35.125,12 12.625,12 12.625,62 46.375,62 46' +
+          '.375,52.1666"/>'#13#10'    <line x1="35.125" x2="46.375" y1="12" y2="2' +
+          '3.25" fill="none" stroke="#000000" stroke-linecap="round" stroke' +
+          '-linejoin="round" stroke-miterlimit="10" stroke-width="2"/>'#13#10'   ' +
+          ' <line x1="41" x2="18" y1="30" y2="30" fill="none" stroke="#0000' +
           '00" stroke-linecap="round" stroke-linejoin="round" stroke-miterl' +
-          'imit="10" stroke-width="2" points="46.375,30.9999 46.375,23.25 3' +
-          '5.125,23.25 35.125,12 12.625,12 12.625,62 46.375,62 46.375,52.16' +
-          '66"/>'#10'    <line x1="35.125" x2="46.375" y1="12" y2="23.25" fill=' +
-          '"none" stroke="#000000" stroke-linecap="round" stroke-linejoin="' +
-          'round" stroke-miterlimit="10" stroke-width="2"/>'#10'    <line x1="4' +
-          '1" x2="18" y1="30" y2="30" fill="none" stroke="#000000" stroke-l' +
-          'inecap="round" stroke-linejoin="round" stroke-miterlimit="10" st' +
-          'roke-width="2"/>'#10'    <line x1="28" x2="18" y1="24" y2="24" fill=' +
-          '"none" stroke="#000000" stroke-linecap="round" stroke-linejoin="' +
-          'round" stroke-miterlimit="10" stroke-width="2"/>'#10'    <line x1="4' +
-          '1" x2="18" y1="36" y2="36" fill="none" stroke="#000000" stroke-l' +
-          'inecap="round" stroke-linejoin="round" stroke-miterlimit="10" st' +
-          'roke-width="2"/>'#10'    <line x1="28" x2="18" y1="42" y2="42" fill=' +
-          '"none" stroke="#000000" stroke-linecap="round" stroke-linejoin="' +
-          'round" stroke-miterlimit="10" stroke-width="2"/>'#10'    <line x1="2' +
-          '8" x2="18" y1="48" y2="48" fill="none" stroke="#000000" stroke-l' +
-          'inecap="round" stroke-linejoin="round" stroke-miterlimit="10" st' +
-          'roke-width="2"/>'#10'    <line x1="28" x2="18" y1="54" y2="54" fill=' +
-          '"none" stroke="#000000" stroke-linecap="round" stroke-linejoin="' +
-          'round" stroke-miterlimit="10" stroke-width="2"/>'#10'    <polygon fi' +
-          'll="none" stroke="#000000" stroke-linecap="round" stroke-linejoi' +
-          'n="round" stroke-miterlimit="10" stroke-width="2" points="34,49 ' +
-          '34,54 39,54 63,30 58,25"/>'#10'  </g>'#10'</svg>'#10
+          'imit="10" stroke-width="2"/>'#13#10'    <line x1="28" x2="18" y1="24" ' +
+          'y2="24" fill="none" stroke="#000000" stroke-linecap="round" stro' +
+          'ke-linejoin="round" stroke-miterlimit="10" stroke-width="2"/>'#13#10' ' +
+          '   <line x1="41" x2="18" y1="36" y2="36" fill="none" stroke="#00' +
+          '0000" stroke-linecap="round" stroke-linejoin="round" stroke-mite' +
+          'rlimit="10" stroke-width="2"/>'#13#10'    <line x1="28" x2="18" y1="42' +
+          '" y2="42" fill="none" stroke="#000000" stroke-linecap="round" st' +
+          'roke-linejoin="round" stroke-miterlimit="10" stroke-width="2"/>'#13 +
+          #10'    <line x1="28" x2="18" y1="48" y2="48" fill="none" stroke="#' +
+          '000000" stroke-linecap="round" stroke-linejoin="round" stroke-mi' +
+          'terlimit="10" stroke-width="2"/>'#13#10'    <line x1="28" x2="18" y1="' +
+          '54" y2="54" fill="none" stroke="#000000" stroke-linecap="round" ' +
+          'stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2"/' +
+          '>'#13#10'    <polygon fill="none" stroke="#000000" stroke-linecap="rou' +
+          'nd" stroke-linejoin="round" stroke-miterlimit="10" stroke-width=' +
+          '"2" points="34,49 34,54 39,54 63,30 58,25"/>'#13#10'  </g>'#13#10'</svg>'
         Opacity = 1.000000000000000000
       end
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'reverse'
         SVGText = 
@@ -71,7 +69,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'play'
         SVGText = 
@@ -91,7 +88,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 109
+            Width = 26
           end>
         IconName = 'Diagram'
         SVGText = 
@@ -107,7 +104,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'TargetArrow'
         SVGText = 
@@ -161,7 +157,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 24
           end>
         IconName = 'Anchor'
         SVGText = 
@@ -187,7 +182,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 24
           end>
         IconName = 'OpenFileFolder'
         SVGText = 
@@ -223,7 +217,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 24
           end>
         IconName = 'Save'
         SVGText = 
@@ -256,7 +249,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'Delete'
         SVGText = 
@@ -291,7 +283,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 24
           end>
         IconName = 'GlobeWithMeridians'
         SVGText = 
@@ -320,7 +311,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'Plus'
         SVGText = 
@@ -360,7 +350,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'Camera'
         SVGText = 
@@ -419,7 +408,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'PaperA4'
         SVGText = 
@@ -441,7 +429,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 24
           end>
         IconName = 'Home'
         SVGText = 
@@ -469,7 +456,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 24
           end>
         IconName = 'Signpost'
         SVGText = 
@@ -499,7 +485,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'Info'
         SVGText = 
@@ -524,7 +509,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'Questionmark'
         SVGText = 
@@ -564,7 +548,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'CopyAction'
         SVGText = 
@@ -599,7 +582,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'PasteAction'
         SVGText = 
@@ -649,7 +631,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'FlipHorizontally'
         SVGText = 
@@ -685,7 +666,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'FlipVertically'
         SVGText = 
@@ -721,7 +701,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'ThoughtEllipsis'
         SVGText = 
@@ -749,7 +728,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'Timer'
         SVGText = 
@@ -781,7 +759,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'FramedPicture'
         SVGText = 
@@ -824,7 +801,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'READ-COM square rounded border'
         SVGText = 
@@ -907,7 +883,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'Scissors'
         SVGText = 
@@ -977,7 +952,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'Sun'
         SVGText = 
@@ -1015,7 +989,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 24
           end>
         IconName = 'Tag'
         SVGText = 
@@ -1054,7 +1027,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'Edit grayscale'
         SVGText = 
@@ -1100,7 +1072,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'Gear8Teeth'
         SVGText = 
@@ -1157,7 +1128,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 24
           end>
         IconName = 'Magnet'
         SVGText = 
@@ -1192,7 +1162,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'Hourglass'
         SVGText = 
@@ -1253,7 +1222,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'LockClosed'
         SVGText = 
@@ -1286,7 +1254,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'LockOpen'
         SVGText = 
@@ -1316,7 +1283,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'Obstacle'
         SVGText = 
@@ -1365,7 +1331,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'RotateCounterClockwise'
         SVGText = 
@@ -1410,7 +1375,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'Close'
         SVGText = 
@@ -1428,7 +1392,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'TextAlignCenter'
         SVGText = 
@@ -1492,7 +1455,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'TextAlignLeft_SVGrepo_7743'
         SVGText = 
@@ -1529,7 +1491,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'TextAlignRight_SVGrepo_39363'
         SVGText = 
@@ -1566,7 +1527,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'B_Bold_SVGrepo_137945'
         SVGText = 
@@ -1600,7 +1560,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'I_Italics_SVGrepo_325311'
         SVGText = 
@@ -1617,7 +1576,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'U_Underline_SVGrepo_156702'
         SVGText = 
@@ -1649,7 +1607,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'Strikeout_Text_SVGrepo_372684'
         SVGText = 
@@ -1688,7 +1645,6 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
           end>
         IconName = 'FullScreen_SVGrepo_505892'
         SVGText = 
@@ -1700,364 +1656,496 @@ object Icons: TIcons
           '" stroke="#000000" stroke-width="1.5" stroke-linecap="round" str' +
           'oke-linejoin="round"/>'#13#10'</svg>'
         Opacity = 1.000000000000000000
+      end
+      item
+        MultiResBitmap = <
+          item
+          end>
+        IconName = 'Factory_SVGrepo_168883'
+        SVGText = 
+          '<?xml version="1.0" encoding="iso-8859-1"?>'#13#10'<!-- Uploaded to: S' +
+          'VG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->'#13#10'<' +
+          '!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org' +
+          '/Graphics/SVG/1.1/DTD/svg11.dtd">'#13#10'<svg fill="#000000" version="' +
+          '1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink=' +
+          '"http://www.w3.org/1999/xlink" '#13#10#9' width="800px" height="800px" ' +
+          'viewBox="0 0 451.921 451.922"'#13#10#9' xml:space="preserve">'#13#10'<g>'#13#10#9'<g' +
+          '>'#13#10#9#9'<path d="M451.874,137.746c-0.005-1.186-0.259-2.232-0.599-3.' +
+          '209c-1.27-6.561-8.917-12.167-16.986-7.502'#13#10#9#9#9'c-39.1,22.594-75.4' +
+          '48,48.604-113.619,72.351c0.939-23.389,0.223-46.769-1.193-70.183c' +
+          '2.66-8.242-10.451-17.288-19.997-10.077'#13#10#9#9#9'c-37.303,28.183-77.88' +
+          '6,52.455-117.312,78.15c-1.222-27.061-2.808-54.106-2.976-81.197c-' +
+          '0.005-1.16-0.239-2.184-0.566-3.146'#13#10#9#9#9'c-1.559-7.488-12.126-13.1' +
+          '98-19.385-5.944c-12.444,12.438-25.885,23.811-39.872,34.602c1.439' +
+          '-38.252,2.724-76.497,2.828-114.777'#13#10#9#9#9'c0-1.046-0.16-1.98-0.388-' +
+          '2.864c0.269-5.393-3.047-11.004-10.011-11.004H58.072c-1.064,0-2.0' +
+          '11,0.173-2.912,0.411'#13#10#9#9#9'c-5.464-0.371-11.131,2.933-10.956,9.988' +
+          'c1.425,58.016-1.704,115.842-6.812,173.619c-10.222,6.426-20.459,1' +
+          '2.842-30.625,19.326'#13#10#9#9#9'c-1.647,1.057-2.823,2.308-3.656,3.651c-1' +
+          '.351,1.579-2.168,3.639-2.138,6.192C1.775,281.031,0.109,367.103,0' +
+          ',421.996'#13#10#9#9#9'c0,1.467,0.317,2.741,0.807,3.884c1.092,4.21,4.695,7' +
+          '.938,10.877,8.247c141.764,7.043,283.702,4.342,425.58,4.342'#13#10#9#9#9'c' +
+          '9.069,0,12.645-7.516,10.796-13.518c0.752-9.141,0.427-18.108-1.04' +
+          '6-27.157C446.765,321.482,452.499,214.067,451.874,137.746z'#13#10#9#9#9' M' +
+          '101.336,33.749c-0.058,8.668-0.193,17.336-0.343,25.999H65.25c0.05' +
+          '1-8.663,0.046-17.331-0.084-25.999H101.336z M64.953,80.547'#13#10#9#9#9'h3' +
+          '5.571c-0.645,25.598-1.554,51.186-2.542,76.782c-12.588,8.861-25.5' +
+          '52,17.331-38.61,25.692'#13#10#9#9#9'C62.19,148.895,64.204,114.742,64.953,' +
+          '80.547z M423.635,404.67c0.01,1.955,0.563,3.585,1.422,4.971'#13#10#9#9#9'c' +
+          '0.142,2.687,0.173,5.367,0.081,8.049c-133.932,0.132-267.894,2.275' +
+          '-401.696-3.869c0.229-50.679,1.549-132.556,0.935-183.244'#13#10#9#9#9'c45.' +
+          '374-28.741,92.094-56.193,131.941-90.825c0.843,26.781,2.544,53.53' +
+          '5,3.402,80.318c0.398,12.477,20.741,13.34,23.133,2.516'#13#10#9#9#9'c37.91' +
+          '2-25.192,77.18-48.729,114.193-74.94c1.031,24.148,1.102,48.271-0.' +
+          '99,72.424c-0.65,7.596,6.591,10.836,13.192,9.8'#13#10#9#9#9'c1.727-0.116,3' +
+          '.534-0.604,5.373-1.69c38.958-22.976,75.377-49.117,113.853-72.687' +
+          'C428.195,228.18,423.036,331.974,423.635,404.67z'#13#10#9#9#9'"/>'#13#10#9#9'<path' +
+          ' d="M369.098,263.405h-34.084c-5.723,0-9.262,3.001-10.633,6.724c-' +
+          '0.863,1.462-1.32,3.234-1.057,5.408'#13#10#9#9#9'c1.864,15.33,1.768,51.394' +
+          ',0,66.729c-0.746,6.52,4.464,9.8,10.166,9.927c1.057,0.279,2.194,0' +
+          '.478,3.474,0.478h33.104'#13#10#9#9#9'c6.921,0,10.623-4.388,11.191-9.13c0.' +
+          '29-0.924,0.498-1.899,0.498-3.006v-64.998c0-2.723-0.99-4.865-2.53' +
+          '4-6.485'#13#10#9#9#9'C377.598,265.857,374.247,263.405,369.098,263.405z M3' +
+          '58.383,331.872h-10.775c0.584-8.958,0.579-38.705-0.076-47.667h10.' +
+          '852'#13#10#9#9#9'V331.872z"/>'#13#10#9#9'<path d="M269.762,263.405h-34.083c-5.718' +
+          ',0-9.257,3.001-10.633,6.724c-0.863,1.462-1.315,3.234-1.051,5.408' +
+          #13#10#9#9#9'c1.861,15.33,1.767,51.394,0,66.729c-0.754,6.52,4.461,9.8,10' +
+          '.161,9.927c1.062,0.279,2.188,0.478,3.474,0.478h33.108'#13#10#9#9#9'c6.916' +
+          ',0,10.623-4.388,11.191-9.13c0.284-0.924,0.487-1.899,0.487-3.006v' +
+          '-64.998c0-2.723-0.99-4.865-2.528-6.485'#13#10#9#9#9'C278.263,265.857,274.' +
+          '917,263.405,269.762,263.405z M259.053,331.872h-10.775c0.584-8.95' +
+          '8,0.573-38.705-0.076-47.667h10.852'#13#10#9#9#9'V331.872z"/>'#13#10#9#9'<path d="' +
+          'M170.432,263.405h-34.086c-5.726,0-9.262,3.001-10.638,6.724c-0.86' +
+          '3,1.462-1.315,3.234-1.051,5.408'#13#10#9#9#9'c1.861,15.33,1.767,51.394,0,' +
+          '66.729c-0.754,6.52,4.461,9.8,10.161,9.927c1.066,0.279,2.193,0.47' +
+          '8,3.479,0.478h33.113'#13#10#9#9#9'c6.919,0,10.618-4.388,11.189-9.13c0.292' +
+          '-0.924,0.492-1.899,0.492-3.006v-64.998c0-2.723-0.993-4.865-2.526' +
+          '-6.485'#13#10#9#9#9'C178.933,265.857,175.583,263.405,170.432,263.405z M15' +
+          '9.72,331.872h-10.775c0.584-8.958,0.579-38.705-0.079-47.667h10.85' +
+          'v47.667'#13#10#9#9#9'H159.72z"/>'#13#10#9'</g>'#13#10'</g>'#13#10'</svg>'
+        FixedColor = xFF880404
+        Opacity = 1.000000000000000000
+      end
+      item
+        MultiResBitmap = <
+          item
+          end>
+        IconName = 'Item 0'
+        SVGText = 
+          '<svg id="emoji" viewBox="0 0 72 72" xmlns="http://www.w3.org/200' +
+          '0/svg">'#13#10'  <g id="color">'#13#10'    <polygon fill="#FCEA2B" stroke="#' +
+          'FCEA2B" stroke-linecap="round" stroke-linejoin="round" stroke-mi' +
+          'terlimit="10" stroke-width="1.8" points="35.25,12 46.375,23.25 4' +
+          '6.375,62 13,62 13,12"/>'#13#10'    <polygon fill="#F1B31C" stroke="#F1' +
+          'B31C" stroke-linecap="round" stroke-linejoin="round" stroke-mite' +
+          'rlimit="10" stroke-width="1.8" points="15.688,62 12.625,62 46.37' +
+          '5,62 46.375,36.625 20.9375,62"/>'#13#10'    <polygon fill="#FFFFFF" st' +
+          'roke="none" stroke-linecap="round" stroke-linejoin="round" strok' +
+          'e-miterlimit="10" stroke-width="2" points="34,49 34,54 39,54 63,' +
+          '30 58,25"/>'#13#10'  </g>'#13#10'  <g id="hair"/>'#13#10'  <g id="skin"/>'#13#10'  <g id' +
+          '="skin-shadow"/>'#13#10'  <g id="line">'#13#10'    <polyline fill="none" str' +
+          'oke="#000000" stroke-linecap="round" stroke-linejoin="round" str' +
+          'oke-miterlimit="10" stroke-width="2" points="46.375,30.9999 46.3' +
+          '75,23.25 35.125,23.25 35.125,12 12.625,12 12.625,62 46.375,62 46' +
+          '.375,52.1666"/>'#13#10'    <line x1="35.125" x2="46.375" y1="12" y2="2' +
+          '3.25" fill="none" stroke="#000000" stroke-linecap="round" stroke' +
+          '-linejoin="round" stroke-miterlimit="10" stroke-width="2"/>'#13#10'   ' +
+          ' <line x1="41" x2="18" y1="30" y2="30" fill="none" stroke="#0000' +
+          '00" stroke-linecap="round" stroke-linejoin="round" stroke-miterl' +
+          'imit="10" stroke-width="2"/>'#13#10'    <line x1="28" x2="18" y1="24" ' +
+          'y2="24" fill="none" stroke="#000000" stroke-linecap="round" stro' +
+          'ke-linejoin="round" stroke-miterlimit="10" stroke-width="2"/>'#13#10' ' +
+          '   <line x1="41" x2="18" y1="36" y2="36" fill="none" stroke="#00' +
+          '0000" stroke-linecap="round" stroke-linejoin="round" stroke-mite' +
+          'rlimit="10" stroke-width="2"/>'#13#10'    <line x1="28" x2="18" y1="42' +
+          '" y2="42" fill="none" stroke="#000000" stroke-linecap="round" st' +
+          'roke-linejoin="round" stroke-miterlimit="10" stroke-width="2"/>'#13 +
+          #10'    <line x1="28" x2="18" y1="48" y2="48" fill="none" stroke="#' +
+          '000000" stroke-linecap="round" stroke-linejoin="round" stroke-mi' +
+          'terlimit="10" stroke-width="2"/>'#13#10'    <line x1="28" x2="18" y1="' +
+          '54" y2="54" fill="none" stroke="#000000" stroke-linecap="round" ' +
+          'stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2"/' +
+          '>'#13#10'    <polygon fill="none" stroke="#000000" stroke-linecap="rou' +
+          'nd" stroke-linejoin="round" stroke-miterlimit="10" stroke-width=' +
+          '"2" points="34,49 34,54 39,54 63,30 58,25"/>'#13#10'  </g>'#13#10'</svg>'#13#10
+        Opacity = 1.000000000000000000
       end>
     Destination = <
       item
         Layers = <
           item
             Name = 'Edit'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'reverse'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 120.000000000000000000
+            SourceRect.Bottom = 120.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'play'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Diagram'
-            SourceRect.Right = 109.000000000000000000
-            SourceRect.Bottom = 109.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'TargetArrow'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Anchor'
-            SourceRect.Right = 24.000000000000000000
-            SourceRect.Bottom = 24.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'OpenFileFolder'
-            SourceRect.Right = 24.000000000000000000
-            SourceRect.Bottom = 24.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Save'
-            SourceRect.Right = 24.000000000000000000
-            SourceRect.Bottom = 24.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Delete'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'GlobeWithMeridians'
-            SourceRect.Right = 24.000000000000000000
-            SourceRect.Bottom = 24.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Plus'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Camera'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'PaperA4'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Home'
-            SourceRect.Right = 24.000000000000000000
-            SourceRect.Bottom = 24.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Signpost'
-            SourceRect.Right = 24.000000000000000000
-            SourceRect.Bottom = 24.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Info'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Questionmark'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'CopyAction'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'PasteAction'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'FlipHorizontally'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'FlipVertically'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'ThoughtEllipsis'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Timer'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'FramedPicture'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'READ-COM square rounded border'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Scissors'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Sun'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Tag'
-            SourceRect.Right = 24.000000000000000000
-            SourceRect.Bottom = 24.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Edit grayscale'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Gear8Teeth'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Magnet'
-            SourceRect.Right = 24.000000000000000000
-            SourceRect.Bottom = 24.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Hourglass'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'LockClosed'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'LockOpen'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Obstacle'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'RotateCounterClockwise'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Close'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'TextAlignCenter'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'TextAlignLeft_SVGrepo_7743'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'TextAlignRight_SVGrepo_39363'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'B_Bold_SVGrepo_137945'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'I_Italics_SVGrepo_325311'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'U_Underline_SVGrepo_156702'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Strikeout_Text_SVGrepo_372684'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'FullScreen_SVGrepo_505892'
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
+          end>
+      end
+      item
+        Layers = <
+          item
+            Name = 'Factory_SVGrepo_168883'
+            SourceRect.Right = 64.000000000000000000
+            SourceRect.Bottom = 64.000000000000000000
+          end>
+      end
+      item
+        Layers = <>
+      end
+      item
+        Layers = <
+          item
+            Name = 'Item 0'
             SourceRect.Right = 136.000000000000000000
             SourceRect.Bottom = 136.000000000000000000
           end>

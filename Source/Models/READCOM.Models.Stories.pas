@@ -202,14 +202,18 @@ interface
       function IsAnchored: Boolean;
       procedure SetAnchored(const Value: Boolean);
 
-      {UrlAction}
-      function GetUrlAction: String;
-      procedure SetUrlAction(const Value: String);
-
       {Tags}
       function GetTags: String;
       procedure SetTags(const Value: String);
       function AreTagsMatched: Boolean;
+
+      {UrlAction}
+      function GetUrlAction: String;
+      procedure SetUrlAction(const Value: String);
+
+      {FactoryCapacity}
+      function GetFactoryCapacity: Integer;
+      procedure SetFactoryCapacity(const Value: Integer);
 
       {TargetsVisible}
       function GetTargetsVisible: Boolean;
@@ -249,9 +253,10 @@ interface
       property Hidden: Boolean read IsHidden write SetHidden; //default false
       property Snapping: Boolean read IsSnapping write SetSnapping; //default false
       property Anchored: Boolean read IsAnchored write SetAnchored; //default true
-      property UrlAction: String read GetUrlAction write SetUrlAction; //default ''
       property Tags: String read GetTags write SetTags; //default ''
       property TagsMatched: Boolean read AreTagsMatched;
+      property UrlAction: String read GetUrlAction write SetUrlAction; //default ''
+      property FactoryCapacity: Integer read GetFactoryCapacity write SetFactoryCapacity; //default 0
       property TargetsVisible: Boolean read GetTargetsVisible write SetTargetsVisible; //default false
       property Options: IStoryItemOptions read GetOptions; //stored false //TODO: currently to be as PUBLIC, NOT PUBLISHED
     end;

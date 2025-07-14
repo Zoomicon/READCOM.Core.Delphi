@@ -31,19 +31,18 @@ package READCOM.Core;
 {$ENDIF IMPLICITBUILDING}
 {$IMPLICITBUILD ON}
 
-//Dependencies: see <DEPENDENCIES.md>
 requires
   rtl,
   fmx,
   FrameStandPackage_11_1,
-  ObjectDebuggerFMX{BOSS},
-  Zoomicon.Media.FMX{BOSS},
-  Zoomicon.Generics{BOSS},
-  Zoomicon.Helpers.RTL{BOSS},
-  Zoomicon.Helpers.FMX{BOSS},
-  Zoomicon.Introspection.FMX{BOSS},
-  Zoomicon.Manipulation.FMX{BOSS},
-  Zoomicon.ZUI.FMX{BOSS};
+  ObjectDebuggerFMX,
+  Zoomicon.Media.FMX,
+  Zoomicon.Generics,
+  Zoomicon.Helpers.RTL,
+  Zoomicon.Helpers.FMX,
+  Zoomicon.Introspection.FMX,
+  Zoomicon.Manipulation.FMX,
+  Zoomicon.ZUI.FMX;
 
 contains
   READCOM.Resources.Icons in 'Resources\READCOM.Resources.Icons.pas' {Icons: TDataModule},

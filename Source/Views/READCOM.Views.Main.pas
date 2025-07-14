@@ -111,8 +111,12 @@ interface
       function LoadFromFileOrUrl(const PathOrUrl: String): Boolean;
       function LoadCommandLineParameter: Boolean;
       function LoadDefaultDocument: Boolean;
+
+      function GetSavedStateName: String;
+      function GetSavedStateStoragePath: String;
       function LoadSavedState: Boolean;
       procedure SaveCurrentState;
+
       procedure CheckCommandLineActions;
       procedure CheckReplaceStoryAllText;
 
@@ -1383,19 +1387,6 @@ implementation
     result := (StorySource <> '') and LoadFromFileOrUrl(StorySource); //assuming short-circuit boolean evaluation
   end;
 
-  function TMainForm.LoadSavedState: Boolean;
-  begin
-    Log('LoadSavedState');
-
-    With SaveState do
-    begin
-      Name := 'SavedState.readcom';
-      StoragePath := TPath.GetHomePath;
-      result := LoadFromStream(Stream, false); //don't ActivateHome, keep last Active one (needed in case the OS brought down the app and need to continue from where we were from saved state)
-      StorySource := StoragePath;
-    end;
-  end;
-
   function TMainForm.LoadDefaultDocument: Boolean;
   begin
     result := false; //don't place inside the try, else you get warning that result might be undefined
@@ -1424,14 +1415,50 @@ implementation
     end;
   end;
 
+  {$region 'SavedState'}
+
+  function GetFileNameWithoutExt(const FullPath: string): string; //TODO: move to some utilities package
+  begin
+    result := ChangeFileExt(ExtractFileName(FullPath), '');
+  end;
+
+  function TMainForm.GetSavedStateName: String;
+  begin
+    result := 'SavedState.readcom';
+  end;
+
+  function TMainForm.GetSavedStateStoragePath: String;
+  begin
+    var LHomePath := TPath.GetHomePath;
+    var LSavedStatePath := TPath.Combine(LHomePath, GetFileNameWithoutExt(Application.ExeName));
+
+    if ForceDirectories(LSavedStatePath) then //will try to create subpaths as needed
+      result := LSavedStatePath
+    else
+      result := LHomePath; //if we fail to create subdirectory under home path for the app, use the home path instead
+  end;
+
+  function TMainForm.LoadSavedState: Boolean;
+  begin
+    Log('LoadSavedState');
+
+    With SaveState do
+    begin
+      Name := GetSavedStateName;
+      StoragePath := GetSavedStateStoragePath;
+      result := LoadFromStream(Stream, false); //don't ActivateHome, keep last Active one (needed in case the OS brought down the app and need to continue from where we were from saved state)
+      StorySource := StoragePath;
+    end;
+  end;
+
   procedure TMainForm.SaveCurrentState;
   begin
     Log('SaveCurrentState');
 
     with SaveState do
     begin
-      Name := 'SavedState.readcom';
-      StoragePath := TPath.GetHomePath;
+      Name := GetSavedStateName;
+      StoragePath := GetSavedStateStoragePath;
 
       Stream.Clear;
 
@@ -1460,6 +1487,8 @@ implementation
       end
     //);
   end;
+
+  {$endregion}
 
   {$endregion}
 

@@ -51,6 +51,7 @@ interface
       FHidden: Boolean;
       FSnapping: Boolean;
       FUrlAction: String;
+      FFactoryCapacity: Integer;
       FOptions: IStoryItemOptions;
       FTargetsVisible: Boolean;
       FDragging: Boolean; //=False
@@ -85,6 +86,8 @@ interface
       procedure DoAddObject(const AObject: TFmxObject); override;
       procedure DoInsertObject(Index: Integer; const AObject: TFmxObject); override;
       procedure DoRemoveObject(const AObject: TFmxObject); override;
+
+      function GetClone: IStoryItem; virtual;
 
       {Z-Order}
       function GetBackIndex: Integer; override;
@@ -205,14 +208,18 @@ interface
       function IsAnchored: Boolean; virtual;
       procedure SetAnchored(const Value: Boolean); virtual;
 
-      {UrlAction}
-      function GetUrlAction: String; virtual;
-      procedure SetUrlAction(const Value: String); virtual;
-
       {Tags}
       function GetTags: String;
       procedure SetTags(const Value: String);
       function AreTagsMatched: Boolean;
+
+      {UrlAction}
+      function GetUrlAction: String; virtual;
+      procedure SetUrlAction(const Value: String); virtual;
+
+      {FactoryCapacity}
+      function GetFactoryCapacity: Integer; virtual;
+      procedure SetFactoryCapacity(const Value: Integer); virtual;
 
       {TargetsVisible}
       function GetTargetsVisible: Boolean; virtual;
@@ -243,6 +250,7 @@ interface
       procedure Cut; virtual;
       procedure Copy; virtual;
       procedure Paste; overload; virtual;
+      procedure Clone; virtual; //TODO: add to IClipboardEnabled at Zoomicon.Media package
 
       {IStoreable}
       procedure ReadState(Reader: TReader); override;
@@ -318,6 +326,7 @@ interface
         DEFAULT_FLIPPED_HORIZONTALLY = false;
         DEFAULT_FLIPPED_VERTICALLY = false;
         DEFAULT_HIDDEN = false;
+        DEFAULT_FACTORY_CAPACITY = 0;
         DEFAULT_TARGETS_VISIBLE = false;
 
       property ParentStoryItem: IStoryItem read GetParentStoryItem write SetParentStoryItem stored false; //default nil
@@ -340,9 +349,10 @@ interface
       property Hidden: Boolean read IsHidden write SetHidden default DEFAULT_HIDDEN;
       property Snapping: Boolean read IsSnapping write SetSnapping default DEFAULT_SNAPPING;
       property Anchored: Boolean read IsAnchored write SetAnchored default DEFAULT_ANCHORED;
-      property UrlAction: String read GetUrlAction write SetUrlAction; //default '' (implied, not allows to use '')
       property Tags: String read GetTags write SetTags; //default '' (implied, not allows to use '')
       property TagsMatched: Boolean read AreTagsMatched;
+      property UrlAction: String read GetUrlAction write SetUrlAction; //default '' (implied, not allows to use '')
+      property FactoryCapacity: Integer read GetFactoryCapacity write SetFactoryCapacity default DEFAULT_FACTORY_CAPACITY;
       property TargetsVisible: Boolean read GetTargetsVisible write SetTargetsVisible stored false default DEFAULT_TARGETS_VISIBLE; //TODO: not using concept of explicit targets now, but since anchored items with Tags serve as targets could use that property to highlight them (as hint for user). Maybe in that case add the Targets visible toggle button again
     end;
 
@@ -1298,21 +1308,6 @@ implementation
 
   {$endregion}
 
-  {$region 'UrlAction'}
-
-  function TStoryItem.GetUrlAction: String;
-  begin
-    Result := FUrlAction;
-  end;
-
-  procedure TStoryItem.SetUrlAction(const Value: String);
-  begin
-    FUrlAction := Trim(Value);
-    UpdateCursor;
-  end;
-
-  {$endregion}
-
   {$region 'Tags'}
 
   function TStoryItem.GetTags: String;
@@ -1381,6 +1376,35 @@ implementation
 
   {$endregion}
 
+  {$region 'UrlAction'}
+
+  function TStoryItem.GetUrlAction: String;
+  begin
+    Result := FUrlAction;
+  end;
+
+  procedure TStoryItem.SetUrlAction(const Value: String);
+  begin
+    FUrlAction := Trim(Value);
+    UpdateCursor;
+  end;
+
+  {$endregion}
+
+  {$region 'FactoryCapacity'}
+
+  function TStoryItem.GetFactoryCapacity: Integer;
+  begin
+    Result := FFactoryCapacity;
+  end;
+
+  procedure TStoryItem.SetFactoryCapacity(const Value: Integer);
+  begin
+    FFactoryCapacity := Value;
+  end;
+
+  {$endregion}
+
   {$region 'TargetsVisible'}
 
   function TStoryItem.GetTargetsVisible: Boolean;
@@ -1444,6 +1468,16 @@ implementation
 
   {$region 'Mouse'}
 
+  procedure TStoryItem.UpdateCursor;
+  begin
+    if (UrlAction <> '') then
+      Cursor := crHandPoint
+    else if (not Anchored) then
+      Cursor := crDrag
+    else
+      Cursor := crDefault;
+  end;
+
   procedure TStoryItem.HandleAreaSelectorMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
   begin
     inherited; //make sure we call this since it does the bring to front / send to back with double click
@@ -1463,7 +1497,24 @@ implementation
   begin
     inherited;
 
-    if EditMode or Anchored then exit;
+    if EditMode then exit; //parent should handle dragging in that case (it's a CustomManipulator)
+
+    var LFactoryCapacity := FactoryCapacity;
+    if (LFactoryCapacity > 0) then //upon drag leave behind a clone
+    begin
+      var LStoryItemClone := GetClone; //our clone will be the new factory but with a decreased FactoryCapacity by 1
+
+      Dec(LFactoryCapacity);
+      LStoryItemClone.FactoryCapacity := LFactoryCapacity;
+
+      if (LFactoryCapacity = 0) and Anchored then //note: much check before changing Anchored
+        LStoryItemClone.Tags := ''; //if clone left behind if anchored and has no more factory capacity, remove its tags else it would act as a target (for puzzles)
+
+      FactoryCapacity := 0; //we left behind the clone to be the factory, we appear as the clone to the user since we're getting dragged
+      Anchored := false; //must allow to get dragged (clone we left behind will still be anchored if we were - when FactoryCapacity gets to 0 [factory behaviour runs out], this will determine wether the last item behind is draggable or not)
+    end;
+
+    if Anchored then exit; //no dragging
 
     FDragStart := PointF(X, Y);
     FDragging := true;
@@ -1635,16 +1686,6 @@ implementation
       Paste(Clipboard);
   end;
 
-  procedure TStoryItem.UpdateCursor;
-  begin
-    if (UrlAction <> '') then
-      Cursor := crHandPoint
-    else if (not Anchored) then
-      Cursor := crDrag
-    else
-      Cursor := crDefault;
-  end;
-
   procedure TStoryItem.Paste(const Clipboard: IFMXExtendedClipboardService);
   var FileExt: String;
   begin
@@ -1676,7 +1717,7 @@ implementation
         if Assigned(StoryItemFactory) then //a FileExt that has a specific TStoryItem subclass assigned to it
         begin
           StoryItem := StoryItemFactory.New(Self).View as TStoryItem;
-          StoryItem.Name := 'Clipboard' + IntToStr(Random(maxint)); //TODO: use a GUID
+          StoryItem.Name := 'Clipboard_' + TGUID.NewGuid.ToString;
           StoryItem.Load(Clipboard); //this should also set the Size of the control
         end
         else //we are adding a ".readcom" file, don't know beforehand what class of TStoryItem descendent it contains serialized
@@ -1691,6 +1732,18 @@ implementation
     finally
       FIgnoreActiveStoryItemChanges := false; //restore value
     end;
+  end;
+
+  function TStoryItem.GetClone: IStoryItem;
+  begin
+    var LClone := LoadFromString(SaveToString, true) as TStoryItem;
+    ParentStoryItem.Add(LClone);
+    result := LClone;
+  end;
+
+  procedure TStoryItem.Clone;
+  begin
+    GetClone; //ignore result, act like stamping/tracing
   end;
 
   {$endregion}
@@ -1837,7 +1890,7 @@ implementation
         if Assigned(StoryItemFactory) then
         begin
           StoryItem := StoryItemFactory.New(Self).View as TStoryItem;
-          StoryItem.Name := RemoveNonAllowedIdentifierChars(TPath.GetFileNameWithoutExtension(Filepath)) + IntToStr(Random(maxint)); //TODO: use a GUID
+          StoryItem.Name := RemoveNonAllowedIdentifierChars(TPath.GetFileNameWithoutExtension(Filepath)) + '_' + TGUID.NewGuid.ToString;
           StoryItem.Load(Filepath); //this should also set the Size of the control
         end
         else //we are adding a ".readcom" file, don't know beforehand what class of TStoryItem descendent it contains serialized
