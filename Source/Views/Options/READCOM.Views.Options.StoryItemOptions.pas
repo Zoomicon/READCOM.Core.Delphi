@@ -216,7 +216,7 @@ begin
   //ShowPopup; //see comment above //doesn't work either (popup shown in the background but closes after OK/Cancel at input prompt)
 end;
 
-procedure TStoryItemOptions.ActChangeUrl;
+procedure TStoryItemOptions.ActChangeActionUrl;
 begin
   TDialogServiceAsync.InputQuery(STR_URL, [STR_URL], [StoryItem.GetUrlAction],
     procedure(const AResult: TModalResult; const AValues: array of string)
