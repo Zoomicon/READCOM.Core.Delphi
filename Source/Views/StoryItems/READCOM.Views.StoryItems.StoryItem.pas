@@ -378,6 +378,14 @@ implementation
 
   {$R *.fmx}
 
+  function GetUniqueID: String;
+  begin
+    Result := TGUID.NewGuid //new GUID (Globally Unique IDentifier - also called UUID, Universally Unique IDentifier)
+                .ToString //{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}
+                .Substring(1, 36); //remove curly braces
+    Result := StringReplace(Result, '-', '', [rfReplaceAll]); //remove dashes
+  end;
+
   {$region 'Lifetime management'}
 
   constructor TStoryItem.Create(AOwner: TComponent);
@@ -1717,7 +1725,7 @@ implementation
         if Assigned(StoryItemFactory) then //a FileExt that has a specific TStoryItem subclass assigned to it
         begin
           StoryItem := StoryItemFactory.New(Self).View as TStoryItem;
-          StoryItem.Name := 'Clipboard_' + TGUID.NewGuid.ToString;
+          StoryItem.Name := 'Clipboard_' + GetUniqueID;
           StoryItem.Load(Clipboard); //this should also set the Size of the control
         end
         else //we are adding a ".readcom" file, don't know beforehand what class of TStoryItem descendent it contains serialized
@@ -1890,7 +1898,7 @@ implementation
         if Assigned(StoryItemFactory) then
         begin
           StoryItem := StoryItemFactory.New(Self).View as TStoryItem;
-          StoryItem.Name := RemoveNonAllowedIdentifierChars(TPath.GetFileNameWithoutExtension(Filepath)) + '_' + TGUID.NewGuid.ToString;
+          StoryItem.Name := RemoveNonAllowedIdentifierChars(TPath.GetFileNameWithoutExtension(Filepath)) + '_' + GetUniqueID;
           StoryItem.Load(Filepath); //this should also set the Size of the control
         end
         else //we are adding a ".readcom" file, don't know beforehand what class of TStoryItem descendent it contains serialized
