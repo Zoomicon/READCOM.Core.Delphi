@@ -368,14 +368,8 @@ implementation
       TVectorImageStoryItem, //for backwards compatibility
       TBitmapImageStoryItem, //for backwards compatibility
       TPanelStoryItem //for backwards compatibility
-    ]);
-  end;
-
-  procedure Register;
-  begin
-    GroupDescendentsWith(TImageStoryItem, TControl);
-    RegisterSerializationClasses;
-    RegisterComponents('Zoomicon', [TImageStoryItem]);
+    ],
+    [TFrame]);
   end;
 
   {$endregion}

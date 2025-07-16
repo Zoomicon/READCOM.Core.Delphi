@@ -151,8 +151,6 @@ interface
 
     {$ENDREGION ........................................................................}
 
-    procedure Register;
-
 implementation
   {$region 'Used units'}
   uses
@@ -833,14 +831,7 @@ end;
 
   procedure RegisterSerializationClasses;
   begin
-    RegisterFmxClasses([TTextStoryItem]);
-  end;
-
-  procedure Register;
-  begin
-    GroupDescendentsWith(TTextStoryItem, TControl);
-    RegisterSerializationClasses;
-    RegisterComponents('Zoomicon', [TTextStoryItem]);
+    RegisterFmxClasses([TTextStoryItem], [TFrame]);
   end;
 
   {$endregion}

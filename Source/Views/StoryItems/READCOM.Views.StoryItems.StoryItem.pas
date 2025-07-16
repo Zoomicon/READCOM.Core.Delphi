@@ -250,7 +250,7 @@ interface
       procedure Cut; virtual;
       procedure Copy; virtual;
       procedure Paste; overload; virtual;
-      procedure Clone; virtual; //TODO: add to IClipboardEnabled at Zoomicon.Media package
+      procedure Stamp; virtual; //TODO: add to IClipboardEnabled at Zoomicon.Media package
 
       {IStoreable}
       procedure ReadState(Reader: TReader); override;
@@ -958,22 +958,13 @@ implementation
     if Assigned(ancestorStoryPoint) then
       exit(ancestorStoryPoint);
 
-    //Loop to end of story
-    if Assigned(Story) then //TODO: we should be able to find the RootStoryItem without Story being assigned (though it would need traversing up the tree)
-    begin
-      var rootStoryItem := Story.RootStoryItem;
-      if Assigned(rootStoryItem) then
-        if rootStoryItem.StoryPoint then //if RootStoryItem is a StoryPoint return that
-          exit(rootStoryItem)
-        else
-          exit(rootStoryItem.GetLastChildStoryPoint); //return last StoryPoint child (if any) //TODO: maybe instead should return last StoryPoint found (checking from RootStoryItem)
-    end;
+    //Note: removed loop to some ending story point, there could be multiple ones
 
     //If we're the topmost StoryPoint
     if StoryPoint then
-      result := Self
+      exit(Self)
     else
-      result := nil; //no StoryPoint found
+      exit(nil); //no StoryPoint found
   end;
 
   function TStoryItem.GetNextStoryPoint: IStoryItem; //TODO: this logic doesn't work ok when there is an isolated StoryPoint deep in the hierarchy (it's ignored)
@@ -1004,21 +995,14 @@ implementation
     end;
 
     //Loop to start of story
-    if Assigned(Story) then //TODO: we should be able to find the RootStoryItem without Story being assigned (though it would need traversing up the tree)
-    begin
-      var rootStoryItem := Story.RootStoryItem;
-      if Assigned(rootStoryItem) then
-        if rootStoryItem.StoryPoint then //if RootStoryItem is a StoryPoint return that
-          exit(rootStoryItem)
-        else
-          exit(rootStoryItem.NextStoryPoint); //return first StoryPoint found (checking from RootStoryItem)
-    end;
+    if Assigned(Story) then
+      exit(Story.GetFirstStoryPoint);
 
     //If we're the topmost StoryPoint
     if StoryPoint then
-      result := Self
+      exit(Self)
     else
-      result := nil; //no StoryPoint found
+      exit(nil); //no StoryPoint found
   end;
 
   function TStoryItem.GetAncestorStoryPoint: IStoryItem;
@@ -1744,12 +1728,18 @@ implementation
 
   function TStoryItem.GetClone: IStoryItem;
   begin
-    var LClone := LoadFromString(SaveToString, true) as TStoryItem;
-    ParentStoryItem.Add(LClone);
+    var LBounds := Self.BoundsRect; //do before calling Parent.AddXX methods (they end up calling Add which resizes placed item into Parent.AreaSelector defined area if non-zero selection)
+
+    var LClone := Self.Clone(Self.Owner) {LoadFromString(SaveToString, true)} as TStoryItem;
+    ParentStoryItem.Add(LClone); //or ParentStoryItem.AddFromString(SaveToString)
+
+    LClone.SetBoundsRect(LBounds); //restore saved bounds //TODO: maybe should instead inform Add via optional boolean parameter to not resize the item
+    LClone.Index := Index; //move the clone just below the previous (now dragged item) factory. The clone is now the factory //must do afer Add //TODO: maybe instead make an Insert similar to the Add or have optional parameter for index (apart from optional param to not resize child)
+
     result := LClone;
   end;
 
-  procedure TStoryItem.Clone;
+  procedure TStoryItem.Stamp;
   begin
     GetClone; //ignore result, act like stamping/tracing
   end;
@@ -2304,10 +2294,20 @@ implementation
 
   {$endregion}
 
+  {$region 'Registration'}
+
+  procedure RegisterSerializationClasses;
+  begin
+    RegisterFmxClasses([TStoryItem], [TFrame]);
+  end;
+
+  {$endregion}
+
 initialization
   StoryItemFactories.Add([EXT_READCOM], nil); //special case, class information is in the serialization stream
 
   AddStoryItemFileFilter(FILTER_READCOM_TITLE, FILTER_READCOM_EXTS); //should make sure this is used first
 
+  RegisterSerializationClasses; //might be needed by the IDE designer, the READ-COM app doesn't save plain TStoryItem instances, only descendant classes
 end.
 

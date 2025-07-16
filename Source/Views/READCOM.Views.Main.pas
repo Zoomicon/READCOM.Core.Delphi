@@ -132,6 +132,9 @@ interface
       function GetHomeStoryItem: IStoryItem;
       procedure SetHomeStoryItem(const Value: IStoryItem);
 
+      {FirstStoryPoint}
+      function GetFirstStoryPoint: IStoryItem;
+
       {NAVIGATION}
 
       {URLs}
@@ -438,6 +441,19 @@ implementation
   procedure TMainForm.SetHomeStoryItem(const Value: IStoryItem);
   begin
     TStoryItem.HomeStoryItem := Value;
+  end;
+
+  {$endregion}
+
+  {$region 'FirstStoryPoint'}
+
+  function TMainForm.GetFirstStoryPoint: IStoryItem;
+  begin
+    var LHome := HomeStoryItem;
+    if (LHome.StoryPoint) then
+      result := LHome
+    else
+      result := HomeStoryItem.GetFirstChildStoryPoint;
   end;
 
   {$endregion}

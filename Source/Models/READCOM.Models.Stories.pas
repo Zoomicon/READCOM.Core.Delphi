@@ -56,6 +56,9 @@ interface
       function GetHomeStoryItem: IStoryItem;
       procedure SetHomeStoryItem(const Value: IStoryItem);
 
+      {FirstStoryPoint}
+      function GetFirstStoryPoint: IStoryItem;
+
       {URLs}
       procedure OpenUrl(const Url: String);
 
