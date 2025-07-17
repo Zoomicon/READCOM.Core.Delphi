@@ -1320,7 +1320,9 @@ implementation
         function(StoryItem: IStoryItem): Boolean
         begin
           with StoryItem do
-            Result := (Tags <> '') and (Anchored = AnchoredValue);
+            Result := (Tags <> '') //SetTags already has trimmed Tags string, so this checks if any Tags are available
+                      and (Anchored = AnchoredValue) //select only StoryItems with given Anchored state
+                      and (FactoryCapacity = 0); //don't select Factories (FactoryCapacity > 0), else anchored Factories (that haven't yet produced all their clones) with a Tag would be treated as Targets for tag matching (riddle solution checking). Also non-anchored Factories with a Tag would be mistreated as unmatched moveables (when the last clone is generated they are no logger a factory and they can be moved to a target)
         end
       );
     end;
@@ -1500,7 +1502,7 @@ implementation
       LStoryItemClone.FactoryCapacity := LFactoryCapacity;
 
       if (LFactoryCapacity = 0) and Anchored then //note: much check before changing Anchored
-        LStoryItemClone.Tags := ''; //if clone left behind if anchored and has no more factory capacity, remove its tags else it would act as a target (for puzzles)
+        LStoryItemClone.Tags := ''; //if clone left behind is anchored and has no more factory capacity, remove its tags else it would act as a target (for puzzles)
 
       FactoryCapacity := 0; //we left behind the clone to be the factory, we appear as the clone to the user since we're getting dragged
       Anchored := false; //must allow to get dragged (clone we left behind will still be anchored if we were - when FactoryCapacity gets to 0 [factory behaviour runs out], this will determine wether the last item behind is draggable or not)
