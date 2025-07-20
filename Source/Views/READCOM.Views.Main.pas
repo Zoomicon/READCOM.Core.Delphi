@@ -31,7 +31,81 @@ interface
 
   type
 
-    TMainForm = class(TForm, IStory)
+    TMainForm = class; //forward declaration needed, since TStory keeps a reference to TMainForm
+
+    {$region 'TStory'}
+
+    TStory = class(TComponent, IStory)
+    protected
+      UI: TMainForm;
+      //
+      FStoryMode: TStoryMode;
+
+    public
+      {Initialization}
+      constructor Create(AUI: TMainForm); reintroduce; //hiding ancestor constructor
+
+      {Zooming}
+      procedure ZoomTo(const StoryItem: IStoryItem = nil); //ZoomTo(nil) zooms to all content
+      procedure ZoomToActiveStoryPointOrHome;
+
+      {RootStoryItem}
+      function GetRootStoryItem: IStoryItem;
+      procedure SetRootStoryItem(const Value: IStoryItem);
+
+      {HomeStoryItem}
+      function GetHomeStoryItem: IStoryItem;
+      procedure SetHomeStoryItem(const Value: IStoryItem);
+
+      {FirstStoryPoint}
+      function GetFirstStoryPoint: IStoryItem;
+
+      {URLs}
+      procedure OpenUrl(const Url: String);
+
+      {ActiveStoryItem}
+      function GetActiveStoryItem: IStoryItem;
+      procedure SetActiveStoryItem(const Value: IStoryItem);
+      //
+      procedure ActivateHomeStoryItem;
+      procedure ActivateRootStoryItem;
+      procedure ActivateParentStoryItem;
+      //
+      procedure ActivateAncestorStoryPoint;
+      procedure ActivatePreviousStoryPoint;
+      procedure ActivateNextStoryPoint;
+
+      {StoryMode}
+      function GetStoryMode: TStoryMode;
+      procedure SetStoryMode(const Value: TStoryMode);
+
+    published
+      property StoryMode: TStoryMode read GetStoryMode write SetStoryMode stored false;
+      property RootStoryItem: IStoryItem read GetRootStoryItem write SetRootStoryItem stored false;
+      property HomeStoryItem: IStoryItem read GetHomeStoryItem write SetHomeStoryItem stored false;
+      property ActiveStoryItem: IStoryItem read GetActiveStoryItem write SetActiveStoryItem stored false;
+    end;
+
+    {$endregion}
+
+    {$region 'TEditableStory'}
+
+    TEditableStory = class(TStory, IStory, IStoryEditor)
+    public
+      procedure NewRootStoryItem;
+      procedure AddChildStoryItem(const TheStoryItemClass: TClass; const TheName: String); //assuming TStoryItemClass is passed
+      //
+      procedure DeleteActiveStoryItem;
+      procedure CutActiveStoryItem;
+      procedure CopyActiveStoryItem;
+      procedure PasteInActiveStoryItem;
+    end;
+
+    {$endregion}
+
+    {$region 'TMainForm'}
+
+    TMainForm = class(TForm)
       HUD: TStoryHUD;
       ZoomFrame: TZoomFrame;
       StoryTimer: TTimer;
@@ -81,7 +155,6 @@ interface
       procedure HUDcomboBackColorChange(Sender: TObject);
 
       //Options action
-      procedure ShowActiveStoryItemOptions;
       procedure HUDactionOptionsExecute(Sender: TObject);
 
       //Scaling
@@ -91,13 +164,14 @@ interface
       procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
 
     protected
+      Story: TEditableStory;
       FShiftDown: Boolean; //set by event handlers for OnFormKeyDown, OnFormKeyUp to monitor SHIFT key standalone presses
       FShortcutCut, FShortcutCopy, FShortcutPaste: TShortCut;
       FTimerStarted: Boolean;
       FCheckedCommandLineActions: Boolean;
-      FStoryMode: TStoryMode;
       FStructureViewFrameInfo: FrameStand.TFrameInfo<TStructureView>;
 
+      {Zooming}
       procedure StartInitialZoomTimer(const Delay: Cardinal = 100);
 
       {Idle}
@@ -124,52 +198,19 @@ interface
       function GetRootStoryItemView: TStoryItem;
       procedure SetRootStoryItemView(const Value: TStoryItem);
 
-      {RootStoryItem}
-      function GetRootStoryItem: IStoryItem;
-      procedure SetRootStoryItem(const Value: IStoryItem);
-
-      {HomeStoryItem}
-      function GetHomeStoryItem: IStoryItem;
-      procedure SetHomeStoryItem(const Value: IStoryItem);
-
-      {FirstStoryPoint}
-      function GetFirstStoryPoint: IStoryItem;
-
-      {NAVIGATION}
-
-      {URLs}
-      procedure OpenUrl(const Url: string);
-
       {ActiveStoryItem}
-      function GetActiveStoryItem: IStoryItem;
-      procedure SetActiveStoryItem(const Value: IStoryItem);
       procedure SetActiveStoryItemIfAssigned(const Value: IStoryItem);
       procedure HandleActiveStoryItemChanged(Sender: TObject);
-
-      {Navigation}
-      procedure ActivateRootStoryItem;
-      procedure ActivateParentStoryItem;
-      procedure ActivateHomeStoryItem;
-      //
-      procedure ActivateAncestorStoryPoint;
-      procedure ActivatePreviousStoryPoint;
-      procedure ActivateNextStoryPoint;
-      //
       procedure NavigateUp;
 
       {Orientation}
       procedure CheckProperOrientation;
 
-      {Zooming}
-      procedure ZoomTo(const StoryItem: IStoryItem = nil); //ZoomTo(nil) zooms to all content
-      procedure ZoomToActiveStoryPointOrHome;
-
       {Scaling}
       procedure RootStoryItemViewResized(Sender: TObject);
 
-      {StoryMode}
-      function GetStoryMode: TStoryMode;
-      procedure SetStoryMode(const Value: TStoryMode);
+      {Options}
+      procedure ShowActiveStoryItemOptions;
 
       {StructureView}
       function GetStructureView: TStructureView;
@@ -187,19 +228,11 @@ interface
     public
       property StructureView: TStructureView read GetStructureView stored false;
 
-      {Edit actions}
-      procedure NewRootStoryItem;
-      procedure DeleteActiveStoryItem;
-      procedure CutActiveStoryItem;
-      procedure AddChildStoryItem(const TheStoryItemClass: TStoryItemClass; const TheName: String);
-
     published
-      property StoryMode: TStoryMode read GetStoryMode write SetStoryMode stored false;
-      property RootStoryItem: IStoryItem read GetRootStoryItem write SetRootStoryItem stored false;
       property RootStoryItemView: TStoryItem read GetRootStoryItemView write SetRootStoryItemView stored false;
-      property HomeStoryItem: IStoryItem read GetHomeStoryItem write SetHomeStoryItem stored false;
-      property ActiveStoryItem: IStoryItem read GetActiveStoryItem write SetActiveStoryItem stored false;
     end;
+
+    {$endregion}
 
   var
     MainForm: TMainForm;
@@ -242,6 +275,296 @@ implementation
 
   {$R *.fmx}
 
+  {$REGION 'TStory' -----------------------------------------------------------}
+
+  constructor TStory.Create(AUI: TMainForm);
+  begin
+    inherited Create(AUI); //the form is the owner for life-time management of the Story object
+    Name := 'Story'; //displayed in Object Debugger
+    UI := AUI;
+  end;
+
+  {$region 'Zooming'}
+
+  procedure TStory.ZoomTo(const StoryItem: IStoryItem);
+  begin
+    if Assigned(StoryItem) then
+      UI.ZoomFrame.ZoomTo(StoryItem.View)
+    else
+      UI.ZoomFrame.ZoomTo; //Zoom to all content
+  end;
+
+  procedure TStory.ZoomToActiveStoryPointOrHome;
+  begin
+    var Value := ActiveStoryItem;
+    if Assigned(Value) then
+    begin
+      if not (Value.StoryPoint or Value.Home) then //not zooming down to items that are not StoryPoints or Home //must do last before the ZoomTo since we change the "Value" local variable
+        Value := Value.GetAncestorStoryPoint; //if it returns nil it will result in zooming to the RootStoryPoint
+      ZoomTo(Value);
+    end;
+  end;
+
+  {$endregion}
+
+  {$region 'RootStoryItem'}
+
+  function TStory.GetRootStoryItem: IStoryItem;
+  begin
+    result := UI.RootStoryItemView as IStoryItem;
+  end;
+
+  procedure TStory.SetRootStoryItem(const Value: IStoryItem);
+  begin
+    UI.RootStoryItemView := Value.GetView as TStoryItem; //Important: don't keep any more logic here, keeping all in SetRootStoryItemView
+  end;
+
+  {$endregion}
+
+  {$region 'HomeStoryItem'}
+
+  function TStory.GetHomeStoryItem: IStoryItem;
+  begin
+    result := TStoryItem.HomeStoryItem;
+  end;
+
+  procedure TStory.SetHomeStoryItem(const Value: IStoryItem);
+  begin
+    TStoryItem.HomeStoryItem := Value;
+  end;
+
+  {$endregion}
+
+  {$region 'FirstStoryPoint'}
+
+  function TStory.GetFirstStoryPoint: IStoryItem;
+  begin
+    var LHome := HomeStoryItem;
+    if (LHome.StoryPoint) then
+      result := LHome
+    else
+      result := HomeStoryItem.GetFirstChildStoryPoint;
+  end;
+
+  {$endregion}
+
+  {$region 'URLs'}
+
+  procedure TStory.OpenUrl(const Url: String);
+  begin
+    if Url = '-' then
+      ActivatePreviousStoryPoint
+    else if Url = '+' then
+      ActivateNextStoryPoint
+    else if Url = '0' then
+      ActivateHomeStoryItem
+    //TODO: check for other StoryPoint reference to Activate that, needed to be able to make Stories with alternative flows
+    //(e.g. "1.3" [if root is storypoint] or "3" in the flattened StructureView tree of non-Edit mode)
+
+    else if Url.EndsWith(EXT_READCOM, True) then //if it's a URL to a .readcom file (case-insensitive comparison)
+      UI.LoadFromUrl(Url)
+
+    else
+      Application.OpenURL(Url); //else open in system browser
+  end;
+
+  {$endregion}
+
+  {$region 'ActiveStoryItem'}
+
+  function TStory.GetActiveStoryItem: IStoryItem;
+  begin
+    result := TStoryItem.ActiveStoryItem;
+  end;
+
+  procedure TStory.SetActiveStoryItem(const Value: IStoryItem);
+  begin
+    TStoryItem.ActiveStoryItem := Value;
+  end;
+
+  procedure TStory.ActivateRootStoryItem;
+  begin
+    ActiveStoryItem := RootStoryItem; //there's always a RootStoryItem
+  end;
+
+  procedure TStory.ActivateParentStoryItem;
+  begin
+    var activeItem := ActiveStoryItem;
+    if Assigned(activeItem) then
+      activeItem.ActivateParentStoryItem; //this checks if ParentStoryItem is nil and does nothing in that case
+  end;
+
+  procedure TStory.ActivateHomeStoryItem;
+  begin
+    ActiveStoryItem := HomeStoryItem; //there's always a HomeStoryItem (code that loads the story takes care of that if none found, setting the RootStoryItem as HomeStoryItem)
+  end;
+
+  procedure TStory.ActivateAncestorStoryPoint;
+  begin
+    var activeItem := ActiveStoryItem;
+    if Assigned(activeItem) then
+      UI.SetActiveStoryItemIfAssigned(activeItem.GetAncestorStoryPoint);
+  end;
+
+  procedure TStory.ActivatePreviousStoryPoint;
+  begin
+    var activeItem := ActiveStoryItem;
+    if Assigned(activeItem) then
+      UI.SetActiveStoryItemIfAssigned(activeItem.PreviousStoryPoint);
+  end;
+
+  procedure TStory.ActivateNextStoryPoint;
+  begin
+    var activeItem := ActiveStoryItem;
+    if Assigned(activeItem) then
+      if ((StoryMode = EditMode) and UI.FShiftDown) or //in Edit mode only, SHIFT key held down bypasses tags-matched check and forces proceeding to NextStoryPoint
+         (activeItem.TagsMatched) then //also checking if Tags are matched (all moveables with Tags are over non-moveables with same Tags and vice-versa) to proceed
+        UI.SetActiveStoryItemIfAssigned(activeItem.NextStoryPoint)
+      else
+        TLockFrame.ShowModal(UI); //warn user that they can't proceed (till Tags are matched)
+  end;
+
+  {$endregion}
+
+  {$region 'StoryMode'}
+
+  function TStory.GetStoryMode: TStoryMode;
+  begin
+    result := FStoryMode;
+  end;
+
+  procedure TStory.SetStoryMode(const Value: TStoryMode);
+  begin
+    FStoryMode := Value;
+    var isEditMode := (Value = EditMode);
+
+    if Assigned(ActiveStoryItem) then
+    begin
+      var view := ActiveStoryItem.View as TStoryItem;
+      if Assigned(view) then
+      begin
+        view.EditMode := isEditMode; //TODO: should add an EditMode property to the Story?
+        ZoomToActiveStoryPointOrHome; //keep the Active StoryPoint or Home in view //TODO: should we always ZoomTo when switching story mode? (e.g. entering or exiting EditMode? this is useful after having autoloaded saved state)
+      end;
+    end;
+
+    if Assigned(UI.FStructureViewFrameInfo) then
+      with UI.FStructureViewFrameInfo.Frame do
+      begin
+        DragDropReorder := isEditMode; //allow moving items in the structure view to change parent or add to same parent again to change their Z-order
+        DragDropReparent := isEditMode; //allow reparenting //TODO: should do after listening to some event so that the control is scaled/repositioned to show in their parent (note that maybe we should also have parent story items clip their children, esp if their panels)
+        UI.UpdateStructureView; //must refresh StructureView contents since we change the FilterMode based on isEditMode
+      end;
+
+    if (not isEditMode) and Assigned(ActiveStoryItem) and (not ActiveStoryItem.StoryPoint) then //if current ActiveStoryItem isn't a StoryPoint, then when exiting Edit mode...
+    begin
+      var ancestor := ActiveStoryItem.GetAncestorStoryPoint; //...try to activeate an ancestor StoryPoint
+      if Assigned(ancestor) then
+        ActiveStoryItem := ancestor
+      else
+        ActiveStoryItem := RootStoryItem; //...making sure we always end up with an ActiveStoryItem (the RootStoryItem) when no StoryPoints have been defined
+    end;
+  end;
+
+  {$endregion}
+
+  {$ENDREGION .................................................................}
+
+  {$REGION 'TEditableStory' ---------------------------------------------------}
+
+  procedure TEditableStory.NewRootStoryItem; //Note: make sure any keyboard actions call the action event handlers since only those do confirmation
+  begin
+    with UI do
+    begin
+      RootStoryItemView := nil; //must do first to free the previous one (to avoid naming clashes)
+      var newRootStoryItemView := TImageStoryItem.Create(Self); //Note: very old versions may expect a TBitmapImageStoryItem instead, ignoring them to keep design clean
+      with newRootStoryItemView do
+        begin
+        //ClipChildren := true; //Empty RootStoryItem should maybe clip its children (not doing at SetRootStoryItem since we may have loaded a template there - anyway commenting out here too in case one wants to design a template from scratch)
+        Size.Size := TSizeF.Create(ZoomFrame.Width, ZoomFrame.Height);
+        EditMode := HUD.EditMode; //TODO: add EditMode property to IStory or use its originally intended mode one
+        end;
+      RootStoryItemView := newRootStoryItemView;
+    end;
+  end;
+
+  procedure TEditableStory.AddChildStoryItem(const TheStoryItemClass: TClass; const TheName: String); //assuming TStoryItemClass is passed
+  begin
+    if not ((StoryMode = EditMode) and Assigned(ActiveStoryItem)) then exit; //only in Edit mode and when an ActiveStoryItem is assigned
+
+    var OwnerAndParent := ActiveStoryItem.View;
+
+    var StoryItem := TStoryItemClass(TheStoryItemClass).Create(OwnerAndParent, TheName); //TODO: should have separate actions for adding such default items (for prototyping) for various StoryItem classes
+
+    with StoryItem do
+    begin
+      Align := TAlignLayout.Scale; //IMPORTANT: adjust when parent resizes
+      Parent := OwnerAndParent;
+
+      var TheAreaSelector := TStoryItem(OwnerAndParent).AreaSelector; //WARNING: Delphi 11 seems to resolve identifiers against the "with" first and THEN the local variables that were defined inside the with block. Don't name this AreaSelector since StoryItem has such property and accessing the Visible property below will get the wrong result...
+      if TheAreaSelector.Visible and (TheAreaSelector.Width <> 0) and (TheAreaSelector.Height <> 0) then //...even worse the IDE introspection during debugging shows the object one was expecting (the one from the local variable), but the one from with would be used instead (checking the wrong "Visible" property value)
+      begin
+        Size.Size := TheAreaSelector.Size.Size;
+        Position.Point := TheAreaSelector.Position.Point; //TODO: assuming the AreaSelector has the same parent, if not (say using a global area selector in the future) should have some way for the AreaSelector to give map the coordinates to the wanted parent
+      end
+      else
+      begin
+        var ItemSize := DefaultSize;
+        Size.Size := ItemSize; //TODO: StoryItem constructor should have set its DefaultSize
+        //Center the new item in its parent...
+        Position.Point := PointF(OwnerAndParent.Size.Width/2 - ItemSize.Width/2, OwnerAndParent.Size.Height/2 - ItemSize.Height/2); //not creating TPosition objects to avoid leaking (TPointF is a record)
+      end;
+
+      BringToFront; //load as front-most
+    end;
+
+    UI.UpdateStructureView; //TODO: should instead have some notification from inside a StoryItem towards the StructureView that children were added to it (similar to how StructureView listens for children removal)
+  end;
+
+  //
+
+  procedure TEditableStory.DeleteActiveStoryItem; //Note: make sure any keyboard actions call the action event handlers since only those do confirmation
+  begin
+    if not Assigned(ActiveStoryItem) then exit;
+
+    if ActiveStoryItem.IsRoot then
+      NewRootStoryItem //deleting the RootStoryItem via "NewRootStoryItem", but not via "HUD.actionNew.Execute" since that also tries "LoadDefaultDocument" first //RootStoryItem change updates StructureView //note: confirmation is only done at "HUDactionCutExecute"
+    else
+      ActiveStoryItem.Delete; //this makes ParentStoryItem active (which updates StructureView)
+  end;
+
+  procedure TEditableStory.CutActiveStoryItem; //Note: make sure any keyboard actions call the action event handlers since only those do confirmation (e.g. when Root is the ActiveStoryItem)
+  begin
+    if not Assigned(ActiveStoryItem) then exit;
+
+    if ActiveStoryItem.IsRoot then
+      begin
+        ActiveStoryItem.Copy; //needed to simulate "Cut"
+        NewRootStoryItem; //deleting the RootStoryItem via "NewRootStoryItem", but not via "HUD.actionNew.Execute" since that also tries "LoadDefaultDocument" first //RootStoryItem change updates StructureView //note: confirmation is only done at "HUDactionCutExecute"
+      end
+    else
+      ActiveStoryItem.Cut; //this makes ParentStoryItem active (which updates StructureView)
+  end;
+
+  procedure TEditableStory.CopyActiveStoryItem;
+  begin
+    if not Assigned(ActiveStoryItem) then exit;
+
+    ActiveStoryItem.Copy;
+  end;
+
+  procedure TEditableStory.PasteInActiveStoryItem;
+  begin
+    if not Assigned(ActiveStoryItem) then exit;
+
+    ActiveStoryItem.Paste;
+
+    UI.UpdateStructureView; //TODO: should do instead similar to deletion by somehow notifying from inside the StoryItem itself the StructureView that items have been added
+  end;
+
+  {$ENDREGION .................................................................}
+
+  {$REGION 'TMainForm' --------------------------------------------------------}
 
   {$region 'DoWithWaitPrompt' //TODO: move to a TWaitFrame class method (say TWaitFrame.Do)}
 
@@ -316,10 +639,14 @@ implementation
       Caption := STR_APP_TITLE + ' ' + STR_COMPATIBILITY_MODE;
     {$ENDIF}
 
-    TStoryItem.Story := Self; //provide a way to StoryItems to influence the Story context
+    Story := TEditableStory.Create(Self);
+    TStoryItem.Story := Self.Story; //provide a way to StoryItems to influence the Story context
+
     FTimerStarted := false;
     FCheckedCommandLineActions := false;
+
     InitHUD;
+
     //ZoomFrame.ScrollBox.AniCalculations.AutoShowing := true; //fade the toolbars when not active //TODO: doesn't work with direct mouse drags near the bottom and right edges (scrollbars do show when scrolling e.g. with mousewheel) since there's other HUD content above them (the navigation and the edit sidebar panes)
 
     Application.OnIdle := Idle;
@@ -346,21 +673,7 @@ implementation
 
   {$ENDREGION}
 
-  {$region 'IStory'}
-
-  {$region 'RootStoryItem'}
-
-  function TMainForm.GetRootStoryItem: IStoryItem;
-  begin
-    result := RootStoryItemView as IStoryItem;
-  end;
-
-  procedure TMainForm.SetRootStoryItem(const Value: IStoryItem);
-  begin
-    RootStoryItemView := Value.GetView as TStoryItem; //Important: don't keep any more logic here, keeping all in SetRootStoryItemView
-  end;
-
-  {$endregion}
+  {$REGION 'TStory related'}
 
   {$region 'RootStoryItemView'}
 
@@ -376,7 +689,7 @@ implementation
     if Assigned(TheRootStoryItemView) and (Value <> TheRootStoryItemView) then //must check that the same one isn't set again to avoid destroying it
       begin
       //TheRootStoryItemView.Parent := nil; //shouldn't be needed
-      ActiveStoryItem := nil; //must clear reference to old ActiveStoryItem since all StoryItems will be destroyed
+      Story.ActiveStoryItem := nil; //must clear reference to old ActiveStoryItem since all StoryItems will be destroyed
       FreeAndNil(TheRootStoryItemView); //destroy the old RootStoryItem //FREE THE CONTROL, DON'T FREE JUST THE INTERFACE
       end;
 
@@ -415,11 +728,14 @@ implementation
         //ClipChildren := true; //Note: not doing here, since if RootStoryItem always clip its children and we load a Template (say a rabbit with its speech bubble), then children of that template will be clipped and when saved the top object in that template will get the ClipChildren=true which is unwanted
       end;
 
-      if not Assigned(HomeStoryItem) then
-        HomeStoryItem := RootStoryItem; //set RootStoryItem as the HomeStoryItem if no such assigned
+      with Story do
+      begin
+        if not Assigned(Story.HomeStoryItem) then
+          HomeStoryItem := RootStoryItem; //set RootStoryItem as the HomeStoryItem if no such assigned
 
-      if not Assigned(ActiveStoryItem) then
-        ActiveStoryItem := RootStoryItem; //set RootStoryItem as the ActiveStoryItem if no such is set (e.g. from loaded state). Note this will also try to ZoomTo it
+        if not Assigned(ActiveStoryItem) then
+          ActiveStoryItem := RootStoryItem; //set RootStoryItem as the ActiveStoryItem if no such is set (e.g. from loaded state). Note this will also try to ZoomTo it
+      end;
 
       CheckReplaceStoryAllText;
 
@@ -431,73 +747,12 @@ implementation
 
   {$endregion}
 
-  {$region 'HomeStoryItem'}
-
-  function TMainForm.GetHomeStoryItem: IStoryItem;
-  begin
-    result := TStoryItem.HomeStoryItem;
-  end;
-
-  procedure TMainForm.SetHomeStoryItem(const Value: IStoryItem);
-  begin
-    TStoryItem.HomeStoryItem := Value;
-  end;
-
-  {$endregion}
-
-  {$region 'FirstStoryPoint'}
-
-  function TMainForm.GetFirstStoryPoint: IStoryItem;
-  begin
-    var LHome := HomeStoryItem;
-    if (LHome.StoryPoint) then
-      result := LHome
-    else
-      result := HomeStoryItem.GetFirstChildStoryPoint;
-  end;
-
-  {$endregion}
-
-  {$region 'Navigation'}
-
-  {$region 'URLs'}
-
-  procedure TMainForm.OpenUrl(const Url: String);
-  begin
-    if Url = '-' then
-      ActivatePreviousStoryPoint
-    else if Url = '+' then
-      ActivateNextStoryPoint
-    else if Url = '0' then
-      ActivateHomeStoryItem
-    //TODO: check for other StoryPoint reference to Activate that, needed to be able to make Stories with alternative flows
-    //(e.g. "1.3" [if root is storypoint] or "3" in the flattened StructureView tree of non-Edit mode)
-
-    else if Url.EndsWith(EXT_READCOM, True) then //if it's a URL to a .readcom file (case-insensitive comparison)
-      LoadFromUrl(Url)
-
-    else
-      Application.OpenURL(Url); //else open in system browser
-  end;
-
-  {$endregion}
-
   {$region 'ActiveStoryItem'}
-
-  function TMainForm.GetActiveStoryItem: IStoryItem;
-  begin
-    result := TStoryItem.ActiveStoryItem;
-  end;
-
-  procedure TMainForm.SetActiveStoryItem(const Value: IStoryItem);
-  begin
-    TStoryItem.ActiveStoryItem := Value;
-  end;
 
   procedure TMainForm.SetActiveStoryItemIfAssigned(const Value: IStoryItem);
   begin
     if Assigned(Value) then
-      SetActiveStoryItem(Value);
+      Story.SetActiveStoryItem(Value);
   end;
 
   procedure TMainForm.HandleActiveStoryItemChanged(Sender: TObject);
@@ -522,7 +777,7 @@ implementation
 
     RecursiveClearEditMode(RootStoryItemView); //Clear EditMode from all items recursively
 
-    var Value := ActiveStoryItem;
+    var Value := Story.ActiveStoryItem;
 
     //Set any current editmode to the newly active item
     if Assigned(Value) then
@@ -570,154 +825,26 @@ implementation
 
     //HUD.actionDelete.Visible := (ActiveStoryItem.View <> RootStoryItem.View); //doesn't seem to work (neither HUD.btnDelete.Visible does), but have implemented delete of RootStoryItem as a call to actionNew.Execute instead
 
-    ZoomToActiveStoryPointOrHome;
+    Story.ZoomToActiveStoryPointOrHome;
 
     //CheckProperOrientation; //don't do here, it gets annoying to show rotation modal popup upon navigation, plus some Stories may have StoryItems that are designed to be partially appear side-by-side to appear as books
   end;
 
-  procedure TMainForm.CheckProperOrientation;
-  begin
-    var activeItem := ActiveStoryItem;
-    if Assigned(activeItem) then
-      TRotateFrame.ShowModal(Self, (Orientation <> activeItem.View.Orientation)); //Show or Hide rotation prompt based on orientation difference of MainForm and ActiveStoryItem.View
-  end;
-
-  {$endregion}
-
-  procedure TMainForm.ActivateRootStoryItem;
-  begin
-    ActiveStoryItem := RootStoryItem; //there's always a RootStoryItem
-  end;
-
-  procedure TMainForm.ActivateParentStoryItem;
-  begin
-    var activeItem := ActiveStoryItem;
-    if Assigned(activeItem) then
-      activeItem.ActivateParentStoryItem; //this checks if ParentStoryItem is nil and does nothing in that case
-  end;
-
-  procedure TMainForm.ActivateHomeStoryItem;
-  begin
-    ActiveStoryItem := HomeStoryItem; //there's always a HomeStoryItem (code that loads the story takes care of that if none found, setting the RootStoryItem as HomeStoryItem)
-  end;
-
-  procedure TMainForm.ActivateAncestorStoryPoint;
-  begin
-    var activeItem := ActiveStoryItem;
-    if Assigned(activeItem) then
-      SetActiveStoryItemIfAssigned(activeItem.GetAncestorStoryPoint);
-  end;
-
-  procedure TMainForm.ActivatePreviousStoryPoint;
-  begin
-    var activeItem := ActiveStoryItem;
-    if Assigned(activeItem) then
-      SetActiveStoryItemIfAssigned(activeItem.PreviousStoryPoint);
-  end;
-
-  procedure TMainForm.ActivateNextStoryPoint;
-  begin
-    var activeItem := ActiveStoryItem;
-    if Assigned(activeItem) then
-      if ((StoryMode = EditMode) and FShiftDown) or //in Edit mode only, SHIFT key held down bypasses tags-matched check and forces proceeding to NextStoryPoint
-         (activeItem.TagsMatched) then //also checking if Tags are matched (all moveables with Tags are over non-moveables with same Tags and vice-versa) to proceed
-        SetActiveStoryItemIfAssigned(activeItem.NextStoryPoint)
-      else
-        TLockFrame.ShowModal(Self); //warn user that they can't proceed (till Tags are matched)
-  end;
-
   procedure TMainForm.NavigateUp;
   begin
-    if (StoryMode <> EditMode) then //if not in Edit mode...
-      ActivateAncestorStoryPoint //go to (nearest) AncestorStoryPoint, if any
-
-    else //if in Edit mode...
-      if FShiftDown then //if SHIFT pressed, go to RootStoryItem
-        ActivateRootStoryItem
-      else
-        ActivateParentStoryItem //go to ParentStoryItem
-  end;
-
-  {$endregion}
-
-  {$region 'StoryMode'}
-
-  function TMainForm.GetStoryMode: TStoryMode;
-  begin
-    result := FStoryMode;
-  end;
-
-  /// Get or Create StructureView
-  /// note: when app is getting destroyed this will return nil
-  function TMainForm.GetStructureView: TStructureView;
-  begin
-    if not Assigned (FStructureViewFrameInfo) then
-    begin
-      FStructureViewFrameInfo := HUD.MultiViewFrameStand.GetFrameInfo<TStructureView>;
-      with FStructureViewFrameInfo.Frame do
-      begin
-        ShowOnlyClasses := TClassList.Create([TStoryItem]); //TStructureView's destructor will FreeAndNil that TClassList instance
-        ShowNames := false;
-        ShowTypes := false;
-
-        if (StoryMode <> EditMode) then //if non-Edit mode
-          FilterMode := tfFlatten
+    with Story do
+      if (StoryMode <> EditMode) then //if not in Edit mode...
+        ActivateAncestorStoryPoint //go to (nearest) AncestorStoryPoint, if any
+      else //if in Edit mode...
+        if FShiftDown then //if SHIFT pressed, go to RootStoryItem
+          ActivateRootStoryItem
         else
-          FilterMode := tfPrune;
-
-        var isEditMode := (StoryMode = EditMode);
-        DragDropReorder := isEditMode; //allow moving items in the structure view to change parent or add to same parent again to change their Z-order
-        DragDropReparent := isEditMode; //allow reparenting //TODO: should do after listening to some event so that the control is scaled/repositioned to show in their parent (note that maybe we should also have parent story items clip their children, esp if their panels)
-        DragDropSelectTarget := true; //always select (make active / zoom to) the Target StoryItem after a drag-drop operation in the structure view
-
-        OnSelection := StructureViewSelection;
-        OnContextMenu := StructureViewContextMenu;
-        OnShowFilter := StructureViewShowFilter;
-      end;
-    end;
-
-    if Assigned(FStructureViewFrameInfo) then //if we've managed to create a StructureView in a TFrameStand
-      result := FStructureViewFrameInfo.Frame
-    else
-      result := nil; //failed to create a StructureView in a TFrameStand (e.g. when app is getting destroyed)
-  end;
-
-  procedure TMainForm.SetStoryMode(const Value: TStoryMode);
-  begin
-    FStoryMode := Value;
-    var isEditMode := (Value = EditMode);
-
-    if Assigned(ActiveStoryItem) then
-    begin
-      var view := ActiveStoryItem.View as TStoryItem;
-      if Assigned(view) then
-      begin
-        view.EditMode := isEditMode; //TODO: should add an EditMode property to the Story?
-        ZoomToActiveStoryPointOrHome; //keep the Active StoryPoint or Home in view //TODO: should we always ZoomTo when switching story mode? (e.g. entering or exiting EditMode? this is useful after having autoloaded saved state)
-      end;
-    end;
-
-    if Assigned(FStructureViewFrameInfo) then
-      with FStructureViewFrameInfo.Frame do
-      begin
-        DragDropReorder := isEditMode; //allow moving items in the structure view to change parent or add to same parent again to change their Z-order
-        DragDropReparent := isEditMode; //allow reparenting //TODO: should do after listening to some event so that the control is scaled/repositioned to show in their parent (note that maybe we should also have parent story items clip their children, esp if their panels)
-        UpdateStructureView; //must refresh StructureView contents since we change the FilterMode based on isEditMode
-      end;
-
-    if (not isEditMode) and Assigned(ActiveStoryItem) and (not ActiveStoryItem.StoryPoint) then //if current ActiveStoryItem isn't a StoryPoint, then when exiting Edit mode...
-    begin
-      var ancestor := ActiveStoryItem.GetAncestorStoryPoint; //...try to activeate an ancestor StoryPoint
-      if Assigned(ancestor) then
-        ActiveStoryItem := ancestor
-      else
-        ActiveStoryItem := RootStoryItem; //...making sure we always end up with an ActiveStoryItem (the RootStoryItem) when no StoryPoints have been defined
-    end;
+          ActivateParentStoryItem //go to ParentStoryItem
   end;
 
   {$endregion}
 
-  {$region 'ZoomTo'}
+  {$region 'Zooming'}
 
   procedure TMainForm.StartInitialZoomTimer(const Delay: Cardinal = 100);
   begin
@@ -730,47 +857,13 @@ implementation
     end;
   end;
 
-  procedure TMainForm.ZoomTo(const StoryItem: IStoryItem);
-  begin
-    if Assigned(StoryItem) then
-      ZoomFrame.ZoomTo(StoryItem.View)
-    else
-      ZoomFrame.ZoomTo; //Zoom to all content
-  end;
-
-  procedure TMainForm.ZoomToActiveStoryPointOrHome;
-  begin
-    var Value := ActiveStoryItem;
-    if Assigned(Value) then
-    begin
-      if not (Value.StoryPoint or Value.Home) then //not zooming down to items that are not StoryPoints or Home //must do last before the ZoomTo since we change the "Value" local variable
-        Value := Value.GetAncestorStoryPoint; //if it returns nil it will result in zooming to the RootStoryPoint
-      ZoomTo(Value);
-    end;
-  end;
-
   {$endregion}
 
-  {$endregion}
+  {$ENDREGION}
 
   {$REGION 'Events'}
 
   {$region 'File actions'}
-
-  procedure TMainForm.NewRootStoryItem; //Note: make sure any keyboard actions call the action event handlers since only those do confirmation
-  begin
-    RootStoryItemView := nil; //must do first to free the previous one (to avoid naming clashes)
-    var newRootStoryItemView := TImageStoryItem.Create(Self); //Note: very old versions may expect a TBitmapImageStoryItem instead, ignoring them to keep design clean
-    with newRootStoryItemView do
-      begin
-      //ClipChildren := true; //Empty RootStoryItem should maybe clip its children (not doing at SetRootStoryItem since we may have loaded a template there - anyway commenting out here too in case one wants to design a template from scratch)
-      Size.Size := TSizeF.Create(ZoomFrame.Width, ZoomFrame.Height);
-      EditMode := HUD.EditMode; //TODO: add EditMode property to IStory or use its originally intended mode one
-      end;
-    RootStoryItemView := newRootStoryItemView;
-  end;
-
-  //
 
   procedure TMainForm.HUDactionNewExecute(Sender: TObject);
   begin
@@ -778,7 +871,7 @@ implementation
       procedure(Confirmed: Boolean)
       begin
         if Confirmed and (not LoadDefaultDocument) then
-          NewRootStoryItem;
+          Story.NewRootStoryItem;
       end
     );
   end;
@@ -796,7 +889,7 @@ implementation
           if (Filename <> '') then
             begin
               if LoadFromFile(Filename) then //Note: just doing RootStoryItemView := TStoryItem.LoadNew(Filename) wouldn't work do font resizing since that won't do StartInitialZoomTimer
-                ActivateHomeStoryItem; //set the HomeStoryItem (if not any the RootStoryItem will have been set as such by SetRootStoryView) to active (not doing this when loading saved app state)
+                Story.ActivateHomeStoryItem; //set the HomeStoryItem (if not any the RootStoryItem will have been set as such by SetRootStoryView) to active (not doing this when loading saved app state)
 
               //TODO: OLD-CODE-LINE-REMOVE? //RootStoryItemView := RootStoryItemView; //repeat calculations to adapt ZoomFrame.ScaledLayout size //TODO: when RootStoryItemViewResized starts working this shouldn't be needed here anymore
             end;
@@ -813,7 +906,7 @@ implementation
       procedure
       begin
         //HUD.actionSaveExecute(Sender);
-        RootStoryItem.Options.ActSave; //this shows a file dialog
+        Story.RootStoryItem.Options.ActSave; //this shows a file dialog
       end
     );
   end;
@@ -824,119 +917,72 @@ implementation
 
   procedure TMainForm.HUDEditModeChanged(Sender: TObject; const Value: Boolean);
   begin
-    if Value then
-      StoryMode := EditMode
-    else
-      StoryMode := TStoryMode.InteractiveStoryMode; //TODO: should remember previous mode to restore or make EditMode a separate situation
+    with Story do
+      if Value then
+        StoryMode := EditMode
+      else
+        StoryMode := TStoryMode.InteractiveStoryMode; //TODO: should remember previous mode to restore or make EditMode a separate situation
   end;
 
   {$region 'Add actions'}
 
-  procedure TMainForm.AddChildStoryItem(const TheStoryItemClass: TStoryItemClass; const TheName: String);
-  begin
-    if not (HUD.EditMode and Assigned(ActiveStoryItem)) then exit; //only in Edit mode and when an ActiveStoryItem is assigned
-
-    var OwnerAndParent := ActiveStoryItem.View;
-
-    var StoryItem := TheStoryItemClass.Create(OwnerAndParent, TheName); //TODO: should have separate actions for adding such default items (for prototyping) for various StoryItem classes
-
-    with StoryItem do
-    begin
-      Align := TAlignLayout.Scale; //IMPORTANT: adjust when parent resizes
-      Parent := OwnerAndParent;
-
-      var TheAreaSelector := TStoryItem(OwnerAndParent).AreaSelector; //WARNING: Delphi 11 seems to resolve identifiers against the "with" first and THEN the local variables that were defined inside the with block. Don't name this AreaSelector since StoryItem has such property and accessing the Visible property below will get the wrong result...
-      if TheAreaSelector.Visible and (TheAreaSelector.Width <> 0) and (TheAreaSelector.Height <> 0) then //...even worse the IDE introspection during debugging shows the object one was expecting (the one from the local variable), but the one from with would be used instead (checking the wrong "Visible" property value)
-      begin
-        Size.Size := TheAreaSelector.Size.Size;
-        Position.Point := TheAreaSelector.Position.Point; //TODO: assuming the AreaSelector has the same parent, if not (say using a global area selector in the future) should have some way for the AreaSelector to give map the coordinates to the wanted parent
-      end
-      else
-      begin
-        var ItemSize := DefaultSize;
-        Size.Size := ItemSize; //TODO: StoryItem constructor should have set its DefaultSize
-        //Center the new item in its parent...
-        Position.Point := PointF(OwnerAndParent.Size.Width/2 - ItemSize.Width/2, OwnerAndParent.Size.Height/2 - ItemSize.Height/2); //not creating TPosition objects to avoid leaking (TPointF is a record)
-      end;
-
-      BringToFront; //load as front-most
-    end;
-
-    UpdateStructureView; //TODO: should instead have some notification from inside a StoryItem towards the StructureView that children were added to it (similar to how StructureView listens for children removal)
-  end;
-
-  //
-
   procedure TMainForm.HUDactionAddExecute(Sender: TObject);
   begin
-    if not (HUD.EditMode and Assigned(ActiveStoryItem)) then exit; //only in Edit mode and when an ActiveStoryItem is assigned
+    with Story do
+    begin
+      if not ((StoryMode = EditMode) and Assigned(ActiveStoryItem)) then exit; //only in Edit mode and when an ActiveStoryItem is assigned
 
-    ActiveStoryItem.Options.ActAdd;
-    UpdateStructureView; //TODO: should instead have some notification from inside a StoryItem towards the StructureView that children were added to it (similar to how StructureView listens for children removal)
+      ActiveStoryItem.Options.ActAdd;
+      UpdateStructureView; //TODO: should instead have some notification from inside a StoryItem towards the StructureView that children were added to it (similar to how StructureView listens for children removal)
+    end;
   end;
 
   procedure TMainForm.HUDactionAddImageStoryItemExecute(Sender: TObject); //TODO: should change to add a VisualStoryItem that will support any kind of visual item
   begin
-    if not (HUD.EditMode and Assigned(ActiveStoryItem)) then exit; //only in Edit mode and when an ActiveStoryItem is assigned
+    with Story do
+    begin
+      if not ((StoryMode = EditMode) and Assigned(Story.ActiveStoryItem)) then exit; //only in Edit mode and when an ActiveStoryItem is assigned
 
-    AddChildStoryItem(TImageStoryItem, 'ImageStoryItem'); //will also update the StructureView //Note: very old versions may expect a TBitmapImageStoryItem instead, ignoring them to keep design clean
-    //problem is they don't show border when in non-Edit mode, but could have option to show border for any StoryItem and/or style the border color/width, clip children etc. to make like older PanelStoryItem
+      AddChildStoryItem(TImageStoryItem, 'ImageStoryItem'); //will also update the StructureView //Note: very old versions may expect a TBitmapImageStoryItem instead, ignoring them to keep design clean
+      //problem is they don't show border when in non-Edit mode, but could have option to show border for any StoryItem and/or style the border color/width, clip children etc. to make like older PanelStoryItem
+    end;
   end;
 
   procedure TMainForm.HUDactionAddTextStoryItemExecute(Sender: TObject);
   begin
-    if not (HUD.EditMode and Assigned(ActiveStoryItem)) then exit; //only in Edit mode and when an ActiveStoryItem is assigned
+    with Story do
+    begin
+      if not ((StoryMode = EditMode) and Assigned(Story.ActiveStoryItem)) then exit; //only in Edit mode and when an ActiveStoryItem is assigned
 
-    AddChildStoryItem(TTextStoryItem, 'TextStoryItem'); //will also update the StructureView
+      Story.AddChildStoryItem(TTextStoryItem, 'TextStoryItem'); //will also update the StructureView
+    end;
   end;
 
   {$endregion}
 
   {$region 'Edit actions'}
 
-  procedure TMainForm.DeleteActiveStoryItem; //Note: make sure any keyboard actions call the action event handlers since only those do confirmation
-  begin
-    if not Assigned(ActiveStoryItem) then exit;
-
-    if ActiveStoryItem.IsRoot then
-      NewRootStoryItem //deleting the RootStoryItem via "NewRootStoryItem", but not via "HUD.actionNew.Execute" since that also tries "LoadDefaultDocument" first //RootStoryItem change updates StructureView //note: confirmation is only done at "HUDactionCutExecute"
-    else
-      ActiveStoryItem.Delete; //this makes ParentStoryItem active (which updates StructureView)
-  end;
-
-  procedure TMainForm.CutActiveStoryItem; //Note: make sure any keyboard actions call the action event handlers since only those do confirmation
-  begin
-    if not Assigned(ActiveStoryItem) then exit;
-
-    if ActiveStoryItem.IsRoot then
-      begin
-        ActiveStoryItem.Copy; //needed to simulate "Cut"
-        NewRootStoryItem; //deleting the RootStoryItem via "NewRootStoryItem", but not via "HUD.actionNew.Execute" since that also tries "LoadDefaultDocument" first //RootStoryItem change updates StructureView //note: confirmation is only done at "HUDactionCutExecute"
-      end
-    else
-      ActiveStoryItem.Cut; //this makes ParentStoryItem active (which updates StructureView)
-  end;
-
-  //
-
   procedure TMainForm.HUDactionDeleteExecute(Sender: TObject);
   begin
-    if not (HUD.EditMode and Assigned(ActiveStoryItem)) then exit; //only in Edit mode (plus safety check for ActiveStoryItem)
+    with Story do
+    begin
+      if not ((StoryMode = EditMode) and Assigned(Story.ActiveStoryItem)) then exit; //only in Edit mode (plus safety check for ActiveStoryItem before prompting user)
 
-    var msg: String;
-    if ActiveStoryItem.IsRoot then
-      msg := MSG_CONFIRM_CLEAR_STORY
-    else
-      msg := MSG_CONFIRM_DELETION;
+      var msg: String;
+      if ActiveStoryItem.IsRoot then
+        msg := MSG_CONFIRM_CLEAR_STORY
+      else
+        msg := MSG_CONFIRM_DELETION;
 
-    //Always confirming for destructive actions like deletion
-    TApplication.Confirm(msg, //confirmation done only at the action level //Note: could also use Application.Confirm since Confirm is defined as a class function in ApplicationHelper (and those can be called on object instances of the respective class too)
-      procedure(Confirmed: Boolean)
-      begin
-        if Confirmed then
-         DeleteActiveStoryItem;
-      end
-    );
+      //Always confirming for destructive actions like deletion
+      TApplication.Confirm(msg, //confirmation done only at the action level //Note: could also use Application.Confirm since Confirm is defined as a class function in ApplicationHelper (and those can be called on object instances of the respective class too)
+        procedure(Confirmed: Boolean)
+        begin
+          if Confirmed then
+           DeleteActiveStoryItem;
+        end
+      );
+    end;
   end;
 
   procedure TMainForm.HUDactionCutExecute(Sender: TObject);
@@ -947,33 +993,36 @@ implementation
       exit;
     end;
 
-    if not (HUD.EditMode and Assigned(ActiveStoryItem)) then exit; //only in Edit mode (plus safety check for ActiveStoryItem)
+    with Story do
+    begin
+      if not ((StoryMode = EditMode) and Assigned(Story.ActiveStoryItem)) then exit; //only in Edit mode (plus safety check for ActiveStoryItem before prompting user)
 
-    //Not considering Cut a destructive action since one can Paste back. However when cutting the RootStoryItem, since it has no parent to be activated and a new RootStoryItem will be created, paste back means it will become a child of the new RootStoryItem, so asking for confirmation only when cutting the RootStoryItem
-    if ActiveStoryItem.IsRoot then
-      TApplication.Confirm(MSG_CONFIRM_CLEAR_STORY, //confirmation done only at the action level //Note: could also use Application.Confirm since Confirm is defined as a class function in ApplicationHelper (and those can be called on object instances of the respective class too)
-        procedure(Confirmed: Boolean)
-        begin
-          if Confirmed then
-            CutActiveStoryItem;
-        end
-      )
-    else
-      CutActiveStoryItem; //no confirmation for cutting non-Root StoryItems
+      //Not considering Cut a destructive action since one can Paste back. However when cutting the RootStoryItem, since it has no parent to be activated and a new RootStoryItem will be created, paste back means it will become a child of the new RootStoryItem, so asking for confirmation only when cutting the RootStoryItem
+      if ActiveStoryItem.IsRoot then
+        TApplication.Confirm(MSG_CONFIRM_CLEAR_STORY, //confirmation done only at the action level //Note: could also use Application.Confirm since Confirm is defined as a class function in ApplicationHelper (and those can be called on object instances of the respective class too)
+          procedure(Confirmed: Boolean)
+          begin
+            if Confirmed then
+              CutActiveStoryItem;
+          end
+        )
+      else
+        CutActiveStoryItem; //no confirmation needed for cutting non-Root StoryItems
+    end;
   end;
 
   procedure TMainForm.HUDactionCopyExecute(Sender: TObject);
   begin
-    if not (HUD.EditMode and Assigned(ActiveStoryItem)) then exit; //only in Edit mode and when an ActiveStoryItem is assigned
-    ActiveStoryItem.Copy;
-  end;
+    with Story do
+      if (StoryMode = EditMode) then //only in Edit mode
+        CopyActiveStoryItem; //will check if ActiveStoryItem is assigned
+   end;
 
   procedure TMainForm.HUDactionPasteExecute(Sender: TObject);
   begin
-    if not (HUD.EditMode and Assigned(ActiveStoryItem)) then exit; //only in Edit mode and when an ActiveStoryItem is assigned
-
-    ActiveStoryItem.Paste;
-    UpdateStructureView; //TODO: should do similar to deletion by somehow notifying from inside the StoryItem itself the StructureView that items have been added
+    with Story do
+      if (StoryMode = EditMode) then //only in Edit mode
+        PasteInActiveStoryItem; //will check if ActiveStoryItem is assigned
   end;
 
   {$endregion}
@@ -982,18 +1031,24 @@ implementation
 
   procedure TMainForm.HUDactionFlipHorizontallyExecute(Sender: TObject);
   begin
-    if not (HUD.EditMode and Assigned(ActiveStoryItem)) then exit; //only in Edit mode and when an ActiveStoryItem is assigned
+    with Story do
+    begin
+      if not ((StoryMode = EditMode) and Assigned(ActiveStoryItem)) then exit; //only in Edit mode and when an ActiveStoryItem is assigned
 
-    ActiveStoryItem.FlippedHorizontally := not ActiveStoryItem.FlippedHorizontally;
-    UpdateStructureView; //TODO: should maybe only update the tree of thumbs from the ActiveStoryItem up to the root by somehow notifying from inside the StoryItem itself the StructureView our graphics have changed
+      ActiveStoryItem.FlippedHorizontally := not ActiveStoryItem.FlippedHorizontally;
+      UpdateStructureView; //TODO: should maybe only update the tree of thumbs from the ActiveStoryItem up to the root by somehow notifying from inside the StoryItem itself the StructureView our graphics have changed
+    end;
   end;
 
   procedure TMainForm.HUDactionFlipVerticallyExecute(Sender: TObject);
   begin
-    if not (HUD.EditMode and Assigned(ActiveStoryItem)) then exit; //only in Edit mode and when an ActiveStoryItem is assigned
+    with Story do
+    begin
+      if not ((StoryMode = EditMode) and Assigned(ActiveStoryItem)) then exit; //only in Edit mode and when an ActiveStoryItem is assigned
 
-    ActiveStoryItem.FlippedVertically := not ActiveStoryItem.FlippedVertically;
-    UpdateStructureView; //TODO: should maybe only update the tree of thumbs from the ActiveStoryItem up to the root by somehow notifying from inside the StoryItem itself the StructureView our graphics have changed
+      ActiveStoryItem.FlippedVertically := not ActiveStoryItem.FlippedVertically;
+      UpdateStructureView; //TODO: should maybe only update the tree of thumbs from the ActiveStoryItem up to the root by somehow notifying from inside the StoryItem itself the StructureView our graphics have changed
+    end;
   end;
 
   {$endregion}
@@ -1002,7 +1057,7 @@ implementation
 
   procedure TMainForm.HUDcomboForeColorChange(Sender: TObject);
   begin
-    var LActive := ActiveStoryItem;
+    var LActive := Story.ActiveStoryItem;
     if not Assigned(LActive) then exit;
 
     LActive.ForegroundColor := HUD.comboForeColor.Color; //TODO: could check for some interface (IForegroundColor interface)
@@ -1010,7 +1065,7 @@ implementation
 
   procedure TMainForm.HUDcomboBackColorChange(Sender: TObject);
   begin
-    var LActive := ActiveStoryItem;
+    var LActive := Story.ActiveStoryItem;
     if not Assigned(LActive) then exit;
 
     LActive.BackgroundColor := HUD.comboBackColor.Color; //TODO: could check for some interface (IBackgroundColor interface)
@@ -1022,9 +1077,10 @@ implementation
 
   procedure TMainForm.ShowActiveStoryItemOptions;
   begin
-    if Assigned(ActiveStoryItem) and (StoryMode = EditMode) then
-      ActiveStoryItem.Options.ShowPopup;
-  end;
+    with Story do
+      if Assigned(ActiveStoryItem) and (StoryMode = EditMode) then
+        ActiveStoryItem.Options.ShowPopup;
+    end;
 
   procedure TMainForm.HUDactionOptionsExecute(Sender: TObject);
   begin
@@ -1045,17 +1101,18 @@ implementation
     if not HUD.StructureVisible then
       Log('Ignoring UpdateStructureView, currently hidden')
     else
-    begin
-      if (StoryMode <> EditMode) then
-        StructureView.FilterMode := tfFlatten
-      else
-        StructureView.FilterMode := tfPrune;
+    with Story do
+      begin
+        if (StoryMode <> EditMode) then
+          StructureView.FilterMode := tfFlatten
+        else
+          StructureView.FilterMode := tfPrune;
 
-      StructureView.GUIRoot := RootStoryItemView;
+        StructureView.GUIRoot := RootStoryItemView;
 
-      if Assigned(ActiveStoryItem) then
-        StructureView.SelectedObject := ActiveStoryItem.View;
-    end;
+        if Assigned(ActiveStoryItem) then
+          StructureView.SelectedObject := ActiveStoryItem.View;
+      end;
 
     StopTiming_msec; //this will Log elapsed msec at DEBUG builds
   end;
@@ -1081,9 +1138,10 @@ implementation
   procedure TMainForm.HUDTargetsVisibleChanged(Sender: TObject; const Value: Boolean);
   begin
     if HUD.TargetsVisible then
-      if Assigned(ActiveStoryItem) then
-        ActiveStoryItem.TargetsVisible := Value;
-  end;
+      with Story do
+        if Assigned(ActiveStoryItem) then
+          ActiveStoryItem.TargetsVisible := Value;
+    end;
 
   {$endregion}
 
@@ -1111,23 +1169,60 @@ implementation
 
   {$region 'StructureView'}
 
+  // Get or Create StructureView
+  // note: when app is getting destroyed this will return nil
+  function TMainForm.GetStructureView: TStructureView;
+  begin
+    if not Assigned (FStructureViewFrameInfo) then
+    begin
+      FStructureViewFrameInfo := HUD.MultiViewFrameStand.GetFrameInfo<TStructureView>;
+      with FStructureViewFrameInfo.Frame do
+      begin
+        ShowOnlyClasses := TClassList.Create([TStoryItem]); //TStructureView's destructor will FreeAndNil that TClassList instance
+        ShowNames := false;
+        ShowTypes := false;
+
+        var isEditMode := (Story.StoryMode = EditMode);
+
+        if (isEditMode) then
+          FilterMode := tfPrune //if in edit mode then prune the tree (e.g. remove hidden StoryItems like AudioStoryItems)
+        else
+          FilterMode := tfFlatten; //if not in edit mode then flatten the tree (show only StoryPoints)
+
+        DragDropReorder := isEditMode; //allow moving items in the structure view to change parent or add to same parent again to change their Z-order
+        DragDropReparent := isEditMode; //allow reparenting //TODO: should do after listening to some event so that the control is scaled/repositioned to show in their parent (note that maybe we should also have parent story items clip their children, esp if their panels)
+        DragDropSelectTarget := true; //always select (make active / zoom to) the Target StoryItem after a drag-drop operation in the structure view
+
+        OnSelection := StructureViewSelection;
+        OnContextMenu := StructureViewContextMenu;
+        OnShowFilter := StructureViewShowFilter;
+      end;
+    end;
+
+    if Assigned(FStructureViewFrameInfo) then //if we've managed to create a StructureView in a TFrameStand
+      result := FStructureViewFrameInfo.Frame
+    else
+      result := nil; //failed to create a StructureView in a TFrameStand (e.g. when app is getting destroyed)
+  end;
+
   procedure TMainForm.StructureViewShowFilter(Sender: TObject; const TheObject: TObject; var ShowObject: Boolean);
   begin
-    if (StoryMode <> EditMode) and (TheObject is TStoryItem) then //when in non-Edit mode...
+    if (Story.StoryMode <> EditMode) and
+       (TheObject is TStoryItem) then //when in non-Edit mode...
       with TStoryItem(TheObject) do
         ShowObject := StoryPoint or Home; //...only show StoryPoints and Home //IMPORTANT: assuming StructureView's FilterMode=tfFlatten since we're in non-Edit mode
   end;
 
   procedure TMainForm.StructureViewSelection(Sender: TObject; const Selection: TObject);
   begin
-    ActiveStoryItem := TStoryItem(Selection); //Make active (may also zoom to it) - assuming this is a TStoryItem since StructureView was filtering for such class //also accepts "nil" (for no selection)
+    Story.ActiveStoryItem := TStoryItem(Selection); //Make active (may also zoom to it) - assuming this is a TStoryItem since StructureView was filtering for such class //also accepts "nil" (for no selection)
   end;
 
   procedure TMainForm.StructureViewContextMenu(Sender: TObject; const Selection: TObject);
   begin
     if Assigned(Selection) then
     begin
-      ActiveStoryItem := TStoryItem(Selection); //Make active (may also zoom to it) - assuming this is a TStoryItem since StructureView was filtering for such class //also accepts "nil" (for no selection)
+      Story.ActiveStoryItem := TStoryItem(Selection); //Make active (may also zoom to it) - assuming this is a TStoryItem since StructureView was filtering for such class //also accepts "nil" (for no selection)
       //TODO: check that ContextMenu event is indeed called before Selection, in which case it is indeed best to make the item active first
       ShowActiveStoryItemOptions;
     end;
@@ -1154,20 +1249,25 @@ implementation
     begin
       StoryTimer.Enabled := false;
 
-      ZoomTo; //TODO: temp fix, else showing some undrawn text when loading from temp state and till one [un]zooms or resizes (seems 0.3.1 didn't have the issue this fixes, but 0.3.0 and 0.3.2+ had it)
-      ZoomToActiveStoryPointOrHome; //needed upon app first loading to ZoomTo Active StoryPoint or Home from loaded saved state
-
-      //ActivateHomeStoryItem; //apply the home //TODO: text doesn't render yet at this point
+      with Story do
+      begin
+        ZoomTo; //TODO: temp fix, else showing some undrawn text when loading from temp state and till one [un]zooms or resizes (seems 0.3.1 didn't have the issue this fixes, but 0.3.0 and 0.3.2+ had it)
+        ZoomToActiveStoryPointOrHome; //needed upon app first loading to ZoomTo Active StoryPoint or Home from loaded saved state
+        //ActivateHomeStoryItem; //apply the home //TODO: text doesn't render yet at this point
+      end;
 
       //CheckCommandLineActions;
 
       exit;
     end;
 
-    ActivateNextStoryPoint;
+    with Story do
+    begin
+      ActivateNextStoryPoint;
 
-    if Assigned(ActiveStoryItem) and ActiveStoryItem.Home then
-      HUD.UseStoryTimer := false; //TODO: should instead define EndStoryPoint(s) and stop the timer once the end is reached
+      if Assigned(ActiveStoryItem) and ActiveStoryItem.Home then
+        HUD.UseStoryTimer := false; //TODO: should instead define EndStoryPoint(s) and stop the timer once the end is reached
+    end;
   end;
 
   {$endregion}
@@ -1176,17 +1276,17 @@ implementation
 
   procedure TMainForm.HUDactionHomeExecute(Sender: TObject);
   begin
-    ActivateHomeStoryItem;
+    Story.ActivateHomeStoryItem;
   end;
 
   procedure TMainForm.HUDactionPreviousExecute(Sender: TObject);
   begin
-    ActivatePreviousStoryPoint;
+    Story.ActivatePreviousStoryPoint;
   end;
 
   procedure TMainForm.HUDactionNextExecute(Sender: TObject);
   begin
-    ActivateNextStoryPoint;
+    Story.ActivateNextStoryPoint;
   end;
 
   {$endregion}
@@ -1195,7 +1295,7 @@ implementation
 
   procedure TMainForm.FormResize(Sender: TObject);
   begin
-    ZoomToActiveStoryPointOrHome; //keep the Active StoryPoint or Home in view
+    Story.ZoomToActiveStoryPointOrHome; //keep the Active StoryPoint or Home in view
     CheckProperOrientation;
   end;
 
@@ -1203,6 +1303,17 @@ implementation
   begin
     RootStoryItemView := RootStoryItemView; //repeat calculations to adapt ZoomFrame.ScaledLayout size (this keeps the zoom to fit the new size of the RootStoryItem, plus updates StructureView if open)
     //ZoomTo; //Zoom to the root //doesn't seem to do it
+  end;
+
+  {$endregion}
+
+  {$region 'Rotation'}
+
+  procedure TMainForm.CheckProperOrientation;
+  begin
+    var activeItem := Story.ActiveStoryItem;
+    if Assigned(activeItem) then
+      TRotateFrame.ShowModal(Self, (Orientation <> activeItem.View.Orientation)); //Show or Hide rotation prompt based on orientation difference of MainForm and ActiveStoryItem.View
   end;
 
   {$endregion}
@@ -1219,13 +1330,13 @@ implementation
         NavigateUp;
 
       vkPrior, vkLeft, vkUp:     //go to PreviousStoryPoint
-        ActivatePreviousStoryPoint;
+        Story.ActivatePreviousStoryPoint;
 
       vkNext, vkRight, vkDown:   //go to NextStoryPoint
-        ActivateNextStoryPoint;
+        Story.ActivateNextStoryPoint;
 
       vkHome: //go to HomeStoryItem
-        ActivateHomeStoryItem;
+        Story.ActivateHomeStoryItem;
 
       (* //Unsafed, not used - if user is trying to type in TextStoryItem they might remove it altogether by mistake (wrong focus)
       vkDelete:
@@ -1261,18 +1372,18 @@ implementation
       vkF8:
         if ssCtrl in Shift then //Ctrl+F8 - making sure users don't press this by mistake since it will also close the app
         begin
-          ActivateRootStoryItem;
+          Story.ActivateRootStoryItem;
           ShowMessage('Exporting to HTML and exiting'); //this seems to be needed (TThread.Queue doesn't do the trick) to always save TextStoryItem text in exported images
           TThread.Queue(nil, procedure
             begin
-              RootStoryItem.SaveHTML(StorySource + '.html');
+              Story.RootStoryItem.SaveHTML(StorySource + '.html');
               Application.Terminate;
             end
           )
         end;
 
       vkF9:
-        TAllTextFrame.ShowModal(MainForm, ActiveStoryItem); //has [X] button to close itself //Note: to see all text of the Story can 1st navigate to RootStoryItem in EditMode
+        TAllTextFrame.ShowModal(MainForm, Story.ActiveStoryItem); //has [X] button to close itself //Note: to see all text of the Story can 1st navigate to RootStoryItem in EditMode
 
       vkF10:
         HUD.BtnMenu.Action.Execute; //toggle buttons visibility
@@ -1318,7 +1429,7 @@ implementation
     if (not LoadCommandLineParameter) and
        (not LoadSavedState) and
        (not LoadDefaultDocument) then //Note: if it keeps on failing at load comment out the if check for one run of NewRootStoryItem //TODO: shouldn't need to do that
-      NewRootStoryItem;
+      Story.NewRootStoryItem;
   end;
 
   function TMainForm.LoadFromStream(const Stream: TStream; const ActivateHome: Boolean = True): Boolean;
@@ -1330,7 +1441,7 @@ implementation
         RootStoryItemView := TStoryItem.LoadNew(Stream, EXT_READCOM); //a new instance of the TStoryItem descendent serialized in the Stream will be created //only set RootStoryItemView (this affects RootStoryItem too)
 
         if ActivateHome then
-          ActivateHomeStoryItem;
+          Story.ActivateHomeStoryItem;
 
         StartInitialZoomTimer(100); //TODO: maybe the timer value is low //TODO: this still won't fix the font autosizing when story is loaded from saved state with Active=true at some of its StoryPoints
 
@@ -1522,7 +1633,7 @@ implementation
         else
           ThumbPath := StorySource + '.png';
 
-        ActiveStoryItem.SaveThumbnail(ThumbPath, ThumbnailMaxSize, ThumbnailMaxSize); //bounding box for thumbnail fitting is a square
+        Story.ActiveStoryItem.SaveThumbnail(ThumbPath, ThumbnailMaxSize, ThumbnailMaxSize); //bounding box for thumbnail fitting is a square
         Application.Terminate; //close the app after saving the thumb
       end;
     end;
@@ -1537,7 +1648,7 @@ implementation
         else
           HtmlPath := StorySource + '.html';
 
-        RootStoryItem.SaveHtml(HtmlPath, HtmlImageMaxSize, HtmlImageMaxSize); //bounding box for HTML image fitting is a square
+        Story.RootStoryItem.SaveHtml(HtmlPath, HtmlImageMaxSize, HtmlImageMaxSize); //bounding box for HTML image fitting is a square
         Application.Terminate; //close the app after saving the HTML
       end;
     end;
@@ -1569,6 +1680,8 @@ implementation
   end;
 
   {$endregion}
+
+  {$ENDREGION .................................................................}
 
 end.
 

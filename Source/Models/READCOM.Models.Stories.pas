@@ -41,55 +41,6 @@ interface
 
     TStoryMode = (AnimatedStoryMode, InteractiveStoryMode, GuidedInteractiveStoryMode, EditMode);
 
-    {$region 'IStory'}
-
-    IStory = interface
-      ['{3A6CAD51-3787-4D18-9DA7-A07895BC4661}']
-      procedure ZoomTo(const StoryItem: IStoryItem = nil); //ZoomTo(nil) zooms to all content
-      procedure ZoomToActiveStoryPointOrHome;
-
-      {RootStoryItem}
-      function GetRootStoryItem: IStoryItem;
-      procedure SetRootStoryItem(const Value: IStoryItem);
-
-      {HomeStoryItem}
-      function GetHomeStoryItem: IStoryItem;
-      procedure SetHomeStoryItem(const Value: IStoryItem);
-
-      {FirstStoryPoint}
-      function GetFirstStoryPoint: IStoryItem;
-
-      {URLs}
-      procedure OpenUrl(const Url: String);
-
-      {ActiveStoryItem}
-      function GetActiveStoryItem: IStoryItem;
-      procedure SetActiveStoryItem(const Value: IStoryItem);
-
-      {Navigation}
-      procedure ActivateHomeStoryItem;
-      procedure ActivateRootStoryItem;
-      procedure ActivateParentStoryItem;
-      procedure ActivatePreviousStoryPoint;
-      procedure ActivateNextStoryPoint;
-
-      {StoryMode}
-      function GetStoryMode: TStoryMode;
-      procedure SetStoryMode(const Value: TStoryMode);
-
-      {Edit Actions}
-      procedure NewRootStoryItem;
-      procedure DeleteActiveStoryItem;
-      procedure CutActiveStoryItem;
-
-      property StoryMode: TStoryMode read GetStoryMode write SetStoryMode; //default AnimatedStoryMode
-      property RootStoryItem: IStoryItem read GetRootStoryItem write SetRootStoryItem;
-      property HomeStoryItem: IStoryItem read GetHomeStoryItem write SetHomeStoryItem;
-      property ActiveStoryItem: IStoryItem read GetActiveStoryItem write SetActiveStoryItem;
-    end;
-
-    {$endregion}
-
     {$region 'IStoryItemFactory'}
 
     IStoryItemFactory = IFactory<IStoryItem>;
@@ -410,6 +361,68 @@ interface
 
       //-- Properties --
       property TextStoryItem: ITextStoryItem read GetTextStoryItem write SetTextStoryItem; //stored false
+    end;
+
+    {$endregion}
+
+    {$region 'IStory'}
+
+    IStory = interface
+      ['{3A6CAD51-3787-4D18-9DA7-A07895BC4661}']
+
+      {Zooming}
+      procedure ZoomTo(const StoryItem: IStoryItem = nil); //ZoomTo(nil) zooms to all content
+      procedure ZoomToActiveStoryPointOrHome;
+
+      {RootStoryItem}
+      function GetRootStoryItem: IStoryItem;
+      procedure SetRootStoryItem(const Value: IStoryItem);
+
+      {HomeStoryItem}
+      function GetHomeStoryItem: IStoryItem;
+      procedure SetHomeStoryItem(const Value: IStoryItem);
+
+      {FirstStoryPoint}
+      function GetFirstStoryPoint: IStoryItem;
+
+      {URLs}
+      procedure OpenUrl(const Url: String);
+
+      {ActiveStoryItem}
+      function GetActiveStoryItem: IStoryItem;
+      procedure SetActiveStoryItem(const Value: IStoryItem);
+      //
+      procedure ActivateHomeStoryItem;
+      procedure ActivateRootStoryItem;
+      procedure ActivateParentStoryItem;
+      //
+      procedure ActivateAncestorStoryPoint;
+      procedure ActivatePreviousStoryPoint;
+      procedure ActivateNextStoryPoint;
+
+      {StoryMode}
+      function GetStoryMode: TStoryMode;
+      procedure SetStoryMode(const Value: TStoryMode);
+
+      property StoryMode: TStoryMode read GetStoryMode write SetStoryMode;
+      property RootStoryItem: IStoryItem read GetRootStoryItem write SetRootStoryItem;
+      property HomeStoryItem: IStoryItem read GetHomeStoryItem write SetHomeStoryItem;
+      property ActiveStoryItem: IStoryItem read GetActiveStoryItem write SetActiveStoryItem;
+    end;
+
+    {$endregion}
+
+    {$region 'IStoryEditor'}
+
+    IStoryEditor = interface
+    ['{DCBA41A5-0E65-421B-AA51-07EF149BBC78}']
+
+      procedure NewRootStoryItem;
+      procedure AddChildStoryItem(const TheStoryItemClass: TClass; const TheName: String);
+      procedure DeleteActiveStoryItem;
+      procedure CutActiveStoryItem;
+      procedure CopyActiveStoryItem;
+      procedure PasteInActiveStoryItem;
     end;
 
     {$endregion}

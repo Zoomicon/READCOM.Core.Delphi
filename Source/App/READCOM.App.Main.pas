@@ -5,11 +5,15 @@ unit READCOM.App.Main;
 
 interface
   uses
+    System.Classes, //for TNotifyEvent
     System.Math, //for Min
     //
     Zoomicon.Media.FMX.ModalFrame; //for TModalFrameClass
 
-  procedure Main(const TheAboutFrameClass: TModalFrameClass);
+  procedure Main(const TheAboutFrameClass: TModalFrameClass;
+                 const OnMainFormReady: TNotifyEvent = nil;
+                 const OnContentReady: TNotifyEvent = nil);
+
   procedure ShowHelp;
 
   var
@@ -83,12 +87,9 @@ implementation
 
   {$endregion}
 
-  procedure ShowHelp;
-  begin
-    Application.OpenURL(URL_HELP);
-  end;
-
-  procedure Main(const TheAboutFrameClass: TModalFrameClass);
+  procedure Main(const TheAboutFrameClass: TModalFrameClass;
+                 const OnMainFormReady: TNotifyEvent = nil;
+                 const OnContentReady: TNotifyEvent = nil);
   begin
     READCOM.Views.HUD.AboutFrameClass := TheAboutFrameClass;
 
@@ -101,6 +102,9 @@ implementation
 
     Application.Initialize; //FMX app template has this before creation of form(s) - probably the order plays some role
 
+    //TMainForm.OnMainFormReady := OnMainFormReady; //TODO: add as class var to TMainForm and if assigned call back when main form is ready (do check that the form is equal to Application.MainForm or has flag to be MainForm [if there are issues on mobile platforms])
+    //TMainForm.OnContentReady := OnContentReady; //TODO: as above, but call (each time) after new root content has been set
+
     Application.CreateForm(TIcons, Icons); //create before MainForm, it's a DataModule it uses
     Application.CreateForm(TThemes, Themes); //create before MainForm, it's a DataModule it uses
     Application.CreateForm(TMainForm, MainForm); //note that CreateForm doesn't immediately create and assign the form object to the variable (depends on platform, may delay till Application.Run)
@@ -111,6 +115,11 @@ implementation
     finally
       FreeObjectDebugger; //must free here and not in "finalization" section of READCOM.App.Debugging to not see leaks upon exiting
     end;
+  end;
+
+  procedure ShowHelp;
+  begin
+    Application.OpenURL(URL_HELP);
   end;
 
 end.
