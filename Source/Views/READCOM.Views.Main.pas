@@ -35,11 +35,18 @@ interface
 
     {$region 'TStory'}
 
+    TStory = class; //forward declaration
+
+    TStoryLoadedEvent = procedure(const Story: TStory) of object;
+
     TStory = class(TComponent, IStory)
     protected
       UI: TMainForm;
       //
       FStoryMode: TStoryMode;
+
+      class var
+        FOnStoryLoaded: TStoryLoadedEvent;
 
     public
       {Initialization}
@@ -79,6 +86,9 @@ interface
       function GetStoryMode: TStoryMode;
       procedure SetStoryMode(const Value: TStoryMode);
 
+    public
+      class property OnStoryLoaded: TStoryLoadedEvent read FOnStoryLoaded write FOnStoryLoaded;
+
     published
       property StoryMode: TStoryMode read GetStoryMode write SetStoryMode stored false;
       property RootStoryItem: IStoryItem read GetRootStoryItem write SetRootStoryItem stored false;
@@ -104,6 +114,8 @@ interface
     {$endregion}
 
     {$region 'TMainForm'}
+
+    TMainFormReadyEvent = procedure(const MainForm: TMainForm) of object; //there is a forward declaration for TMainForm higher above
 
     TMainForm = class(TForm)
       HUD: TStoryHUD;
@@ -225,7 +237,12 @@ interface
       procedure HUDTargetsVisibleChanged(Sender: TObject; const Value: Boolean);
       procedure HUDUseStoryTimerChanged(Sender: TObject; const Value: Boolean);
 
+      class var
+        FOnMainFormReady: TMainFormReadyEvent;
+
     public
+      class property OnMainFormReady: TMainFormReadyEvent read FOnMainFormReady write FOnMainFormReady;
+
       property StructureView: TStructureView read GetStructureView stored false;
 
     published
@@ -317,6 +334,9 @@ implementation
   procedure TStory.SetRootStoryItem(const Value: IStoryItem);
   begin
     UI.RootStoryItemView := Value.GetView as TStoryItem; //Important: don't keep any more logic here, keeping all in SetRootStoryItemView
+
+    if Assigned(FOnStoryLoaded) then
+      FOnStoryLoaded(Self); //passing the TStory instance to the event handler
   end;
 
   {$endregion}
@@ -598,6 +618,7 @@ implementation
   {$REGION 'Init / Destroy'}
 
   procedure TMainForm.FormCreate(Sender: TObject);
+
     procedure InitHUD;
     begin
       with HUD do
@@ -646,10 +667,15 @@ implementation
     FCheckedCommandLineActions := false;
 
     InitHUD;
+    InitObjectDebugger(MainForm);
 
     //ZoomFrame.ScrollBox.AniCalculations.AutoShowing := true; //fade the toolbars when not active //TODO: doesn't work with direct mouse drags near the bottom and right edges (scrollbars do show when scrolling e.g. with mousewheel) since there's other HUD content above them (the navigation and the edit sidebar panes)
 
     Application.OnIdle := Idle;
+
+    if Assigned(FOnMainFormReady)
+    then
+      FOnMainFormReady(Self); //passing the TMainForm instance to the event handler //Note: event handler should check if Application.MainForm equals the event parameter or is nil if they want to check if this is the main form (in case multiple ones are made available in the future [to have multiple open Stories])
 
     DoWithWaitPrompt(
       procedure
@@ -657,8 +683,6 @@ implementation
         LoadAtStartup;
       end
     );
-
-    InitObjectDebugger(MainForm);
   end;
 
   procedure TMainForm.FormDestroy(Sender: TObject);
