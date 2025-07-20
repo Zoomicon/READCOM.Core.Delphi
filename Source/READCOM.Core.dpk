@@ -60,8 +60,8 @@ contains
   READCOM.Views.Options.StoryItemOptions in 'Views\Options\READCOM.Views.Options.StoryItemOptions.pas' {StoryItemOptions: TFrame},
   READCOM.Views.Options.TextStoryItemOptions in 'Views\Options\READCOM.Views.Options.TextStoryItemOptions.pas' {TextStoryItemOptions: TFrame},
   READCOM.Views.Options.ImageStoryItemOptions in 'Views\Options\READCOM.Views.Options.ImageStoryItemOptions.pas' {ImageStoryItemOptions: TFrame},
-  READCOM.Views.HUD in 'Views\READCOM.Views.HUD.pas' {StoryHUD: TFrame},
-  READCOM.Views.Main in 'Views\READCOM.Views.Main.pas' {MainForm},
+  READCOM.Views.StoryHUD in 'Views\READCOM.Views.StoryHUD.pas' {StoryHUD: TFrame},
+  READCOM.Views.StoryForm in 'Views\READCOM.Views.StoryForm.pas' {StoryForm},
   READCOM.App.Main in 'App\READCOM.App.Main.pas',
   READCOM.App.Messages in 'App\READCOM.App.Messages.pas';
 

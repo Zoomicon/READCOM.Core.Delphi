@@ -221,12 +221,12 @@
             <Form>ImageStoryItemOptions</Form>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="Views\READCOM.Views.HUD.pas">
+        <DCCReference Include="Views\READCOM.Views.StoryHUD.pas">
             <Form>StoryHUD</Form>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="Views\READCOM.Views.Main.pas">
-            <Form>MainForm</Form>
+        <DCCReference Include="Views\READCOM.Views.StoryForm.pas">
+            <Form>StoryForm</Form>
         </DCCReference>
         <DCCReference Include="App\READCOM.App.Main.pas"/>
         <DCCReference Include="App\READCOM.App.Messages.pas"/>

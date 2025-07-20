@@ -9,10 +9,10 @@ interface
     System.Math, //for Min
     //
     Zoomicon.Media.FMX.ModalFrame, //for TModalFrameClass
-    READCOM.Views.Main; //for TMainForm, TMainFormReadyEvent, TStoryLoadedEvent
+    READCOM.Views.StoryForm; //for TStoryForm, TStoryFormReadyEvent, TStoryLoadedEvent
 
   procedure Main(const TheAboutFrameClass: TModalFrameClass;
-                 const OnMainFormReady: TMainFormReadyEvent = nil;
+                 const OnStoryFormReady: TStoryFormReadyEvent = nil;
                  const OnStoryLoaded: TStoryLoadedEvent = nil);
 
   procedure ShowHelp;
@@ -38,7 +38,7 @@ implementation
     Zoomicon.Introspection.FMX.Debugging, //for CheckSafeMode
     //
     READCOM.Models, //for DEFAULT_THUMB_WIDTH, DEFAULT_THUMB_HEIGHT, DEFAULT_HTML_IMAGE_WIDTH, DEFAULT_HTML_IMAGE_HEIGHT
-    READCOM.Views.HUD, //for AboutFrameClass
+    READCOM.Views.StoryHUD, //for TStoryHUD.AboutFrameClass
     READCOM.Resources.Icons, //for TIcons
     READCOM.Resources.Themes, //for TThemes
     READCOM.App.Messages;
@@ -88,10 +88,10 @@ implementation
   {$endregion}
 
   procedure Main(const TheAboutFrameClass: TModalFrameClass;
-                 const OnMainFormReady: TMainFormReadyEvent = nil;
+                 const OnStoryFormReady: TStoryFormReadyEvent = nil;
                  const OnStoryLoaded: TStoryLoadedEvent = nil);
   begin
-    READCOM.Views.HUD.AboutFrameClass := TheAboutFrameClass;
+    TStoryHUD.AboutFrameClass := TheAboutFrameClass;
 
     CheckSafeMode; //must do before Application.Initialize //this also configures Graphics settings (e.g. when SHIFT key isn't held down at startup, replaces FMX rendering engine with Skia, disables Skia rasterizer, uses Metal on OS-X/iOS, uses Vulkan on Windows/Android)
 
@@ -102,15 +102,18 @@ implementation
 
     Application.Initialize; //FMX app template has this before creation of form(s) - probably the order plays some role
 
-    TMainForm.OnMainFormReady := OnMainFormReady; //called when main form is ready //TODO: do check that the form is equal to Application.MainForm or has flag to be MainForm (if there are issues on mobile platforms)
+    TStoryForm.OnStoryFormReady := OnStoryFormReady; //called when main form is ready //TODO: do check that the form is equal to Application.MainForm or has flag to be MainForm (if there are issues on mobile platforms)
     TStory.OnStoryLoaded := OnStoryLoaded; //called (each time) after new root content has been set
 
-    Icons := TIcons.Create(Application); //create before MainForm, it's a DataModule it uses
-    Themes := TThemes.Create(Application); //create before MainForm, it's a DataModule it uses
+    Icons := TIcons.Create(Application); //must create before StoryForm, it's a DataModule it uses
+    Themes := TThemes.Create(Application); //must create before StoryForm, it's a DataModule it uses
 
+    var MainForm: TStoryForm := nil;
     //IMPORTANT: first call to Application.CreateForm defines the Application.MainForm, if DataModules above use it Delphi 12.3 internally sets 1st one as the Application.MainForm, causing various issues...
-    Application.CreateForm(TMainForm, MainForm); //note that CreateForm doesn't immediately create and assign the form object to the variable (depends on platform, may delay till Application.Run)
+    Application.CreateForm(TStoryForm, MainForm); //note that CreateForm doesn't immediately create and assign the form object to the variable (depends on platform, may delay till Application.Run)
     //IMPORTANT: ...we couldn't just set Application.MainForm := MainForm here, since on some mobile platforms (e.g. Android) Application.CreateForm returns immediately and the instance of the form is created later on and assigned to the variable we passed a reference to
+
+    //TODO: move from StoryForm the InitObjecDebugger call into a local event handler for StoryFormReady and do only if Sender is the Application.MainForm or if MainForm=nil. And always delegate to the event handler we were passed above as parameter
 
     try
       ParseCommandLine;

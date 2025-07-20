@@ -3,7 +3,7 @@
 
 {-$DEFINE NOSTYLE}
 
-unit READCOM.Views.HUD;
+unit READCOM.Views.StoryHUD;
 
 interface
   {$region 'Used units'}
@@ -22,9 +22,6 @@ interface
     Zoomicon.Media.FMX.ModalFrame, //for TModalFrameClass (used to reference the class for the About dialog)
     READCOM.Resources.Icons; //for Icons.SVGIconImageList
   {$endregion}
-
-  var
-    AboutFrameClass: TModalFrameClass;
 
   type
     TEditModeChangedEvent = procedure (Sender: TObject; const Value: Boolean) of object;
@@ -126,6 +123,9 @@ interface
 
     public
       constructor Create(AOwner: TComponent); override;
+
+      class var
+        AboutFrameClass: TModalFrameClass;
 
     published
       property EditMode: Boolean read FEditMode write SetEditMode default false;

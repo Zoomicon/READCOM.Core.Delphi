@@ -10,6 +10,8 @@ implementation
     //DesignIntf, //for ForceDemandLoadState
     System.Classes, //for RegisterComponents
     //
+    READCOM.Views.StoryForm, //for TStoryForm
+    READCOM.Views.StoryHUD, //for TStoryHUD
     //READCOM.Views.StoryItems.StoryItem, //for TStoryItem
     READCOM.Views.StoryItems.ImageStoryItem, //for TImageStoryItem
     READCOM.Views.StoryItems.AudioStoryItem, //for TAudioStoryItem
@@ -24,6 +26,8 @@ implementation
   procedure Register; //only called by IDE on installed package
   begin
     RegisterComponents('READCOM', [
+      TStoryForm,
+      TStoryHUD,
       {TStoryItem, } //TImageStoryItem should be preferred, no need to expose base StoryItem to component palette
       TImageStoryItem,
       TAudioStoryItem,

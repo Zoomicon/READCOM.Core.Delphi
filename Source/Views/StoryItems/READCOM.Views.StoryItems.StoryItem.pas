@@ -1,6 +1,8 @@
 //Description: READ-COM StoryItem View
 //Author: George Birbilis (http://zoomicon.com)
 
+//TODO: double-clicking to open in the IDE can't show Design pane, asks for TCustomManipulator. Can add its unit to the project by referencing its file in "modules" subfolder of BOSS package manager. Upon building Delphi will remove it again since it's defined in another package though (Zoomicon.Manipulation.FMX)
+
 unit READCOM.Views.StoryItems.StoryItem;
 
 interface
@@ -44,36 +46,35 @@ interface
     //-- Fields ---
 
     protected
-      //FID: TGUID;
-      FContent: TBytes; //opaque content storage (dynamic array of bytes)
-      FContentExt: String;
-      FStoryPoint: Boolean;
-      FHidden: Boolean;
-      FSnapping: Boolean;
-      FUrlAction: String;
-      FFactoryCapacity: Integer;
-      FOptions: IStoryItemOptions;
-      FTargetsVisible: Boolean;
-      FDragging: Boolean; //=False
-      FDragStart: TPointF; //=TPointF.Zero
+      var
+        //FID: TGUID;
+        FContent: TBytes; //opaque content storage (dynamic array of bytes)
+        FContentExt: String;
+        FStoryPoint: Boolean;
+        FHidden: Boolean;
+        FSnapping: Boolean;
+        FUrlAction: String;
+        FFactoryCapacity: Integer;
+        FOptions: IStoryItemOptions;
+        FTargetsVisible: Boolean;
+        FDragging: Boolean; //=False
+        FDragStart: TPointF; //=TPointF.Zero
 
-      FStoryItems: TIStoryItemList;
-      FAudioStoryItems: TIAudioStoryItemList;
+        FStoryItems: TIStoryItemList;
+        FAudioStoryItems: TIAudioStoryItemList;
 
-      FOnActiveChanged: TNotifyEvent;
+        FOnActiveChanged: TNotifyEvent;
 
       //Global IStory (context) //TODO: talk to that so that we could tell it to open hyperlinks (e.g. http://...) but also special hyperlinks like story:next, story:previous etc. that can invoke methods to navigate in the story (actually could pass the "verb" to the story itself via special method and it would know how to handle the hyperlinks and the special ones [not have any download and url opening code in the StoryItem])
       class var
         FStory: IStory;
 
-      //TODO: maybe move to IStory so that we don't have many class variables and maybe also be able to have side-by-side stories by passing them different context (IStory)
-      class var
+        //TODO: maybe move to IStory so that we don't have many class variables and maybe also be able to have side-by-side stories by passing them different context (IStory)
         FIgnoreActiveStoryItemChanges: Boolean; //=False
         FActiveStoryItem: IStoryItem; //=nil
         FOnActiveStoryItemChanged: TNotifyEvent;
 
-      //TODO: maybe move to IStory so that we don't have many class variables
-      class var
+        //TODO: maybe move to IStory so that we don't have many class variables
         FHomeStoryItem: IStoryItem;
 
     //--- Methods ---

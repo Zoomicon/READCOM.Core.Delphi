@@ -3,7 +3,7 @@
 
 {-$DEFINE NOSTYLE}
 
-unit READCOM.Views.Main;
+unit READCOM.Views.StoryForm;
 
 interface
   {$region 'Used units'}
@@ -26,12 +26,12 @@ interface
     //
     READCOM.Models.Stories, //for IStory, IStoryItem
     READCOM.Views.StoryItems.StoryItem, //for TStoryItem
-    READCOM.Views.HUD; //for TStoryHUD
+    READCOM.Views.StoryHUD; //for TStoryHUD
   {$endregion}
 
   type
 
-    TMainForm = class; //forward declaration needed, since TStory keeps a reference to TMainForm
+    TStoryForm = class; //forward declaration needed, since TStory keeps a reference to TStoryForm
 
     {$region 'TStory'}
 
@@ -41,16 +41,17 @@ interface
 
     TStory = class(TComponent, IStory)
     protected
-      UI: TMainForm;
-      //
-      FStoryMode: TStoryMode;
+      var
+        UI: TStoryForm;
+        //
+        FStoryMode: TStoryMode;
 
       class var
         FOnStoryLoaded: TStoryLoadedEvent;
 
     public
       {Initialization}
-      constructor Create(AUI: TMainForm); reintroduce; //hiding ancestor constructor
+      constructor Create(AUI: TStoryForm); reintroduce; //hiding ancestor constructor
 
       {Zooming}
       procedure ZoomTo(const StoryItem: IStoryItem = nil); //ZoomTo(nil) zooms to all content
@@ -113,11 +114,11 @@ interface
 
     {$endregion}
 
-    {$region 'TMainForm'}
+    {$region 'TStoryForm'}
 
-    TMainFormReadyEvent = procedure(const MainForm: TMainForm) of object; //there is a forward declaration for TMainForm higher above
+    TStoryFormReadyEvent = procedure(const StoryForm: TStoryForm) of object; //there is a forward declaration for TStoryForm higher above
 
-    TMainForm = class(TForm)
+    TStoryForm = class(TForm)
       HUD: TStoryHUD;
       ZoomFrame: TZoomFrame;
       StoryTimer: TTimer;
@@ -238,21 +239,18 @@ interface
       procedure HUDUseStoryTimerChanged(Sender: TObject; const Value: Boolean);
 
       class var
-        FOnMainFormReady: TMainFormReadyEvent;
+        FOnStoryFormReady: TStoryFormReadyEvent;
 
     public
-      class property OnMainFormReady: TMainFormReadyEvent read FOnMainFormReady write FOnMainFormReady;
-
       property StructureView: TStructureView read GetStructureView stored false;
+
+      class property OnStoryFormReady: TStoryFormReadyEvent read FOnStoryFormReady write FOnStoryFormReady;
 
     published
       property RootStoryItemView: TStoryItem read GetRootStoryItemView write SetRootStoryItemView stored false;
     end;
 
     {$endregion}
-
-  var
-    MainForm: TMainForm;
 
   resourcestring
     MSG_CONFIRM_CLEAR_STORY = 'Clearing Story: are you sure?';
@@ -294,7 +292,7 @@ implementation
 
   {$REGION 'TStory' -----------------------------------------------------------}
 
-  constructor TStory.Create(AUI: TMainForm);
+  constructor TStory.Create(AUI: TStoryForm);
   begin
     inherited Create(AUI); //the form is the owner for life-time management of the Story object
     Name := 'Story'; //displayed in Object Debugger
@@ -584,7 +582,7 @@ implementation
 
   {$ENDREGION .................................................................}
 
-  {$REGION 'TMainForm' --------------------------------------------------------}
+  {$REGION 'TStoryForm' --------------------------------------------------------}
 
   {$region 'DoWithWaitPrompt' //TODO: move to a TWaitFrame class method (say TWaitFrame.Do)}
 
@@ -617,7 +615,7 @@ implementation
 
   {$REGION 'Init / Destroy'}
 
-  procedure TMainForm.FormCreate(Sender: TObject);
+  procedure TStoryForm.FormCreate(Sender: TObject);
 
     procedure InitHUD;
     begin
@@ -667,15 +665,15 @@ implementation
     FCheckedCommandLineActions := false;
 
     InitHUD;
-    InitObjectDebugger(MainForm);
+    InitObjectDebugger(Self); //TODO: should move to Main and do only once for the Application.MainForm
 
     //ZoomFrame.ScrollBox.AniCalculations.AutoShowing := true; //fade the toolbars when not active //TODO: doesn't work with direct mouse drags near the bottom and right edges (scrollbars do show when scrolling e.g. with mousewheel) since there's other HUD content above them (the navigation and the edit sidebar panes)
 
     Application.OnIdle := Idle;
 
-    if Assigned(FOnMainFormReady)
+    if Assigned(FOnStoryFormReady)
     then
-      FOnMainFormReady(Self); //passing the TMainForm instance to the event handler //Note: event handler should check if Application.MainForm equals the event parameter or is nil if they want to check if this is the main form (in case multiple ones are made available in the future [to have multiple open Stories])
+      FOnStoryFormReady(Self); //passing the TStoryForm instance to the event handler //Note: event handler should check if Application.MainForm equals the event parameter or is nil if they want to check if this is the main form (in case multiple ones are made available in the future [to have multiple open Stories])
 
     DoWithWaitPrompt(
       procedure
@@ -685,12 +683,12 @@ implementation
     );
   end;
 
-  procedure TMainForm.FormDestroy(Sender: TObject);
+  procedure TStoryForm.FormDestroy(Sender: TObject);
   begin
     HUD.MultiViewFrameStand.CloseAll;
   end;
 
-  procedure TMainForm.FormShow(Sender: TObject);
+  procedure TStoryForm.FormShow(Sender: TObject);
   begin
     //NOP
   end;
@@ -701,12 +699,12 @@ implementation
 
   {$region 'RootStoryItemView'}
 
-  function TMainForm.GetRootStoryItemView: TStoryItem;
+  function TStoryForm.GetRootStoryItemView: TStoryItem;
   begin
     result := TObjectListEx<TControl>.GetFirstClass<TStoryItem>(ZoomFrame.ScaledLayout.Controls)
   end;
 
-  procedure TMainForm.SetRootStoryItemView(const Value: TStoryItem);
+  procedure TStoryForm.SetRootStoryItemView(const Value: TStoryItem);
   begin
     //Remove old story
     var TheRootStoryItemView := RootStoryItemView;
@@ -773,13 +771,13 @@ implementation
 
   {$region 'ActiveStoryItem'}
 
-  procedure TMainForm.SetActiveStoryItemIfAssigned(const Value: IStoryItem);
+  procedure TStoryForm.SetActiveStoryItemIfAssigned(const Value: IStoryItem);
   begin
     if Assigned(Value) then
       Story.SetActiveStoryItem(Value);
   end;
 
-  procedure TMainForm.HandleActiveStoryItemChanged(Sender: TObject);
+  procedure TStoryForm.HandleActiveStoryItemChanged(Sender: TObject);
 
     procedure RecursiveClearEditMode(const partialRoot: IStoryItem);
     begin
@@ -854,7 +852,7 @@ implementation
     //CheckProperOrientation; //don't do here, it gets annoying to show rotation modal popup upon navigation, plus some Stories may have StoryItems that are designed to be partially appear side-by-side to appear as books
   end;
 
-  procedure TMainForm.NavigateUp;
+  procedure TStoryForm.NavigateUp;
   begin
     with Story do
       if (StoryMode <> EditMode) then //if not in Edit mode...
@@ -870,7 +868,7 @@ implementation
 
   {$region 'Zooming'}
 
-  procedure TMainForm.StartInitialZoomTimer(const Delay: Cardinal = 100);
+  procedure TStoryForm.StartInitialZoomTimer(const Delay: Cardinal = 100);
   begin
     with StoryTimer do
     begin
@@ -889,7 +887,7 @@ implementation
 
   {$region 'File actions'}
 
-  procedure TMainForm.HUDactionNewExecute(Sender: TObject);
+  procedure TStoryForm.HUDactionNewExecute(Sender: TObject);
   begin
     TApplication.Confirm(MSG_CONFIRM_CLEAR_STORY, //confirmation done only at the action level //Note: could also use Application.Confirm since Confirm is defined as a class function in ApplicationHelper (and those can be called on object instances of the respective class too)
       procedure(Confirmed: Boolean)
@@ -900,7 +898,7 @@ implementation
     );
   end;
 
-  procedure TMainForm.HUDactionLoadExecute(Sender: TObject);
+  procedure TStoryForm.HUDactionLoadExecute(Sender: TObject);
   begin
     DoWithWaitPrompt(
       procedure
@@ -924,7 +922,7 @@ implementation
     );
   end;
 
-  procedure TMainForm.HUDactionSaveExecute(Sender: TObject);
+  procedure TStoryForm.HUDactionSaveExecute(Sender: TObject);
   begin
     DoWithWaitPrompt(
       procedure
@@ -939,7 +937,7 @@ implementation
 
   {$region 'Edit-mode actions'}
 
-  procedure TMainForm.HUDEditModeChanged(Sender: TObject; const Value: Boolean);
+  procedure TStoryForm.HUDEditModeChanged(Sender: TObject; const Value: Boolean);
   begin
     with Story do
       if Value then
@@ -950,7 +948,7 @@ implementation
 
   {$region 'Add actions'}
 
-  procedure TMainForm.HUDactionAddExecute(Sender: TObject);
+  procedure TStoryForm.HUDactionAddExecute(Sender: TObject);
   begin
     with Story do
     begin
@@ -961,7 +959,7 @@ implementation
     end;
   end;
 
-  procedure TMainForm.HUDactionAddImageStoryItemExecute(Sender: TObject); //TODO: should change to add a VisualStoryItem that will support any kind of visual item
+  procedure TStoryForm.HUDactionAddImageStoryItemExecute(Sender: TObject); //TODO: should change to add a VisualStoryItem that will support any kind of visual item
   begin
     with Story do
     begin
@@ -972,7 +970,7 @@ implementation
     end;
   end;
 
-  procedure TMainForm.HUDactionAddTextStoryItemExecute(Sender: TObject);
+  procedure TStoryForm.HUDactionAddTextStoryItemExecute(Sender: TObject);
   begin
     with Story do
     begin
@@ -986,7 +984,7 @@ implementation
 
   {$region 'Edit actions'}
 
-  procedure TMainForm.HUDactionDeleteExecute(Sender: TObject);
+  procedure TStoryForm.HUDactionDeleteExecute(Sender: TObject);
   begin
     with Story do
     begin
@@ -1009,7 +1007,7 @@ implementation
     end;
   end;
 
-  procedure TMainForm.HUDactionCutExecute(Sender: TObject);
+  procedure TStoryForm.HUDactionCutExecute(Sender: TObject);
   begin
     if FShiftDown then //if Shift key is pressed...
     begin
@@ -1035,14 +1033,14 @@ implementation
     end;
   end;
 
-  procedure TMainForm.HUDactionCopyExecute(Sender: TObject);
+  procedure TStoryForm.HUDactionCopyExecute(Sender: TObject);
   begin
     with Story do
       if (StoryMode = EditMode) then //only in Edit mode
         CopyActiveStoryItem; //will check if ActiveStoryItem is assigned
    end;
 
-  procedure TMainForm.HUDactionPasteExecute(Sender: TObject);
+  procedure TStoryForm.HUDactionPasteExecute(Sender: TObject);
   begin
     with Story do
       if (StoryMode = EditMode) then //only in Edit mode
@@ -1053,7 +1051,7 @@ implementation
 
   {$region 'Flip actions'}
 
-  procedure TMainForm.HUDactionFlipHorizontallyExecute(Sender: TObject);
+  procedure TStoryForm.HUDactionFlipHorizontallyExecute(Sender: TObject);
   begin
     with Story do
     begin
@@ -1064,7 +1062,7 @@ implementation
     end;
   end;
 
-  procedure TMainForm.HUDactionFlipVerticallyExecute(Sender: TObject);
+  procedure TStoryForm.HUDactionFlipVerticallyExecute(Sender: TObject);
   begin
     with Story do
     begin
@@ -1079,7 +1077,7 @@ implementation
 
   {$region 'Color actions'}
 
-  procedure TMainForm.HUDcomboForeColorChange(Sender: TObject);
+  procedure TStoryForm.HUDcomboForeColorChange(Sender: TObject);
   begin
     var LActive := Story.ActiveStoryItem;
     if not Assigned(LActive) then exit;
@@ -1087,7 +1085,7 @@ implementation
     LActive.ForegroundColor := HUD.comboForeColor.Color; //TODO: could check for some interface (IForegroundColor interface)
   end;
 
-  procedure TMainForm.HUDcomboBackColorChange(Sender: TObject);
+  procedure TStoryForm.HUDcomboBackColorChange(Sender: TObject);
   begin
     var LActive := Story.ActiveStoryItem;
     if not Assigned(LActive) then exit;
@@ -1099,14 +1097,14 @@ implementation
 
   {$region 'Options action'}
 
-  procedure TMainForm.ShowActiveStoryItemOptions;
+  procedure TStoryForm.ShowActiveStoryItemOptions;
   begin
     with Story do
       if Assigned(ActiveStoryItem) and (StoryMode = EditMode) then
         ActiveStoryItem.Options.ShowPopup;
     end;
 
-  procedure TMainForm.HUDactionOptionsExecute(Sender: TObject);
+  procedure TStoryForm.HUDactionOptionsExecute(Sender: TObject);
   begin
     ShowActiveStoryItemOptions;
   end;
@@ -1117,7 +1115,7 @@ implementation
 
   {$region 'View actions'}
 
-  procedure TMainForm.UpdateStructureView;
+  procedure TStoryForm.UpdateStructureView;
   begin
     Log('UpdateStructureView');
     StartTiming; //doing nothing in non-DEBUG builds
@@ -1143,7 +1141,7 @@ implementation
 
   //
 
-  procedure TMainForm.HUDStructureVisibleChanged(Sender: TObject; const Value: Boolean);
+  procedure TStoryForm.HUDStructureVisibleChanged(Sender: TObject; const Value: Boolean);
   begin
     if Value then
     begin
@@ -1159,7 +1157,7 @@ implementation
     end;
   end;
 
-  procedure TMainForm.HUDTargetsVisibleChanged(Sender: TObject; const Value: Boolean);
+  procedure TStoryForm.HUDTargetsVisibleChanged(Sender: TObject; const Value: Boolean);
   begin
     if HUD.TargetsVisible then
       with Story do
@@ -1171,7 +1169,7 @@ implementation
 
   {$region 'Light-Dark mode actions'}
 
-  procedure TMainForm.HUDactionNextThemeExecute(Sender: TObject);
+  procedure TStoryForm.HUDactionNextThemeExecute(Sender: TObject);
   begin
     if not Assigned(Themes) then exit; //Note: safety check (useful when debugging with loading of Themes data module commented-out [had some issues loading the main form on Android when that was loaded too])
 
@@ -1183,7 +1181,7 @@ implementation
       DarkTheme.UseStyleManager := not switchToLightMode;
     end;
 
-    if switchToLightMode then //the code above isn't enough to switch theme, so switching the MainForm's theme directly //TODO: this won't work for extra forms, try TStyleManager instead
+    if switchToLightMode then //the code above isn't enough to switch theme, so switching the form's theme directly //TODO: this won't work for extra forms, try TStyleManager instead
       StyleBook := Themes.LightTheme
     else
       StyleBook := Themes.DarkTheme;
@@ -1195,7 +1193,7 @@ implementation
 
   // Get or Create StructureView
   // note: when app is getting destroyed this will return nil
-  function TMainForm.GetStructureView: TStructureView;
+  function TStoryForm.GetStructureView: TStructureView;
   begin
     if not Assigned (FStructureViewFrameInfo) then
     begin
@@ -1229,7 +1227,7 @@ implementation
       result := nil; //failed to create a StructureView in a TFrameStand (e.g. when app is getting destroyed)
   end;
 
-  procedure TMainForm.StructureViewShowFilter(Sender: TObject; const TheObject: TObject; var ShowObject: Boolean);
+  procedure TStoryForm.StructureViewShowFilter(Sender: TObject; const TheObject: TObject; var ShowObject: Boolean);
   begin
     if (Story.StoryMode <> EditMode) and
        (TheObject is TStoryItem) then //when in non-Edit mode...
@@ -1237,12 +1235,12 @@ implementation
         ShowObject := StoryPoint or Home; //...only show StoryPoints and Home //IMPORTANT: assuming StructureView's FilterMode=tfFlatten since we're in non-Edit mode
   end;
 
-  procedure TMainForm.StructureViewSelection(Sender: TObject; const Selection: TObject);
+  procedure TStoryForm.StructureViewSelection(Sender: TObject; const Selection: TObject);
   begin
     Story.ActiveStoryItem := TStoryItem(Selection); //Make active (may also zoom to it) - assuming this is a TStoryItem since StructureView was filtering for such class //also accepts "nil" (for no selection)
   end;
 
-  procedure TMainForm.StructureViewContextMenu(Sender: TObject; const Selection: TObject);
+  procedure TStoryForm.StructureViewContextMenu(Sender: TObject; const Selection: TObject);
   begin
     if Assigned(Selection) then
     begin
@@ -1256,7 +1254,7 @@ implementation
 
   {$region 'Timer'}
 
-  procedure TMainForm.HUDUseStoryTimerChanged(Sender: TObject; const Value: Boolean);
+  procedure TStoryForm.HUDUseStoryTimerChanged(Sender: TObject; const Value: Boolean);
   begin
     with StoryTimer do
     begin
@@ -1266,7 +1264,7 @@ implementation
     end;
   end;
 
-  procedure TMainForm.StoryTimerTimer(Sender: TObject); //TODO: should show some timer animation at top-right when the story timer is enabled (AnimatedStoryMode)
+  procedure TStoryForm.StoryTimerTimer(Sender: TObject); //TODO: should show some timer animation at top-right when the story timer is enabled (AnimatedStoryMode)
   begin
     //special case used at app startup
     if not FTimerStarted then //TODO: should check if we loaded from saved state and remember if we were playing the timer and continue [see CCR.PrefsIniFile github repo maybe to keep app settings])
@@ -1298,17 +1296,17 @@ implementation
 
   {$region 'Navigation actions'}
 
-  procedure TMainForm.HUDactionHomeExecute(Sender: TObject);
+  procedure TStoryForm.HUDactionHomeExecute(Sender: TObject);
   begin
     Story.ActivateHomeStoryItem;
   end;
 
-  procedure TMainForm.HUDactionPreviousExecute(Sender: TObject);
+  procedure TStoryForm.HUDactionPreviousExecute(Sender: TObject);
   begin
     Story.ActivatePreviousStoryPoint;
   end;
 
-  procedure TMainForm.HUDactionNextExecute(Sender: TObject);
+  procedure TStoryForm.HUDactionNextExecute(Sender: TObject);
   begin
     Story.ActivateNextStoryPoint;
   end;
@@ -1317,13 +1315,13 @@ implementation
 
   {$region 'Scaling'}
 
-  procedure TMainForm.FormResize(Sender: TObject);
+  procedure TStoryForm.FormResize(Sender: TObject);
   begin
     Story.ZoomToActiveStoryPointOrHome; //keep the Active StoryPoint or Home in view
     CheckProperOrientation;
   end;
 
-  procedure TMainForm.RootStoryItemViewResized(Sender: TObject); //TODO: this doesn't seem to get called (needed for AutoSize of RootStoryItemView to work)
+  procedure TStoryForm.RootStoryItemViewResized(Sender: TObject); //TODO: this doesn't seem to get called (needed for AutoSize of RootStoryItemView to work)
   begin
     RootStoryItemView := RootStoryItemView; //repeat calculations to adapt ZoomFrame.ScaledLayout size (this keeps the zoom to fit the new size of the RootStoryItem, plus updates StructureView if open)
     //ZoomTo; //Zoom to the root //doesn't seem to do it
@@ -1333,18 +1331,18 @@ implementation
 
   {$region 'Rotation'}
 
-  procedure TMainForm.CheckProperOrientation;
+  procedure TStoryForm.CheckProperOrientation;
   begin
     var activeItem := Story.ActiveStoryItem;
     if Assigned(activeItem) then
-      TRotateFrame.ShowModal(Self, (Orientation <> activeItem.View.Orientation)); //Show or Hide rotation prompt based on orientation difference of MainForm and ActiveStoryItem.View
+      TRotateFrame.ShowModal(Self, (Orientation <> activeItem.View.Orientation)); //Show or Hide rotation prompt based on our orientation difference compared to ActiveStoryItem.View
   end;
 
   {$endregion}
 
   {$region 'Keyboard'}
 
-  procedure TMainForm.FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState); //also see HUD Actions' shortcuts
+  procedure TStoryForm.FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState); //also see HUD Actions' shortcuts
   begin
     case Key of
       vkSHIFT:
@@ -1407,7 +1405,7 @@ implementation
         end;
 
       vkF9:
-        TAllTextFrame.ShowModal(MainForm, Story.ActiveStoryItem); //has [X] button to close itself //Note: to see all text of the Story can 1st navigate to RootStoryItem in EditMode
+        TAllTextFrame.ShowModal(Self, Story.ActiveStoryItem); //has [X] button to close itself //Note: to see all text of the Story can 1st navigate to RootStoryItem in EditMode
 
       vkF10:
         HUD.BtnMenu.Action.Execute; //toggle buttons visibility
@@ -1420,7 +1418,7 @@ implementation
     end;
   end;
 
-  procedure TMainForm.FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
+  procedure TStoryForm.FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
   begin
     case Key of
       vkSHIFT:
@@ -1432,7 +1430,7 @@ implementation
 
   {$region 'Idle'}
 
-  procedure TMainForm.Idle(Sender: TObject; var Done: Boolean); //only process command-line actions after app enters idle mode (to be sure its GUI is ready to capture screenshots) //TODO: probably there exists other better event, sometimes have to move the mouse for command-line processing to occur
+  procedure TStoryForm.Idle(Sender: TObject; var Done: Boolean); //only process command-line actions after app enters idle mode (to be sure its GUI is ready to capture screenshots) //TODO: probably there exists other better event, sometimes have to move the mouse for command-line processing to occur
   begin
     if not FCheckedCommandLineActions then
     begin
@@ -1447,7 +1445,7 @@ implementation
 
   {$region 'Loading / SavedState'}
 
-  procedure TMainForm.LoadAtStartup;
+  procedure TStoryForm.LoadAtStartup;
   begin
     //assuming short-circuit boolean evaluation below
     if (not LoadCommandLineParameter) and
@@ -1456,7 +1454,7 @@ implementation
       Story.NewRootStoryItem;
   end;
 
-  function TMainForm.LoadFromStream(const Stream: TStream; const ActivateHome: Boolean = True): Boolean;
+  function TStoryForm.LoadFromStream(const Stream: TStream; const ActivateHome: Boolean = True): Boolean;
   begin
     result := false;
     if Stream.Size > 0 then
@@ -1475,13 +1473,13 @@ implementation
           begin
           //Stream.Clear; //clear stream if causes loading error //TODO: instead of Clear which doesn't seem to work, try saving instead a new instance of TPanelStoryItem
           Log(E);
-          ShowException(E, @TMainForm.LoadFromStream);
+          ShowException(E, @TStoryForm.LoadFromStream);
           end;
       end;
     end;
   end;
 
-  function TMainForm.LoadFromFile(const Filepath: string): Boolean;
+  function TStoryForm.LoadFromFile(const Filepath: string): Boolean;
   begin
     var InputFileStream := TFileStream.Create(Filepath,  fmOpenRead {or fmShareDenyNone}); //TODO: fmShareDenyNote probably needed for Android
     try
@@ -1492,7 +1490,7 @@ implementation
     end;
   end;
 
-  function TMainForm.LoadFromUrl(const Url: String): Boolean; //TODO: should add LoadFromUrl and AddFromUrl to TStoryItem too
+  function TStoryForm.LoadFromUrl(const Url: String): Boolean; //TODO: should add LoadFromUrl and AddFromUrl to TStoryItem too
   begin
     try
       TWaitFrame.ShowModal(Self);
@@ -1525,7 +1523,7 @@ implementation
     end;
   end;
 
-  function TMainForm.LoadFromFileOrUrl(const PathOrUrl: String): Boolean;
+  function TStoryForm.LoadFromFileOrUrl(const PathOrUrl: String): Boolean;
   begin
     if IsURI(PathOrUrl) then
       result := LoadFromUrl(PathOrUrl)
@@ -1533,12 +1531,12 @@ implementation
       result := LoadFromFile(PathOrUrl);
   end;
 
-  function TMainForm.LoadCommandLineParameter: Boolean;
+  function TStoryForm.LoadCommandLineParameter: Boolean;
   begin
     result := (StorySource <> '') and LoadFromFileOrUrl(StorySource); //assuming short-circuit boolean evaluation
   end;
 
-  function TMainForm.LoadDefaultDocument: Boolean;
+  function TStoryForm.LoadDefaultDocument: Boolean;
   begin
     result := false; //don't place inside the try, else you get warning that result might be undefined
     try
@@ -1554,7 +1552,7 @@ implementation
             on E: Exception do
               begin
               Log(E);
-              ShowException(E, @TMainForm.LoadDefaultDocument);
+              ShowException(E, @TStoryForm.LoadDefaultDocument);
               end;
           end;
         end;
@@ -1573,12 +1571,12 @@ implementation
     result := ChangeFileExt(ExtractFileName(FullPath), '');
   end;
 
-  function TMainForm.GetSavedStateName: String;
+  function TStoryForm.GetSavedStateName: String;
   begin
     result := 'SavedState.readcom';
   end;
 
-  function TMainForm.GetSavedStateStoragePath: String;
+  function TStoryForm.GetSavedStateStoragePath: String;
   begin
     var LHomePath := TPath.GetHomePath;
     var LSavedStatePath := TPath.Combine(LHomePath, GetFileNameWithoutExt(Application.ExeName));
@@ -1589,7 +1587,7 @@ implementation
       result := LHomePath; //if we fail to create subdirectory under home path for the app, use the home path instead
   end;
 
-  function TMainForm.LoadSavedState: Boolean;
+  function TStoryForm.LoadSavedState: Boolean;
   begin
     Log('LoadSavedState');
 
@@ -1602,7 +1600,7 @@ implementation
     end;
   end;
 
-  procedure TMainForm.SaveCurrentState;
+  procedure TStoryForm.SaveCurrentState;
   begin
     Log('SaveCurrentState');
 
@@ -1622,13 +1620,13 @@ implementation
             begin
             Stream.Clear; //clear stream in case it got corrupted
             Log(E);
-            ShowException(E, @TMainForm.SaveCurrentState);
+            ShowException(E, @TStoryForm.SaveCurrentState);
             end;
         end
     end;
   end;
 
-  procedure TMainForm.FormSaveState(Sender: TObject);
+  procedure TStoryForm.FormSaveState(Sender: TObject);
   begin
     //DoWithWaitPrompt( //TODO: causes error, not using for now
       //procedure
@@ -1645,7 +1643,7 @@ implementation
 
   {$region 'Command-line'}
 
-  procedure TMainForm.CheckCommandLineActions;
+  procedure TStoryForm.CheckCommandLineActions;
 
     procedure CheckSaveThumbnail;
     begin
@@ -1683,7 +1681,7 @@ implementation
     CheckSaveHtml;
   end;
 
-  procedure TMainForm.CheckReplaceStoryAllText; //TODO: what's this for?
+  procedure TStoryForm.CheckReplaceStoryAllText; //TODO: what's this for?
   begin
     (* //TODO
     if LoadAllText or SaveAllText and (StorySource <> '') then
