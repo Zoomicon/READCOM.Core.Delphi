@@ -25,7 +25,6 @@ type
     ActionList: TActionList;
     actionLoad: TAction;
     actionSave: TAction;
-    actionAdd: TAction;
     OpenDialog: TOpenDialog;
     SaveDialog: TSaveDialog;
     AddDialog: TOpenDialog;

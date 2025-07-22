@@ -137,7 +137,7 @@ object StoryItemOptions: TStoryItemOptions
         Align = Client
         Anchors = []
         Hint = 
-          'Set action URL'#13#13'Defines URL to be opened in web browser when the' +
+          'Set Action URL'#13#13'Defines URL to be opened in web browser when the' +
           ' Active StoryItem is clicked in non-Edit mode'
         Images = Icons.SVGIconImageList
         ImageIndex = 9
@@ -154,8 +154,10 @@ object StoryItemOptions: TStoryItemOptions
         Align = Client
         Anchors = []
         Hint = 
-          'Set action URL'#13#13'Defines URL to be opened in web browser when the' +
-          ' Active StoryItem is clicked in non-Edit mode'
+          'Set Factory Capacity'#13#13'Defines max number of clones produceable o' +
+          'n drag.'#13#13'When depleted, anchored factories leave back non-Factor' +
+          'y clone with no Tags.'#13#13'Non-depleted tagged factories are not che' +
+          'cked to allow procedding to Next StoryPoint'
         Images = Icons.SVGIconImageList
         ImageIndex = 45
         Size.Width = 64.000000000000000000
@@ -214,12 +216,6 @@ object StoryItemOptions: TStoryItemOptions
       ImageIndex = 7
       OnExecute = actionSaveExecute
       ImageIndex = 7
-    end
-    object actionAdd: TAction
-      Category = 'File'
-      Text = 'Add'
-      ImageIndex = 10
-      ImageIndex = 10
     end
   end
 end
