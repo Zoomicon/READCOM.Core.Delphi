@@ -184,6 +184,7 @@ interface
       procedure SaveReadComBin(const Stream: TStream);
 
       //--- Properties ---
+
       property View: TControl read GetView;
       property ParentStoryItem: IStoryItem read GetParentStoryItem write SetParentStoryItem; //stored false //default nil
       property StoryItems: TIStoryItemList read GetStoryItems write SetStoryItems; //default nil
@@ -219,6 +220,7 @@ interface
       ['{1AEC7512-1E1D-4720-9D74-9A5411A64377}']
 
       //--- Methods ---
+
       {View}
       function GetView: TControl;
 
@@ -237,6 +239,7 @@ interface
       function ActSave: Boolean;
 
       //--- Properties ---
+
       property View: TControl read GetView; //stored false
       property StoryItem: IStoryItem read GetStoryItem write SetStoryItem; //stored false
     end;
@@ -369,6 +372,9 @@ interface
 
     IStory = interface
       ['{3A6CAD51-3787-4D18-9DA7-A07895BC4661}']
+
+      {Refresh any structure view}
+      procedure RefreshStructure;
 
       {Zooming}
       procedure ZoomTo(const StoryItem: IStoryItem = nil); //ZoomTo(nil) zooms to all content

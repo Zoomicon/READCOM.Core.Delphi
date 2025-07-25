@@ -53,6 +53,9 @@ interface
       {Initialization}
       constructor Create(AUI: TStoryForm); reintroduce; //hiding ancestor constructor
 
+      {Refresh any structure view}
+      procedure RefreshStructure;
+
       {Zooming}
       procedure ZoomTo(const StoryItem: IStoryItem = nil); //ZoomTo(nil) zooms to all content
       procedure ZoomToActiveStoryPointOrHome;
@@ -299,6 +302,15 @@ implementation
     UI := AUI;
   end;
 
+  {$region 'Refresh any structure view'}
+
+  procedure TStory.RefreshStructure;
+  begin
+    UI.UpdateStructureView;
+  end;
+
+  {$endregion}
+
   {$region 'Zooming'}
 
   procedure TStory.ZoomTo(const StoryItem: IStoryItem);
@@ -471,7 +483,7 @@ implementation
       begin
         DragDropReorder := isEditMode; //allow moving items in the structure view to change parent or add to same parent again to change their Z-order
         DragDropReparent := isEditMode; //allow reparenting //TODO: should do after listening to some event so that the control is scaled/repositioned to show in their parent (note that maybe we should also have parent story items clip their children, esp if their panels)
-        UI.UpdateStructureView; //must refresh StructureView contents since we change the FilterMode based on isEditMode
+        RefreshStructure; //must refresh StructureView contents since we change the FilterMode based on isEditMode //TODO: shouldn't the StructureView autoupdate in this case? (RefreshStructure calls UI.UpdateStructureView which seems to do a lot of things though)
       end;
 
     if (not isEditMode) and Assigned(ActiveStoryItem) and (not ActiveStoryItem.StoryPoint) then //if current ActiveStoryItem isn't a StoryPoint, then when exiting Edit mode...
@@ -536,7 +548,7 @@ implementation
       BringToFront; //load as front-most
     end;
 
-    UI.UpdateStructureView; //TODO: should instead have some notification from inside a StoryItem towards the StructureView that children were added to it (similar to how StructureView listens for children removal)
+    RefreshStructure; //TODO: should instead have some notification from inside a StoryItem towards the StructureView that children were added to it (similar to how StructureView listens for children removal)
   end;
 
   //
@@ -577,7 +589,7 @@ implementation
 
     ActiveStoryItem.Paste;
 
-    UI.UpdateStructureView; //TODO: should do instead similar to deletion by somehow notifying from inside the StoryItem itself the StructureView that items have been added
+    RefreshStructure; //TODO: should do instead similar to deletion by somehow notifying from inside the StoryItem itself the StructureView that items have been added
   end;
 
   {$ENDREGION .................................................................}

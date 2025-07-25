@@ -9,7 +9,8 @@ interface
   {$region 'Used units' ---------------------------------------------------------}
   uses
     System.UITypes,
-    System.SysUtils, System.Types, System.Classes, System.Variants,
+    System.SysUtils, //for TBytes, Supports
+    System.Types, System.Classes, System.Variants,
     //
     FMX.Types, FMX.Graphics, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.StdCtrls,
     FMX.Objects,
@@ -127,14 +128,16 @@ interface
       procedure SetParentStoryItem(const Value: IStoryItem);
 
       {StoryItems}
-      function GetStoryItems: TIStoryItemList; inline;
+      function GetStoryItems: TIStoryItemList; inline; //Note: using inline since this just returns the field value (have a method at the property's get accessor instead of the field directly, since we implement an interface with Get/Set accessors)
       procedure SetStoryItems(const Value: TIStoryItemList);
+      procedure RefreshStoryItemsList;
 
       {ImageStoryItems}
       function GetImageStoryItems: TIImageStoryItemList; inline; //Note: need to free returned object when done, isn't cached by the StoryItem
 
       {AudioStoryItems}
       function GetAudioStoryItems: TIAudioStoryItemList; inline;
+      procedure RefreshAudioStoryItemsList;
 
       {TextStoryItems}
       function GetTextStoryItems: TITextStoryItemList; inline; //Note: need to free returned object when done, isn't cached by the StoryItem
@@ -543,6 +546,7 @@ implementation
   {$endregion}
 
   procedure TStoryItem.DoAddObject(const AObject: TFmxObject); //TODO: this doesn't do the side-effects that Add(IStoryItem) does, doesn't set TAlignLayout.Scale
+
     procedure CheckAddToStoryItems;
     var StoryItem: IStoryItem;
     begin
@@ -566,19 +570,29 @@ implementation
     CheckAddToAudioStoryItems;
   end;
 
+  procedure TStoryItem.RefreshStoryItemsList;
+  begin
+    FreeAndNil(FStoryItems); //TODO: this will fail if while looping on StoryItems we insert some new StoryItem (BUT THAT IS AN EDGE CASE, NOT DOING)
+    FStoryItems := TObjectListEx<TControl>.GetAllInterface<IStoryItem>(Controls);
+  end;
+
+  procedure TStoryItem.RefreshAudioStoryItemsList;
+  begin
+    FreeAndNil(FAudioStoryItems); //TODO: this will fail if while looping on StoryItems we insert some new AudioStoryItem (BUT THAT IS AN EDGE CASE, NOT DOING)
+    FAudioStoryItems := TObjectListEx<TControl>.GetAllInterface<IAudioStoryItem>(Controls);
+  end;
+
   procedure TStoryItem.DoInsertObject(Index: Integer; const AObject: TFmxObject); //TODO: this doesn't do the side-effects that Add(IStoryItem) does, doesn't set TAlignLayout.Scale
   begin
     inherited;
 
-    FreeAndNil(FStoryItems); //TODO: this will fail if while looping on StoryItems we insert some new StoryItem (BUT THAT IS AN EDGE CASE, NOT DOING)
-    FStoryItems := TObjectListEx<TControl>.GetAllInterface<IStoryItem>(Controls); //need to recalculate the list, since the "Index" of objects is different from the one of StoryItems (the TStoryItem contains other FmxObjects too in its UI design)
+    RefreshStoryItemsList; //need to recalculate the list, since the "Index" of objects is different from the one of StoryItems (the TStoryItem contains other FmxObjects too in its UI design)
 
     var StoryItem: IStoryItem;
     if Supports(AObject, IStoryItem, StoryItem) then
       ApplyParentEditMode(StoryItem);
 
-    FreeAndNil(FAudioStoryItems); //TODO: this will fail if while looping on StoryItems we insert some new AudioStoryItem (BUT THAT IS AN EDGE CASE, NOT DOING)
-    FAudioStoryItems := TObjectListEx<TControl>.GetAllInterface<IAudioStoryItem>(Controls); //need to recalculate the list, since the "Index" of objects is different from the one of AudioStoryItems (the TStoryItem contains other FmxObjects too in its UI design)
+    RefreshAudioStoryItemsList; //need to recalculate the list, since the "Index" of objects is different from the one of AudioStoryItems (the TStoryItem contains other FmxObjects too in its UI design)
   end;
 
   procedure TStoryItem.DoRemoveObject(const AObject: TFmxObject);
@@ -756,7 +770,7 @@ implementation
   procedure TStoryItem.SetStoryItems(const Value: TIStoryItemList);
   begin
     for var item in Value do
-      AddObject(item.GetView As TStoryItem);
+      AddObject(item.GetView As TStoryItem); //TODO: this is probably wrong, should first remove all StoryItems, then use Add(StoryItem), not AddObject
   end;
 
   {$endregion}
@@ -835,8 +849,8 @@ implementation
 
   procedure TStoryItem.ActivateRootStoryItem;
   begin
-    if Assigned(Story) then
-      Story.ActivateRootStoryItem;
+    if Assigned(FStory) then
+      FStory.ActivateRootStoryItem;
   end;
 
   procedure TStoryItem.ActivateParentStoryItem;
@@ -996,8 +1010,8 @@ implementation
     end;
 
     //Loop to start of story
-    if Assigned(Story) then
-      exit(Story.GetFirstStoryPoint);
+    if Assigned(FStory) then
+      exit(FStory.GetFirstStoryPoint);
 
     //If we're the topmost StoryPoint
     if StoryPoint then
@@ -1311,6 +1325,7 @@ implementation
   procedure TStoryItem.SetTags(const Value: String);
   begin
     TagString := Trim(Value);
+    //UpdateCursor; //not used. Non-anchored tagged items show drag cursor anyway (since they're non-anchored). Anchored tagged items shouldn't show some special cursor. Don't want to reveal puzzle solution (e.g. correct target)
   end;
 
   function TStoryItem.AreTagsMatched: Boolean;
@@ -1396,6 +1411,7 @@ implementation
   procedure TStoryItem.SetFactoryCapacity(const Value: Integer);
   begin
     FFactoryCapacity := Value;
+    UpdateCursor;
   end;
 
   {$endregion}
@@ -1465,10 +1481,14 @@ implementation
 
   procedure TStoryItem.UpdateCursor;
   begin
-    if (UrlAction <> '') then
+    if (UrlAction <> '') then //a story navigation action item
       Cursor := crHandPoint
-    else if (not Anchored) then
+    else if (not Anchored) or (FactoryCapacity > 0) then //a moveable item (note that if tagged also takes part in puzzle solving) or a (cloning) factory
       Cursor := crDrag
+    (* NOT USED: would always tell the user where they can drop (puzzle author may not want it) or show the correct answer since only that target (others may just have a snap/magnet) has tag. Could show just where magnets are, but anyway cursor wouldn't change with this during drag of another item over the target. Even showing where snapping occurs might not be desired by puzzle author, plus might confuse users since not all targets use snap (esp. those that are to accept multiple moveable Tagged items in whatever arrangement user wants)
+    else if ((Tags <> '') and Anchored) then //a Target for puzzles
+      Cursor := crSizeAll //don't use crSize (obsolete)
+    *)
     else
       Cursor := crDefault;
   end;
@@ -1583,7 +1603,7 @@ implementation
 
     inherited; //fire event handlers
 
-    if EditMode then //don't use check (Story.StoryMode = TStoryMode.EditMode) aka Global EditMode, in that case would have issue working at a given nesting level (grandchidlren would get in our way, getting activated by accident)
+    if EditMode then //don't use check (FStory.StoryMode = TStoryMode.EditMode) aka Global EditMode, in that case would have issue working at a given nesting level (grandchidlren would get in our way, getting activated by accident)
     begin
       if (ssCtrl in Shift) or (ssRight in Shift) then //either Ctrl+LeftClick or just RightClick
       begin
@@ -1613,7 +1633,8 @@ implementation
 
         //var LParent := ParentStoryItem;
         if (HasUrlAction
-            and (Story.StoryMode <> TStoryMode.EditMode) //make sure we don't do UrlActions when editing a story //should we use EditMode property instead? it doesn't seem to check StoryMode, but seems to store to local storable field
+            and Assigned(FStory)
+            and (FStory.StoryMode <> TStoryMode.EditMode) //make sure we don't do UrlActions when editing a story //should we use EditMode property instead? it doesn't seem to check StoryMode, but seems to store to local storable field (//TODO THAT EDITMODE PROPERTY IS FOR BEING ABLE TO DISABLE CHILDREN THAT ARE DEEPER INSIDE, SHOULD CHANGE THAT LOGIC ANYWAY AND DISABLE SUBTREES UNDER NESTED STORYPOINTS WHEN WE ARE AT SOME ANCESTOR STORYPOINT)
             {and //TODO: should have URLs clickable only for children of ActiveStoryItem (and for itself if it's the RootStoryItem maybe) //in non-EditMode should disable HitTest though at everything that isn't the current StoryItem or direct child of the ActiveStoryItem apart from the TextStoryItems maybe (could maybe just disble HitTest at all siblings of ActiveStoryItem and have everything under ActiveStoryItem HitTest-enabled)
             ((Assigned(LParent) and LParent.Active) or
             ((not Assigned(LParent)) and Active))}) then //only when ParentStoryItem is the ActiveStoryItem //assuming short-circuit evaluation //if no LParent then it's the RootStoryItem, allowing it to have URLAction too
@@ -1733,11 +1754,22 @@ implementation
   begin
     var LBounds := Self.BoundsRect; //do before calling Parent.AddXX methods (they end up calling Add which resizes placed item into Parent.AreaSelector defined area if non-zero selection)
 
-    var LClone := Self.Clone(Self.Owner) {LoadFromString(SaveToString, true)} as TStoryItem;
+    var LClone := LoadFromString(SaveToString, true) as TStoryItem; //don't use Self.Clone(Self.Owner), will cause issue with properties that are interface arrays and probably related strange behaviour in StructureView
     ParentStoryItem.Add(LClone); //or ParentStoryItem.AddFromString(SaveToString)
 
     LClone.SetBoundsRect(LBounds); //restore saved bounds //TODO: maybe should instead inform Add via optional boolean parameter to not resize the item
+
     LClone.Index := Index; //move the clone just below the previous (now dragged item) factory. The clone is now the factory //must do afer Add //TODO: maybe instead make an Insert similar to the Add or have optional parameter for index (apart from optional param to not resize child)
+
+    //Refresh StoryItems list
+    (ParentStoryItem.View as TStoryItem).RefreshStoryItemsList;
+
+    //Refresh AudioStoryItems list, only if needed (if we're an AudioStoryItem our clone will be such too)
+    if Supports(Self, IAudioStoryItem) then //Note: would be nice if could use "is" operator for interfaces too (can't in Delphi 12.3)
+      (ParentStoryItem.View as TStoryItem).RefreshAudioStoryItemsList;
+
+    if Assigned(FStory) then
+      FStory.RefreshStructure; //Refresh any structure view
 
     result := LClone;
   end;
@@ -1860,7 +1892,7 @@ implementation
 
     StoryItemView.Align := TAlignLayout.Scale; //IMPORTANT: adjust when parent resizes
 
-    StoryItemView.Parent := Self;
+    StoryItemView.Parent := Self; //note that Self.InsertComponent above had only set Self as Owner of StoryItemView, not as parent
     StoryItemView.BringToFront; //load as front-most
   end;
 
@@ -2249,8 +2281,8 @@ implementation
 
       var LIndex := 1;
       var LStartingStoryItem := HomeStoryItem;
-      if not Assigned(LStartingStoryItem) then
-        LStartingStoryItem := Story.RootStoryItem;
+      if not Assigned(LStartingStoryItem) and Assigned(FStory) then
+        LStartingStoryItem := FStory.RootStoryItem;
 
       SaveHTMLImage(LStartingStoryItem, LIndex);
 
