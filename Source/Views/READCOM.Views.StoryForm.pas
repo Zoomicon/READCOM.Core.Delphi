@@ -26,7 +26,7 @@ interface
     //
     READCOM.Models.Stories, //for IStory, IStoryItem
     READCOM.Views.StoryItems.StoryItem, //for TStoryItem
-    READCOM.Views.StoryHUD, FMX.MultiView, FMX.Colors; //for TStoryHUD
+    READCOM.Views.StoryHUD; //for TStoryHUD
   {$endregion}
 
   type

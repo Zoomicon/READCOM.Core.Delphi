@@ -939,6 +939,8 @@ implementation
       FHomeStoryItem := nil;
 
     //HomeChanged; //don't need to issue notification if home storyitem changed //TODO: maybe have such and have StructureView somehow mark the HomeStoryItem thumb with an icon (maybe allow various such symbol annotations)
+
+    UpdateHint;
   end;
 
   class procedure TStoryItem.SetHomeStoryItem(const Value: IStoryItem);
@@ -963,6 +965,8 @@ implementation
   procedure TStoryItem.SetStoryPoint(const Value: Boolean);
   begin
     FStoryPoint := Value;
+
+    UpdateHint;
   end;
 
   {$endregion}
@@ -1284,6 +1288,8 @@ implementation
   begin
     FSnapping := Value;
     //don't apply snapping at this point, it is supposed to be applied when user drags and drops an unanchored StoryItem into the area of a snapping StoryItem which are both children of the ActiveStoryItem. So we need to know what was dropped to check if there's a snapping sibling's area containing the drop point (comparing in absolute coordinates)
+
+    UpdateHint;
   end;
 
   procedure TStoryItem.DoSnapping;
@@ -1318,7 +1324,9 @@ implementation
   procedure TStoryItem.SetAnchored(const Value: Boolean);
   begin
     Locked := Value;
+
     UpdateCursor;
+    UpdateHint;
   end;
 
   {$endregion}
@@ -1333,7 +1341,9 @@ implementation
   procedure TStoryItem.SetTags(const Value: String);
   begin
     TagString := Trim(Value);
+
     //UpdateCursor; //not used. Non-anchored tagged items show drag cursor anyway (since they're non-anchored). Anchored tagged items shouldn't show some special cursor. Don't want to reveal puzzle solution (e.g. correct target)
+    UpdateHint;
   end;
 
   function TStoryItem.AreTagsMatched: Boolean;
@@ -1404,6 +1414,7 @@ implementation
   procedure TStoryItem.SetUrlAction(const Value: String);
   begin
     FUrlAction := Trim(Value);
+
     UpdateHint;
     UpdateCursor;
   end;
@@ -1420,7 +1431,9 @@ implementation
   procedure TStoryItem.SetFactoryCapacity(const Value: Integer);
   begin
     FFactoryCapacity := Value;
+
     UpdateCursor;
+    UpdateHint;
   end;
 
   {$endregion}
@@ -1489,7 +1502,7 @@ implementation
   {$region 'Hints'}
 
   procedure TStoryItem.UpdateHint; //TODO: should also have StructureView show hints of items on hover (though as code is below won't work since it would work only for the ActiveStoryItem - unless we only show for the selected one there)
-  begin
+  begin //TODO: this could update any overlay icons for StructureView items (to show that they're StoryPoint, are anchored etc.)
     if not EditMode then //don't check FStory.StoryMode here, when copying in Edit mode of Story it would add hint too to serialized data
       Hint := '' //don't show Hint in other cases //TODO: consider having a Hint set at StoryItemOptions (if mechanism is added to show such with long tap on touch screens for example). In that case could show it in non-Edit mode (and maybe in Edit mode show a composite hint augmenting it with any extra state like showing URL etc. [could also show if item has anchor etc. on such hint)
     else
@@ -1501,7 +1514,7 @@ implementation
       if Snapping then LHint := LHint + ' Snapping';
       if Anchored then LHint := LHint + ' Anchored';
       if (Tags <> '') then LHint := LHint + ' Tags=[' + Tags + ']';
-      if (UrlAction <> '') then LHint := LHint + ' UrlAction=[' + UrlAction + ']'; //TODO: this seems to be called ActionURL instead of UrlAction in Options pane and hints, should maybe rename there for consistency
+      if (UrlAction <> '') then LHint := LHint + ' UrlAction=[' + UrlAction + ']';
       if (FactoryCapacity > 0) then LHint := LHint + ' FactoryCapacity=[' + IntToStr(FactoryCapacity) + ']';
       Hint := LHint;
     end;
