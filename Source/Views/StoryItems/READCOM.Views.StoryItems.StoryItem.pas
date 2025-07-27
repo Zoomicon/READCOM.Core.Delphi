@@ -91,18 +91,6 @@ interface
 
       function GetClone: IStoryItem; virtual;
 
-      {Z-Order}
-      function GetBackIndex: Integer; override;
-      procedure SetBackgroundZorder; virtual;
-      procedure SetGlyphZorder; virtual;
-      procedure SetBorderZorder; virtual;
-
-      {Cursor}
-      procedure UpdateCursor;
-
-      {Clipboard}
-      procedure Paste(const Clipboard: IFMXExtendedClipboardService); overload; virtual;
-
       {Name}
       procedure SetName(const NewName: TComponentName); override;
 
@@ -111,6 +99,21 @@ interface
 
       {Parent}
       procedure SetParent(const Value: TFmxObject); override;
+
+      {Z-Order}
+      function GetBackIndex: Integer; override;
+      procedure SetBackgroundZorder; virtual;
+      procedure SetGlyphZorder; virtual;
+      procedure SetBorderZorder; virtual;
+
+      {Hint}
+      procedure UpdateHint;
+
+      {Cursor}
+      procedure UpdateCursor;
+
+      {Clipboard}
+      procedure Paste(const Clipboard: IFMXExtendedClipboardService); overload; virtual;
 
       {EditMode}
       procedure SetEditMode(const Value: Boolean); override;
@@ -303,6 +306,8 @@ interface
       procedure MouseUp(Button: TMouseButton; Shift: TShiftState;  X, Y: single); override;
       procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
       procedure MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override; //preferring overriden methods instead of event handlers that get stored with saved state
+      //procedure DoMouseEnter; override;
+      //procedure DoMouseExit; override;
       procedure Tap(const Point: TPointF); override;
 
     //--- Properties ---
@@ -333,6 +338,7 @@ interface
         DEFAULT_FACTORY_CAPACITY = 0;
         DEFAULT_TARGETS_VISIBLE = false;
 
+      property Hint stored False; //don't store Hint, we use it in Edit mode only //TODO: see comment at UpdateHint, might store in the future (without the edit mode extra info)
       property ParentStoryItem: IStoryItem read GetParentStoryItem write SetParentStoryItem stored false; //default nil
       property StoryItems: TIStoryItemList read GetStoryItems write SetStoryItems stored false; //default nil
       property ImageStoryItems: TIImageStoryItemList read GetImageStoryItems stored false; //default nil //Note: need to free returned object when done, isn't cached by the StoryItem
@@ -889,6 +895,7 @@ implementation
       for var StoryItem in FStoryItems do
         ApplyParentEditMode(StoryItem);
 
+      UpdateHint;
     finally
       //EndUpdate;
     end;
@@ -902,6 +909,7 @@ implementation
       //View.BeginUpdate; //TODO: see if it helps or causes text drawing issues
       BorderVisible := ParentEditMode;
       Hidden := Hidden; //reapply logic for child StoryItems' Hidden since it's related to StoryItemParent's EditMode
+      UpdateHint;
     finally
       //View.EndUpdate;
     end;
@@ -1396,6 +1404,7 @@ implementation
   procedure TStoryItem.SetUrlAction(const Value: String);
   begin
     FUrlAction := Trim(Value);
+    UpdateHint;
     UpdateCursor;
   end;
 
@@ -1476,6 +1485,29 @@ implementation
   {$ENDREGION}
 
   {$REGION '--- EVENTS ---'}
+
+  {$region 'Hints'}
+
+  procedure TStoryItem.UpdateHint; //TODO: should also have StructureView show hints of items on hover (though as code is below won't work since it would work only for the ActiveStoryItem - unless we only show for the selected one there)
+  begin
+    if not EditMode then //don't check FStory.StoryMode here, when copying in Edit mode of Story it would add hint too to serialized data
+      Hint := '' //don't show Hint in other cases //TODO: consider having a Hint set at StoryItemOptions (if mechanism is added to show such with long tap on touch screens for example). In that case could show it in non-Edit mode (and maybe in Edit mode show a composite hint augmenting it with any extra state like showing URL etc. [could also show if item has anchor etc. on such hint)
+    else
+    begin
+      //Hint := Options.GetDescription; //TODO: move below code to method
+      var LHint: string := '';
+      if Home then LHint := LHint + ' Home';
+      if StoryPoint then LHint := LHint + ' StoryPoint';
+      if Snapping then LHint := LHint + ' Snapping';
+      if Anchored then LHint := LHint + ' Anchored';
+      if (Tags <> '') then LHint := LHint + ' Tags=[' + Tags + ']';
+      if (UrlAction <> '') then LHint := LHint + ' UrlAction=[' + UrlAction + ']'; //TODO: this seems to be called ActionURL instead of UrlAction in Options pane and hints, should maybe rename there for consistency
+      if (FactoryCapacity > 0) then LHint := LHint + ' FactoryCapacity=[' + IntToStr(FactoryCapacity) + ']';
+      Hint := LHint;
+    end;
+  end;
+
+  {$endregion}
 
   {$region 'Mouse'}
 
@@ -1613,6 +1645,8 @@ implementation
         else
           Options.ShowPopup; //if no child at this position show options popup
       end
+      else if (ssAlt in Shift) and HasUrlAction then //load new story from UrlAction of ActiveStoryItem with ALT+CLICK
+        FStory.DoUrlAction(FUrlAction) //this includes special URLs too (like -/0/+) used for navigation in the story
       else
         PlayRandomAudioStoryItem; //TODO: maybe should play AudioStoryItems in the order they exist in their parent StoryItem (but would need to remember last one played in that case which may be problematic if they are reordered etc.)
         //PlayNextAudioStoryItem;
@@ -1634,15 +1668,27 @@ implementation
         //var LParent := ParentStoryItem;
         if (HasUrlAction
             and Assigned(FStory)
-            and (FStory.StoryMode <> TStoryMode.EditMode) //make sure we don't do UrlActions when editing a story //should we use EditMode property instead? it doesn't seem to check StoryMode, but seems to store to local storable field (//TODO THAT EDITMODE PROPERTY IS FOR BEING ABLE TO DISABLE CHILDREN THAT ARE DEEPER INSIDE, SHOULD CHANGE THAT LOGIC ANYWAY AND DISABLE SUBTREES UNDER NESTED STORYPOINTS WHEN WE ARE AT SOME ANCESTOR STORYPOINT)
+            and (FStory.StoryMode <> TStoryMode.EditMode) //make sure we don't do UrlActions of child items when editing a story //should we use EditMode property instead? it doesn't seem to check StoryMode, but seems to store to local storable field (//TODO THAT EDITMODE PROPERTY IS FOR BEING ABLE TO DISABLE CHILDREN THAT ARE DEEPER INSIDE, SHOULD CHANGE THAT LOGIC ANYWAY AND DISABLE SUBTREES UNDER NESTED STORYPOINTS WHEN WE ARE AT SOME ANCESTOR STORYPOINT)
             {and //TODO: should have URLs clickable only for children of ActiveStoryItem (and for itself if it's the RootStoryItem maybe) //in non-EditMode should disable HitTest though at everything that isn't the current StoryItem or direct child of the ActiveStoryItem apart from the TextStoryItems maybe (could maybe just disble HitTest at all siblings of ActiveStoryItem and have everything under ActiveStoryItem HitTest-enabled)
             ((Assigned(LParent) and LParent.Active) or
             ((not Assigned(LParent)) and Active))}) then //only when ParentStoryItem is the ActiveStoryItem //assuming short-circuit evaluation //if no LParent then it's the RootStoryItem, allowing it to have URLAction too
-          FStory.OpenUrl(FUrlAction);
+          FStory.DoUrlAction(FUrlAction);
       end;
     end;
 
   end;
+
+  (*
+  procedure TStoryItem.DoMouseEnter;
+  begin
+    //NOP
+  end;
+
+  procedure TStoryItem.DoMouseExit;
+  begin
+    //NOP
+  end;
+  *)
 
   {$endregion}
 

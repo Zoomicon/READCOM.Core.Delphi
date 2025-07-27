@@ -391,8 +391,12 @@ interface
       {FirstStoryPoint}
       function GetFirstStoryPoint: IStoryItem;
 
+      {Tags}
+      function CheckTagsMatched: Boolean;
+      function RequireTagsMatched: Boolean;
+
       {URLs}
-      procedure OpenUrl(const Url: String);
+      procedure DoUrlAction(const UrlAction: String);
 
       {ActiveStoryItem}
       function GetActiveStoryItem: IStoryItem;
@@ -404,7 +408,7 @@ interface
       //
       procedure ActivateAncestorStoryPoint;
       procedure ActivatePreviousStoryPoint;
-      procedure ActivateNextStoryPoint;
+      procedure ActivateNextStoryPoint(const DoTagsMatching: Boolean = true);
 
       {StoryMode}
       function GetStoryMode: TStoryMode;

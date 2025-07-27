@@ -26,7 +26,7 @@ interface
     //
     READCOM.Models.Stories, //for IStory, IStoryItem
     READCOM.Views.StoryItems.StoryItem, //for TStoryItem
-    READCOM.Views.StoryHUD; //for TStoryHUD
+    READCOM.Views.StoryHUD, FMX.MultiView, FMX.Colors; //for TStoryHUD
   {$endregion}
 
   type
@@ -71,8 +71,12 @@ interface
       {FirstStoryPoint}
       function GetFirstStoryPoint: IStoryItem;
 
+      {Tags}
+      function CheckTagsMatched: Boolean;
+      function RequireTagsMatched: Boolean;
+
       {URLs}
-      procedure OpenUrl(const Url: String);
+      procedure DoUrlAction(const UrlAction: String);
 
       {ActiveStoryItem}
       function GetActiveStoryItem: IStoryItem;
@@ -84,7 +88,7 @@ interface
       //
       procedure ActivateAncestorStoryPoint;
       procedure ActivatePreviousStoryPoint;
-      procedure ActivateNextStoryPoint;
+      procedure ActivateNextStoryPoint(const DoTagsMatching: Boolean = true);
 
       {StoryMode}
       function GetStoryMode: TStoryMode;
@@ -378,24 +382,80 @@ implementation
 
   {$endregion}
 
+  {$region 'Tags'}
+
+  function TStory.CheckTagsMatched: Boolean; //used to check if tags are matched or if there's a mistake (informing user in both cases)
+  begin
+    var activeItem := ActiveStoryItem;
+    result :=
+      Assigned(activeItem)
+      and ( ((StoryMode = EditMode) and UI.FShiftDown) or //in Edit mode only, SHIFT key held down bypasses tags-matched check and forces proceeding to NextStoryPoint
+            (activeItem.TagsMatched) ); //also checking if Tags are matched (all moveables with Tags are over non-moveables with same Tags and vice-versa) to proceed
+
+    TLockFrame.ShowModal(UI); //Note: must do before trying to set Locked_Modal (to create the modal instance if needed)
+    TLockFrame.Locked_Modal := not result; //tell user they had it all correct or had mistakes in Tags matching
+  end;
+
+  function TStory.RequireTagsMatched: Boolean; //used to check (informing user they can't proceed) if tags are matched
+  begin
+    var activeItem := ActiveStoryItem;
+    result :=
+      Assigned(activeItem)
+      and ( ((StoryMode = EditMode) and UI.FShiftDown) or //in Edit mode only, SHIFT key held down bypasses tags-matched check and forces proceeding to NextStoryPoint
+            (activeItem.TagsMatched) ); //also checking if Tags are matched (all moveables with Tags are over non-moveables with same Tags and vice-versa) to proceed
+
+    if not result then
+      TLockFrame.ShowModal(UI); //warn user that they can't proceed (till Tags are matched)
+  end;
+
+  {$endregion}
+
   {$region 'URLs'}
 
-  procedure TStory.OpenUrl(const Url: String);
+  procedure TStory.DoUrlAction(const UrlAction: String);
   begin
-    if Url = '-' then
-      ActivatePreviousStoryPoint
-    else if Url = '+' then
-      ActivateNextStoryPoint
-    else if Url = '0' then
-      ActivateHomeStoryItem
+    if UrlAction = '' then exit;
+
+    var LUrl := UrlAction;
+
+    //Check for ! prefix to skip Tags Matching
+    var LDoTagsMatching := true;
+    if LUrl.StartsWith('!') then
+    begin
+      Delete(LUrl, 1, 1); //remove first letter (the !) from LUrl parameter
+      LDoTagsMatching := false;
+    end;
+
+    if LUrl = '?' then
+      (if LDoTagsMatching then CheckTagsMatched else exit) //a !? will do nothing, a ? will check if Tags are Matched and display Closed or Open LockPrompt
+
+    else if LUrl = '-' then
+      ActivatePreviousStoryPoint //never does TagsMatching //a !- will act as - (go back to PreviousStoryPoint)
+
+    else if LUrl = '+' then
+      ActivateNextStoryPoint(LDoTagsMatching) //a !+ will skip Tags Matching and act as + (advance to NextStoryPoint)
+
+    else if LUrl = '0' then
+      ActivateHomeStoryItem //never does TagsMatching //a !0 will act as 0 (go to HomeStoryItem)
+
     //TODO: check for other StoryPoint reference to Activate that, needed to be able to make Stories with alternative flows
     //(e.g. "1.3" [if root is storypoint] or "3" in the flattened StructureView tree of non-Edit mode)
 
-    else if Url.EndsWith(EXT_READCOM, True) then //if it's a URL to a .readcom file (case-insensitive comparison)
-      UI.LoadFromUrl(Url)
+    else if LUrl.EndsWith(EXT_READCOM, True) then //if it's a LUrl to a .readcom file (case-insensitive comparison)
+    begin
+      if LUrl.StartsWith('+') then
+        Delete(LUrl, 1, 1) //remove first letter (the +) from LUrl parameter //any earlier ! prefix had been removed //a '+url' will do Tags Matching or not depending on earlier '!' prefix
+      else
+        LDoTagsMatching := false; //.readcom URLs that don't start with '+' don't do Tags Matching before navigating to other Story
+
+      if (not LDoTagsMatching) //if not bypassing tags matching, aka a !+url wasn't given
+         or RequireTagsMatched //does the Tags Matching and shows modal LockPrompt if tags are not matched
+      then
+        UI.LoadFromUrl(LUrl); //either bypassing Tags Matcing, or Tags are Matched, advance to LUrl
+    end
 
     else
-      Application.OpenURL(Url); //else open in system browser
+      Application.OpenUrl(LUrl); //else open in system browser
   end;
 
   {$endregion}
@@ -443,15 +503,12 @@ implementation
       UI.SetActiveStoryItemIfAssigned(activeItem.PreviousStoryPoint);
   end;
 
-  procedure TStory.ActivateNextStoryPoint;
+  procedure TStory.ActivateNextStoryPoint(const DoTagsMatching: Boolean = true);
   begin
-    var activeItem := ActiveStoryItem;
-    if Assigned(activeItem) then
-      if ((StoryMode = EditMode) and UI.FShiftDown) or //in Edit mode only, SHIFT key held down bypasses tags-matched check and forces proceeding to NextStoryPoint
-         (activeItem.TagsMatched) then //also checking if Tags are matched (all moveables with Tags are over non-moveables with same Tags and vice-versa) to proceed
-        UI.SetActiveStoryItemIfAssigned(activeItem.NextStoryPoint)
-      else
-        TLockFrame.ShowModal(UI); //warn user that they can't proceed (till Tags are matched)
+    if (not DoTagsMatching) //used to bypass Tags Matching if needed (passing false to parameter)
+       or RequireTagsMatched //does the Tags Matching and shows modal LockPrompt if tags are not matched
+    then
+      UI.SetActiveStoryItemIfAssigned(ActiveStoryItem.NextStoryPoint); //either bypassing Tags Matcing, or Tags are Matched, advance to NextStoryPoint
   end;
 
   {$endregion}
