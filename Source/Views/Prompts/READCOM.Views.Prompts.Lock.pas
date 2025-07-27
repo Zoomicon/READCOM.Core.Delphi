@@ -1,4 +1,4 @@
-//Description: READ-COM Lock dialog
+//Description: READ-COM Lock prompt
 //Author: George Birbilis (http://zoomicon.com)
 
 unit READCOM.Views.Prompts.Lock;
@@ -27,12 +27,18 @@ type
     const
       DEFAULT_LOCKED = true;
 
+    class function GetLockFrame: TLockFrame; static;
+
     {Locked}
+    class function IsLocked_Modal: Boolean; static;
+    class procedure SetLocked_Modal(const Value: Boolean); static;
     function IsLocked: Boolean;
     procedure SetLocked(const Value: Boolean);
 
   public
     constructor Create(AOwner: TComponent); override;
+    class property LockFrame: TLockFrame read GetLockFrame;
+    class property Locked_Modal: Boolean read IsLocked_Modal write SetLocked_Modal default DEFAULT_LOCKED;
 
   published
     property Locked: Boolean read IsLocked write SetLocked default DEFAULT_LOCKED;
@@ -53,6 +59,20 @@ end;
 {$endregion}
 
 {$region 'Properties'}
+
+{$region 'Locked_Modal'}
+
+class function TLockFrame.IsLocked_Modal: Boolean;
+begin
+  result := LockFrame.IsLocked;
+end;
+
+class procedure TLockFrame.SetLocked_Modal(const Value: Boolean);
+begin
+  LockFrame.SetLocked(Value);
+end;
+
+{$endregion}
 
 {$region 'Locked'}
 
@@ -76,5 +96,14 @@ end;
 {$endregion}
 
 {$endregion}
+
+{$region 'Methods'}
+
+class function TLockFrame.GetLockFrame: TLockFrame;
+begin
+  result := (Frame as TLockFrame);
+end;
+
+{$endregion'}
 
 end.
