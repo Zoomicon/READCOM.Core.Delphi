@@ -528,13 +528,13 @@ end;
   *)
 
   (**)
-  procedure TTextStoryItem.Painting; //TOO HEAVY
+  procedure TTextStoryItem.Painting;
   begin
-    {//}Log('TTextStoryItem.Painting %p', [@Self]);
+    //Log('TTextStoryItem.Painting %p', [@Self]);
     inherited;
     //Memo.SetFontSizeToFit(FLastMemoSize);
     //Memo.SetFontSizeToFit(FLastFontSize);
-    SetFontSizeToFit(Memo, FLastMemoSize);
+    SetFontSizeToFit(Memo, FLastMemoSize); //TODO: TOO HEAVY, CALLED TOO OFTEN
   end;
   (**)
 
