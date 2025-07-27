@@ -404,8 +404,11 @@ implementation
       and ( ((StoryMode = EditMode) and UI.FShiftDown) or //in Edit mode only, SHIFT key held down bypasses tags-matched check and forces proceeding to NextStoryPoint
             (activeItem.TagsMatched) ); //also checking if Tags are matched (all moveables with Tags are over non-moveables with same Tags and vice-versa) to proceed
 
-    if not result then
+    if not result then //showing prompt only if Tags aren't matched
+      begin
       TLockFrame.ShowModal(UI); //warn user that they can't proceed (till Tags are matched)
+      TLockFrame.Locked_Modal := true; //tell user they had mistakes in Tags matching
+      end;
   end;
 
   {$endregion}
@@ -426,36 +429,52 @@ implementation
       LDoTagsMatching := false;
     end;
 
+    //Check for ? prefix to also show open lock prompt when Tag Matching (when tags are matched), apart from closed lock prompt (when tags are not matched)
+    var LShowCorrectPrompt := false;
     if LUrl = '?' then
-      (if LDoTagsMatching then CheckTagsMatched else exit) //a !? will do nothing, a ? will check if Tags are Matched and display Closed or Open LockPrompt
+    begin
+      Delete(LUrl, 1, 1); //remove first letter (the ?) from LUrl parameter
+      LShowCorrectPrompt := true;
+    end;
 
-    else if LUrl = '-' then
-      ActivatePreviousStoryPoint //never does TagsMatching //a !- will act as - (go back to PreviousStoryPoint)
+    //--- In-Story Navigation URLs (with Tags Matching checking for NextStoryPoint if not bypassed with "!" prefix) ---
 
-    else if LUrl = '+' then
-      ActivateNextStoryPoint(LDoTagsMatching) //a !+ will skip Tags Matching and act as + (advance to NextStoryPoint)
+    if LUrl = '-' then
+    begin
+      ActivatePreviousStoryPoint; //never does TagsMatching //a !- will act as - (go back to PreviousStoryPoint)
+      exit;
+    end;
 
-    else if LUrl = '0' then
-      ActivateHomeStoryItem //never does TagsMatching //a !0 will act as 0 (go to HomeStoryItem)
+    if LUrl = '+' then
+    begin
+      ActivateNextStoryPoint(LDoTagsMatching); //a !+ will skip Tags Matching and act as + (advance to NextStoryPoint)
+      exit;
+    end;
+
+    if LUrl = '0' then
+    begin
+      ActivateHomeStoryItem; //never does TagsMatching //a !0 will act as 0 (go to HomeStoryItem)
+      exit;
+    end;
 
     //TODO: check for other StoryPoint reference to Activate that, needed to be able to make Stories with alternative flows
     //(e.g. "1.3" [if root is storypoint] or "3" in the flattened StructureView tree of non-Edit mode)
 
-    else if LUrl.EndsWith(EXT_READCOM, True) then //if it's a LUrl to a .readcom file (case-insensitive comparison)
-    begin
-      if LUrl.StartsWith('+') then
-        Delete(LUrl, 1, 1) //remove first letter (the +) from LUrl parameter //any earlier ! prefix had been removed //a '+url' will do Tags Matching or not depending on earlier '!' prefix
-      else
-        LDoTagsMatching := false; //.readcom URLs that don't start with '+' don't do Tags Matching before navigating to other Story
+    //--- Resource URLs - including navigation to other .readcom story (with Tags Matching checking if not bypassed with "!" prefix and only if explicitly asked for with "+" prefix) ---
 
-      if (not LDoTagsMatching) //if not bypassing tags matching, aka a !+url wasn't given
-         or RequireTagsMatched //does the Tags Matching and shows modal LockPrompt if tags are not matched
-      then
-        UI.LoadFromUrl(LUrl); //either bypassing Tags Matcing, or Tags are Matched, advance to LUrl
-    end
-
+    if LUrl.StartsWith('+') then
+      Delete(LUrl, 1, 1) //remove first letter (the +) from LUrl parameter //any earlier ! prefix had been removed //a '+url' will do Tags Matching or not depending on earlier '!' prefix
     else
-      Application.OpenUrl(LUrl); //else open in system browser
+      LDoTagsMatching := false; //URLs that don't start with '+' don't do Tags Matching before navigating to other Story
+
+    if (not LDoTagsMatching) //if not bypassing tags matching, aka a !+url wasn't given
+       or (LShowCorrectPrompt and CheckTagsMatched) //does the Tags Matching and shows modal LockPrompt with closed lock if tags are not matched and open if matched
+       or ((not LShowCorrectPrompt) and RequireTagsMatched) //does the Tags Matching and shows modal LockPrompt with closed lock if tags are not matched
+    then
+      if LUrl.EndsWith(EXT_READCOM, True) then //if it's a LUrl to a .readcom file (case-insensitive comparison)
+        UI.LoadFromUrl(LUrl) //either bypassing Tags Matcing, or Tags are Matched, advance to LUrl
+      else
+        Application.OpenUrl(LUrl); //else open in system browser
   end;
 
   {$endregion}
@@ -1775,4 +1794,3 @@ implementation
   {$ENDREGION .................................................................}
 
 end.
-
