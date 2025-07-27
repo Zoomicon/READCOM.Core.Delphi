@@ -1,4 +1,4 @@
-//Description: READ-COM Wait dialog
+//Description: READ-COM Wait prompt
 //Author: George Birbilis (http://zoomicon.com)
 
 unit READCOM.Views.Prompts.Wait;
