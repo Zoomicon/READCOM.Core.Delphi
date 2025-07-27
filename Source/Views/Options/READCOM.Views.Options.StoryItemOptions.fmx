@@ -132,7 +132,7 @@ object StoryItemOptions: TStoryItemOptions
         TextSettings.Trimming = None
         OnClick = actionChangeTagsExecute
       end
-      object btnToggleActionURL: TSpeedButton
+      object btnToggleUrlAction: TSpeedButton
         StaysPressed = True
         Align = Client
         Anchors = []
@@ -153,7 +153,7 @@ object StoryItemOptions: TStoryItemOptions
         StaysPressed = True
         Align = Client
         Anchors = []
-        Hint =
+        Hint = 
           'Set Factory capacity'#13#13'Defines max number of clones produceable o' +
           'n drag.'#13#13'When depleted, anchored factories leave back non-Factor' +
           'y clone with no Tags.'#13#13'Non-depleted tagged factories are not che' +

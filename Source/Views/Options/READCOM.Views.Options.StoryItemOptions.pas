@@ -33,7 +33,7 @@ type
     btnToggleStoryPoint: TSpeedButton;
     btnToggleAnchored: TSpeedButton;
     btnToggleTags: TSpeedButton;
-    btnToggleActionURL: TSpeedButton;
+    btnToggleUrlAction: TSpeedButton;
     btnToggleFactory: TSpeedButton;
     btnLoad: TSpeedButton;
     btnSave: TSpeedButton;
@@ -74,7 +74,7 @@ type
     function ActLoad: Boolean;
     function ActSave: Boolean;
     procedure ActChangeTags;
-    procedure ActChangeActionUrl;
+    procedure ActChangeUrlAction;
     procedure ActChangeFactoryCapacity;
 
     property Popup: TPopup read FPopup write FPopup stored false;
@@ -127,7 +127,7 @@ begin
     btnToggleSnapping.IsPressed := Snapping;
     btnToggleAnchored.IsPressed := Anchored;
     btnToggleTags.IsPressed := (Tags <> '');
-    btnToggleActionURL.IsPressed := (UrlAction <> '');
+    btnToggleUrlAction.IsPressed := (UrlAction <> '');
     btnToggleFactory.IsPressed := (FactoryCapacity <> 0);
 
     {$IF DEFINED(ANDROID) OR DEFINED(IOS)}
@@ -216,7 +216,7 @@ begin
   //ShowPopup; //see comment above //doesn't work either (popup shown in the background but closes after OK/Cancel at input prompt)
 end;
 
-procedure TStoryItemOptions.ActChangeActionUrl;
+procedure TStoryItemOptions.ActChangeUrlAction;
 begin
   TDialogServiceAsync.InputQuery(STR_URL, [STR_URL], [StoryItem.GetUrlAction],
     procedure(const AResult: TModalResult; const AValues: array of string)
@@ -225,7 +225,7 @@ begin
       begin
         var LUrl := Trim(AValues[0]);
         StoryItem.SetUrlAction(LUrl);
-        btnToggleActionURL.IsPressed := (LUrl <> '');
+        btnToggleUrlAction.IsPressed := (LUrl <> '');
       end;
       //ShowPopup; //TODO: doesn't work (popup gets hidden after OK/Cancel). Probably it is executed at other thread (and ignore), haven't tried telling it to do from the UI thread, or try else with a timeout to do it a moment later
     end
@@ -284,7 +284,7 @@ end;
 
 procedure TStoryItemOptions.actionChangeUrlActionExecute(Sender: TObject);
 begin
-  actChangeActionUrl;
+  actChangeUrlAction;
 end;
 
 procedure TStoryItemOptions.actionChangeFactoryCapacityExecute(Sender: TObject);
