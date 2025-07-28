@@ -72,8 +72,10 @@ interface
       function GetHomeStoryItem: IStoryItem;
       procedure SetHomeStoryItem(const Value: IStoryItem);
 
-      {FirstStoryPoint}
+      {Navigation}
       function GetFirstStoryPoint: IStoryItem;
+      function GetPreviousStoryPoint: IStoryItem;
+      function GetNextStoryPoint: IStoryItem;
 
       {Tags}
       function CheckTagsMatched(const TagsMatching: TTagsMatching = TagsMatching_Default): Boolean;
@@ -104,9 +106,14 @@ interface
 
     published
       property StoryMode: TStoryMode read GetStoryMode write SetStoryMode stored false;
+      //
       property RootStoryItem: IStoryItem read GetRootStoryItem write SetRootStoryItem stored false;
       property HomeStoryItem: IStoryItem read GetHomeStoryItem write SetHomeStoryItem stored false;
       property ActiveStoryItem: IStoryItem read GetActiveStoryItem write SetActiveStoryItem stored false;
+      //
+      property FirstStoryPoint: IStoryItem read GetFirstStoryPoint stored false;
+      property PreviousStoryPoint: IStoryItem read GetPreviousStoryPoint stored false;
+      property NextStoryPoint: IStoryItem read GetNextStoryPoint stored false;
     end;
 
     {$endregion}
@@ -374,7 +381,7 @@ implementation
 
   {$endregion}
 
-  {$region 'FirstStoryPoint'}
+  {$region 'Navigation'}
 
   function TStory.GetFirstStoryPoint: IStoryItem;
   begin
@@ -383,6 +390,24 @@ implementation
       result := LHome
     else
       result := HomeStoryItem.GetFirstChildStoryPoint;
+  end;
+
+  function TStory.GetPreviousStoryPoint;
+  begin
+    var LActiveItem := ActiveStoryItem;
+    if Assigned(LActiveItem) then
+      result := LActiveItem.NextStoryPoint
+    else
+      result := nil;
+  end;
+
+  function TStory.GetNextStoryPoint;
+  begin
+    var LActiveItem := ActiveStoryItem;
+    if Assigned(LActiveItem) then
+      result := LActiveItem.NextStoryPoint
+    else
+      result := nil;
   end;
 
   {$endregion}
@@ -533,9 +558,7 @@ implementation
        CheckTagsMatched(TagsMatching) //pass it to CheckTagsMatched to do close-only or open/close lock prompting and return matching state
     then
     begin
-      var activeItem := ActiveStoryItem;
-      if Assigned(activeItem) then
-        UI.SetActiveStoryItemIfAssigned(activeItem.PreviousStoryPoint);
+      UI.SetActiveStoryItemIfAssigned(PreviousStoryPoint);
 
       if (TagsMatching = TagsMatching_OkFail_Prompt) then
         TLockFrame.Hide_Modal(OPENLOCK_DELAY);
@@ -548,9 +571,7 @@ implementation
        CheckTagsMatched(TagsMatching) //pass it to CheckTagsMatched to do close-only or open/close lock prompting and return matching state
     then
     begin
-      var activeItem := ActiveStoryItem;
-      if Assigned(activeItem) then
-        UI.SetActiveStoryItemIfAssigned(activeItem.NextStoryPoint); //either bypassing Tags Matcing, or Tags are Matched, advance to NextStoryPoint
+      UI.SetActiveStoryItemIfAssigned(NextStoryPoint); //either bypassing Tags Matcing, or Tags are Matched, advance to NextStoryPoint
 
       if (TagsMatching = TagsMatching_OkFail_Prompt) then
         TLockFrame.Hide_Modal(OPENLOCK_DELAY);

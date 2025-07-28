@@ -389,8 +389,10 @@ interface
       function GetHomeStoryItem: IStoryItem;
       procedure SetHomeStoryItem(const Value: IStoryItem);
 
-      {FirstStoryPoint}
+      {Navigation}
       function GetFirstStoryPoint: IStoryItem;
+      function GetPreviousStoryPoint: IStoryItem;
+      function GetNextStoryPoint: IStoryItem;
 
       {Tags}
       function CheckTagsMatched(const TagsMatching: TTagsMatching = TagsMatching_Default): Boolean;
@@ -417,9 +419,14 @@ interface
       procedure SetStoryMode(const Value: TStoryMode);
 
       property StoryMode: TStoryMode read GetStoryMode write SetStoryMode;
+      //
       property RootStoryItem: IStoryItem read GetRootStoryItem write SetRootStoryItem;
       property HomeStoryItem: IStoryItem read GetHomeStoryItem write SetHomeStoryItem;
       property ActiveStoryItem: IStoryItem read GetActiveStoryItem write SetActiveStoryItem;
+      //
+      property FirstStoryPoint: IStoryItem read GetFirstStoryPoint;
+      property PreviousStoryPoint: IStoryItem read GetPreviousStoryPoint;
+      property NextStoryPoint: IStoryItem read GetNextStoryPoint;
     end;
 
     {$endregion}
