@@ -3,6 +3,8 @@
 
 {-$DEFINE NOSTYLE}
 
+//WARNING: if Delphi corrupts the form (sometimes it fails to load the StoryHUD frame first), revert only the StoryForm.fmx file from version control
+
 unit READCOM.Views.StoryForm;
 
 interface
@@ -29,8 +31,10 @@ interface
     READCOM.Views.StoryHUD; //for TStoryHUD
   {$endregion}
 
-  type
+  const
+    OPENLOCK_DELAY = 800; //msec
 
+  type
     TStoryForm = class; //forward declaration needed, since TStory keeps a reference to TStoryForm
 
     {$region 'TStory'}
@@ -72,8 +76,7 @@ interface
       function GetFirstStoryPoint: IStoryItem;
 
       {Tags}
-      function CheckTagsMatched: Boolean;
-      function RequireTagsMatched: Boolean;
+      function CheckTagsMatched(const TagsMatching: TTagsMatching = TagsMatching_Default): Boolean;
 
       {URLs}
       procedure DoUrlAction(const UrlAction: String);
@@ -82,13 +85,15 @@ interface
       function GetActiveStoryItem: IStoryItem;
       procedure SetActiveStoryItem(const Value: IStoryItem);
       //
-      procedure ActivateHomeStoryItem;
+      procedure ActivateHomeStoryItem(const TagsMatching: TTagsMatching = TagsMatching_Default);
       procedure ActivateRootStoryItem;
       procedure ActivateParentStoryItem;
       //
       procedure ActivateAncestorStoryPoint;
-      procedure ActivatePreviousStoryPoint;
-      procedure ActivateNextStoryPoint(const DoTagsMatching: Boolean = true);
+      procedure ActivatePreviousStoryPoint(const TagsMatching: TTagsMatching = TagsMatching_Default);
+      procedure ActivateNextStoryPoint(const TagsMatching: TTagsMatching = TagsMatching_Default);
+      //
+      procedure ActivateUrl(const Url:string; const TagsMatching: TTagsMatching = TagsMatching_Default); //open new story when ending in .readcom, else open url in browser
 
       {StoryMode}
       function GetStoryMode: TStoryMode;
@@ -384,30 +389,22 @@ implementation
 
   {$region 'Tags'}
 
-  function TStory.CheckTagsMatched: Boolean; //used to check if tags are matched or if there's a mistake (informing user in both cases)
+  function TStory.CheckTagsMatched(const TagsMatching: TTagsMatching = TagsMatching_Default): Boolean; //used to check (informing user they can or can't proceed) if tags are matched
   begin
     var activeItem := ActiveStoryItem;
     result :=
       Assigned(activeItem)
-      and ( ((StoryMode = EditMode) and UI.FShiftDown) or //in Edit mode only, SHIFT key held down bypasses tags-matched check and forces proceeding to NextStoryPoint
+      and ( (TagsMatching = TagsMatching_Skip) or //skip Tags Matching
+            ((StoryMode = EditMode) and UI.FShiftDown) or //in Edit mode only, SHIFT key held down bypasses tags-matched check and forces proceeding to NextStoryPoint
             (activeItem.TagsMatched) ); //also checking if Tags are matched (all moveables with Tags are over non-moveables with same Tags and vice-versa) to proceed
 
-    TLockFrame.ShowModal(UI); //Note: must do before trying to set Locked_Modal (to create the modal instance if needed)
-    TLockFrame.Locked_Modal := not result; //tell user they had it all correct or had mistakes in Tags matching
-  end;
-
-  function TStory.RequireTagsMatched: Boolean; //used to check (informing user they can't proceed) if tags are matched
-  begin
-    var activeItem := ActiveStoryItem;
-    result :=
-      Assigned(activeItem)
-      and ( ((StoryMode = EditMode) and UI.FShiftDown) or //in Edit mode only, SHIFT key held down bypasses tags-matched check and forces proceeding to NextStoryPoint
-            (activeItem.TagsMatched) ); //also checking if Tags are matched (all moveables with Tags are over non-moveables with same Tags and vice-versa) to proceed
-
-    if not result then //showing prompt only if Tags aren't matched
+    if (TagsMatching <> TagsMatching_Skip) and //not showing prompt if skipped Tags Matching
+       (TagsMatching <> TagsMatching_Silent_Prompt) and //not showing prompt if set to Silent prompting
+       ((not result) or (TagsMatching = TagsMatching_OkFail_Prompt)) //showing prompt by default only if failed to match tags, or if set to show open/close lock
+    then
       begin
       TLockFrame.ShowModal(UI); //warn user that they can't proceed (till Tags are matched)
-      TLockFrame.Locked_Modal := true; //tell user they had mistakes in Tags matching
+      TLockFrame.Locked_Modal := (not result); //set lock image based on result
       end;
   end;
 
@@ -421,39 +418,58 @@ implementation
 
     var LUrl := UrlAction;
 
-    //Check for ! prefix to skip Tags Matching
-    var LDoTagsMatching := true;
+    var TagsMatching := TagsMatching_Default;
+
+    //--- Check for ! prefix to skip Tags Matching ---
     if LUrl.StartsWith('!') then
     begin
       Delete(LUrl, 1, 1); //remove first letter (the !) from LUrl parameter
-      LDoTagsMatching := false;
+      TagsMatching := TagsMatching_Skip;
     end;
 
-    //Check for ? prefix to also show open lock prompt when Tag Matching (when tags are matched), apart from closed lock prompt (when tags are not matched)
-    var LShowCorrectPrompt := false;
-    if LUrl = '?' then
+    //--- Check for ?/??/??? prefix to force Tags Matching and show just closed (?) or open/closed (???) lock prompt or with no prompt / silent (???). Overrides any earlier !
+
+    if LUrl.StartsWith('?') then
     begin
       Delete(LUrl, 1, 1); //remove first letter (the ?) from LUrl parameter
-      LShowCorrectPrompt := true;
+      TagsMatching := TagsMatching_Fail_Prompt;
+
+      if LUrl.StartsWith('?') then //check if 2nd ? follows
+      begin
+        Delete(LUrl, 1, 1); //remove first letter (the ?) from LUrl parameter
+        TagsMatching := TagsMatching_OkFail_Prompt;
+      end;
+
+      if (LUrl = '') then //we just have ? or ?? with nothing following
+      begin
+        CheckTagsMatched(TagsMatching); //ignore result, just show Tags Matching prompt to user
+        exit;
+      end;
+
+      if LUrl.StartsWith('?') then //check if 3rd ? follows
+      begin
+        Delete(LUrl, 1, 1); //remove first letter (the ?) from LUrl parameter
+        TagsMatching := TagsMatching_Silent_Prompt;
+      end;
     end;
 
-    //--- In-Story Navigation URLs (with Tags Matching checking for NextStoryPoint if not bypassed with "!" prefix) ---
+    //--- In-Story Navigation URLs (with Tags Matching is set to do so, or for + [NextStoryPoint] by default [unless + tag matching is bypassed with ! prefix]) ---
 
     if LUrl = '-' then
     begin
-      ActivatePreviousStoryPoint; //never does TagsMatching //a !- will act as - (go back to PreviousStoryPoint)
+      ActivatePreviousStoryPoint(TagsMatching); //?-, ??-, ???- will do tags matching
       exit;
     end;
 
     if LUrl = '+' then
     begin
-      ActivateNextStoryPoint(LDoTagsMatching); //a !+ will skip Tags Matching and act as + (advance to NextStoryPoint)
+      ActivateNextStoryPoint(TagsMatching); //!+ will skip tags matching
       exit;
     end;
 
-    if LUrl = '0' then
+     if LUrl = '0' then
     begin
-      ActivateHomeStoryItem; //never does TagsMatching //a !0 will act as 0 (go to HomeStoryItem)
+      ActivateHomeStoryItem(TagsMatching); //?0, ??0, ???0 will do tags matching
       exit;
     end;
 
@@ -462,19 +478,7 @@ implementation
 
     //--- Resource URLs - including navigation to other .readcom story (with Tags Matching checking if not bypassed with "!" prefix and only if explicitly asked for with "+" prefix) ---
 
-    if LUrl.StartsWith('+') then
-      Delete(LUrl, 1, 1) //remove first letter (the +) from LUrl parameter //any earlier ! prefix had been removed //a '+url' will do Tags Matching or not depending on earlier '!' prefix
-    else
-      LDoTagsMatching := false; //URLs that don't start with '+' don't do Tags Matching before navigating to other Story
-
-    if (not LDoTagsMatching) //if not bypassing tags matching, aka a !+url wasn't given
-       or (LShowCorrectPrompt and CheckTagsMatched) //does the Tags Matching and shows modal LockPrompt with closed lock if tags are not matched and open if matched
-       or ((not LShowCorrectPrompt) and RequireTagsMatched) //does the Tags Matching and shows modal LockPrompt with closed lock if tags are not matched
-    then
-      if LUrl.EndsWith(EXT_READCOM, True) then //if it's a LUrl to a .readcom file (case-insensitive comparison)
-        UI.LoadFromUrl(LUrl) //either bypassing Tags Matcing, or Tags are Matched, advance to LUrl
-      else
-        Application.OpenUrl(LUrl); //else open in system browser
+    ActivateUrl(LUrl, TagsMatching);
   end;
 
   {$endregion}
@@ -503,9 +507,17 @@ implementation
       activeItem.ActivateParentStoryItem; //this checks if ParentStoryItem is nil and does nothing in that case
   end;
 
-  procedure TStory.ActivateHomeStoryItem;
+  procedure TStory.ActivateHomeStoryItem(const TagsMatching: TTagsMatching = TagsMatching_Default);
   begin
-    ActiveStoryItem := HomeStoryItem; //there's always a HomeStoryItem (code that loads the story takes care of that if none found, setting the RootStoryItem as HomeStoryItem)
+     if (TagsMatching = TagsMatching_Default) or //skip tags matching by default for HomeStoryItem
+       CheckTagsMatched(TagsMatching) //pass it to CheckTagsMatched to do close-only or open/close lock prompting and return matching state
+    then
+    begin
+      ActiveStoryItem := HomeStoryItem; //there's always a HomeStoryItem (code that loads the story takes care of that if none found, setting the RootStoryItem as HomeStoryItem)
+
+      if (TagsMatching = TagsMatching_OkFail_Prompt) then
+        TLockFrame.Hide_Modal(OPENLOCK_DELAY);
+    end;
   end;
 
   procedure TStory.ActivateAncestorStoryPoint;
@@ -515,19 +527,50 @@ implementation
       UI.SetActiveStoryItemIfAssigned(activeItem.GetAncestorStoryPoint);
   end;
 
-  procedure TStory.ActivatePreviousStoryPoint;
+  procedure TStory.ActivatePreviousStoryPoint(const TagsMatching: TTagsMatching = TagsMatching_Default);
   begin
-    var activeItem := ActiveStoryItem;
-    if Assigned(activeItem) then
-      UI.SetActiveStoryItemIfAssigned(activeItem.PreviousStoryPoint);
+    if (TagsMatching = TagsMatching_Default) or //skip tags matching by default for PreviousStoryPoint
+       CheckTagsMatched(TagsMatching) //pass it to CheckTagsMatched to do close-only or open/close lock prompting and return matching state
+    then
+    begin
+      var activeItem := ActiveStoryItem;
+      if Assigned(activeItem) then
+        UI.SetActiveStoryItemIfAssigned(activeItem.PreviousStoryPoint);
+
+      if (TagsMatching = TagsMatching_OkFail_Prompt) then
+        TLockFrame.Hide_Modal(OPENLOCK_DELAY);
+    end;
   end;
 
-  procedure TStory.ActivateNextStoryPoint(const DoTagsMatching: Boolean = true);
+  procedure TStory.ActivateNextStoryPoint(const TagsMatching: TTagsMatching = TagsMatching_Default);
   begin
-    if (not DoTagsMatching) //used to bypass Tags Matching if needed (passing false to parameter)
-       or RequireTagsMatched //does the Tags Matching and shows modal LockPrompt if tags are not matched
+    if //(TagsMatching = TagsMatching_Default) or //commented out, default for NextStoryPoint is to do tags matching
+       CheckTagsMatched(TagsMatching) //pass it to CheckTagsMatched to do close-only or open/close lock prompting and return matching state
     then
-      UI.SetActiveStoryItemIfAssigned(ActiveStoryItem.NextStoryPoint); //either bypassing Tags Matcing, or Tags are Matched, advance to NextStoryPoint
+    begin
+      var activeItem := ActiveStoryItem;
+      if Assigned(activeItem) then
+        UI.SetActiveStoryItemIfAssigned(activeItem.NextStoryPoint); //either bypassing Tags Matcing, or Tags are Matched, advance to NextStoryPoint
+
+      if (TagsMatching = TagsMatching_OkFail_Prompt) then
+        TLockFrame.Hide_Modal(OPENLOCK_DELAY);
+    end;
+  end;
+
+  procedure TStory.ActivateUrl(const Url:string; const TagsMatching: TTagsMatching = TagsMatching_Default); //open new story when ending in .readcom, else open url in browser
+  begin
+    if (TagsMatching = TagsMatching_Default) or //skip tags matching by default for URLs
+       CheckTagsMatched(TagsMatching) //pass it to CheckTagsMatched to do close-only or open/close lock prompting and return matching state
+    then
+    begin
+      if Url.EndsWith(EXT_READCOM, True) then //if it's a LUrl to a .readcom file (case-insensitive comparison)
+        UI.LoadFromUrl(Url) //either bypassing Tags Matcing, or Tags are Matched, advance to LUrl
+      else
+        Application.OpenUrl(Url); //else open in system browser
+
+      if (TagsMatching = TagsMatching_OkFail_Prompt) then
+        TLockFrame.Hide_Modal(OPENLOCK_DELAY);
+    end;
   end;
 
   {$endregion}
@@ -1702,7 +1745,7 @@ implementation
       var TheRootStoryItemView := RootStoryItemView;
       if Assigned(TheRootStoryItemView) then
         try
-          TheRootStoryItemView.Save(Stream); //default file format is EXT_READCOM
+          TheRootStoryItemView.Save(Stream); //default file format is EXT_READCOM //Note: saves .readcom in binary (instead of text) format unless SHIFT key is being pressed
         except
           on E: Exception do
             begin

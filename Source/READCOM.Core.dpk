@@ -30,6 +30,8 @@ package READCOM.Core;
 {$ENDIF IMPLICITBUILDING}
 {$IMPLICITBUILD ON}
 
+{$RUNONLY ON}
+
 requires
   rtl,
   fmx,

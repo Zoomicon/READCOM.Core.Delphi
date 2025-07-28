@@ -254,11 +254,6 @@
         </DCCReference>
         <DCCReference Include="App\READCOM.App.Main.pas"/>
         <DCCReference Include="App\READCOM.App.Messages.pas"/>
-        <None Include="..\boss.json"/>
-        <None Include="..\DEPENDENCIES.md"/>
-        <None Include="..\LICENSE.txt"/>
-        <None Include="..\README.md"/>
-        <None Include="boss.json"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

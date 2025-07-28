@@ -40,6 +40,7 @@ interface
     TITextStoryItemList = TListEx<ITextStoryItem>;
 
     TStoryMode = (AnimatedStoryMode, InteractiveStoryMode, GuidedInteractiveStoryMode, EditMode);
+    TTagsMatching = (TagsMatching_Default, TagsMatching_Skip, TagsMatching_Silent_Prompt, TagsMatching_Fail_Prompt, TagsMatching_OkFail_Prompt);
 
     {$region 'IStoryItemFactory'}
 
@@ -392,8 +393,7 @@ interface
       function GetFirstStoryPoint: IStoryItem;
 
       {Tags}
-      function CheckTagsMatched: Boolean;
-      function RequireTagsMatched: Boolean;
+      function CheckTagsMatched(const TagsMatching: TTagsMatching = TagsMatching_Default): Boolean;
 
       {URLs}
       procedure DoUrlAction(const UrlAction: String);
@@ -402,13 +402,15 @@ interface
       function GetActiveStoryItem: IStoryItem;
       procedure SetActiveStoryItem(const Value: IStoryItem);
       //
-      procedure ActivateHomeStoryItem;
+      procedure ActivateHomeStoryItem(const TagsMatching: TTagsMatching = TagsMatching_Default);
       procedure ActivateRootStoryItem;
       procedure ActivateParentStoryItem;
       //
       procedure ActivateAncestorStoryPoint;
-      procedure ActivatePreviousStoryPoint;
-      procedure ActivateNextStoryPoint(const DoTagsMatching: Boolean = true);
+      procedure ActivatePreviousStoryPoint(const TagsMatching: TTagsMatching = TagsMatching_Default);
+      procedure ActivateNextStoryPoint(const TagsMatching: TTagsMatching = TagsMatching_Default);
+      //
+      procedure ActivateUrl(const Url:string; const TagsMatching: TTagsMatching = TagsMatching_Default); //open new story when ending in .readcom, else open url in browser
 
       {StoryMode}
       function GetStoryMode: TStoryMode;
