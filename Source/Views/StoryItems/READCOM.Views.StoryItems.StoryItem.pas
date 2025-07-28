@@ -594,27 +594,28 @@ implementation
 
     RefreshStoryItemsList; //need to recalculate the list, since the "Index" of objects is different from the one of StoryItems (the TStoryItem contains other FmxObjects too in its UI design)
 
-    var StoryItem: IStoryItem;
-    if Supports(AObject, IStoryItem, StoryItem) then
-      ApplyParentEditMode(StoryItem);
+    if Supports(AObject, IAudioStoryItem) then //Note: would be nice if could use "is" operator for interfaces too (can't in Delphi 12.3)
+      RefreshAudioStoryItemsList; //need to recalculate the list, since the "Index" of objects is different from the one of AudioStoryItems (the TStoryItem contains other FmxObjects too in its UI design)
 
-    RefreshAudioStoryItemsList; //need to recalculate the list, since the "Index" of objects is different from the one of AudioStoryItems (the TStoryItem contains other FmxObjects too in its UI design)
+    var LStoryItem: IStoryItem;
+    if Supports(AObject, IStoryItem, LStoryItem) then
+      ApplyParentEditMode(LStoryItem);
   end;
 
   procedure TStoryItem.DoRemoveObject(const AObject: TFmxObject);
 
     procedure CheckRemoveFromStoryItems;
-    var StoryItem: IStoryItem;
     begin
-      if Supports(AObject, IStoryItem, StoryItem) then
-        FStoryItems.Remove(StoryItem);
+      var LStoryItem: IStoryItem;
+      if Supports(AObject, IStoryItem, LStoryItem) then
+        FStoryItems.Remove(LStoryItem);
     end;
 
     procedure CheckRemoveFromAudioStoryItems;
-    var AudioStoryItem: IAudioStoryItem;
     begin
-      if Supports(AObject, IAudioStoryItem, AudioStoryItem) then
-        FAudioStoryItems.Remove(AudioStoryItem);
+      var LAudioStoryItem: IAudioStoryItem;
+      if Supports(AObject, IAudioStoryItem, LAudioStoryItem) then
+        FAudioStoryItems.Remove(LAudioStoryItem);
     end;
 
   begin

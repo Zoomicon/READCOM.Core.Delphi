@@ -396,7 +396,7 @@ implementation
   begin
     var LActiveItem := ActiveStoryItem;
     if Assigned(LActiveItem) then
-      result := LActiveItem.NextStoryPoint
+      result := LActiveItem.PreviousStoryPoint
     else
       result := nil;
   end;
