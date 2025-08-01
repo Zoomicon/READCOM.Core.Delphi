@@ -81,3 +81,7 @@ __recovery/
 modules/
 /Source/boss-lock.json
 boss-lock.json
+
+# Build folders
+**/Debug/
+**/Release/
