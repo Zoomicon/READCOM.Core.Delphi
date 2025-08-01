@@ -31,7 +31,6 @@ package READCOM.Core;
 {$IMPLICITBUILD ON}
 
 {$RUNONLY ON}
-{$DESCRIPTION 'READCOM.Core run-time package'}
 
 requires
   rtl,

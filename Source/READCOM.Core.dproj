@@ -64,6 +64,12 @@
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Android64' and '$(Cfg_1)'=='true') or '$(Cfg_1_Android64)'!=''">
+        <Cfg_1_Android64>true</Cfg_1_Android64>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
     <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
         <Cfg_1_Win32>true</Cfg_1_Win32>
         <CfgParent>Cfg_1</CfgParent>
@@ -88,7 +94,7 @@
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
         <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
         <SanitizedProjectName>READCOM_Core</SanitizedProjectName>
-        <DCC_UnitSearchPath>..\modules\.dcp;..\modules\.dcu;..\modules;..\modules\.bpl;..\modules\object-debugger-for-firemonkey\DemoDesktop;..\modules\object-debugger-for-firemonkey\DemoMobile;..\modules\object-debugger-for-firemonkey;..\modules\object-debugger-for-firemonkey\Test;..\modules\zoomicon.generics.delphi\Source\Collections;..\modules\zoomicon.generics.delphi\Source\Factories;..\modules\zoomicon.generics.delphi\Source\Functors;..\modules\zoomicon.generics.delphi\Test;..\modules\zoomicon.helpers.fmx.delphi\Source;..\modules\zoomicon.helpers.rtl.delphi\Source;..\modules\zoomicon.introspection.fmx.delphi\Demo;..\modules\zoomicon.introspection.fmx.delphi\Source;..\modules\zoomicon.manipulation.fmx.delphi\Source;..\modules\zoomicon.media.fmx.delphi\Demo\Views;..\modules\zoomicon.media.fmx.delphi\Source;..\modules\zoomicon.zui.fmx.delphi\Demo;..\modules\zoomicon.zui.fmx.delphi\Source;modules\.dcp;modules\.dcu;modules;modules\.bpl;modules\object-debugger-for-firemonkey\DemoDesktop;modules\object-debugger-for-firemonkey\DemoMobile;modules\object-debugger-for-firemonkey;modules\object-debugger-for-firemonkey\Test;modules\zoomicon.generics.delphi\Source\Collections;modules\zoomicon.generics.delphi\Source\Factories;modules\zoomicon.generics.delphi\Source\Functors;modules\zoomicon.generics.delphi\Test;modules\zoomicon.helpers.fmx.delphi\Source;modules\zoomicon.helpers.rtl.delphi\Source;modules\zoomicon.introspection.fmx.delphi\Demo;modules\zoomicon.introspection.fmx.delphi\Source;modules\zoomicon.manipulation.fmx.delphi\Source\Registration;..\modules\zoomicon.manipulation.fmx.delphi\Source\Registration;modules\zoomicon.manipulation.fmx.delphi\Source;modules\zoomicon.media.fmx.delphi\Demo\Views;modules\zoomicon.media.fmx.delphi\Source;modules\zoomicon.zui.fmx.delphi\Demo;modules\zoomicon.zui.fmx.delphi\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\modules\object-debugger-for-firemonkey;..\modules\zoomicon.generics.delphi\Source\Collections;..\modules\zoomicon.generics.delphi\Source\Factories;..\modules\zoomicon.generics.delphi\Source\Functors;..\modules\zoomicon.helpers.fmx.delphi\Source;..\modules\zoomicon.helpers.rtl.delphi\Source;..\modules\zoomicon.introspection.fmx.delphi\Source;..\modules\zoomicon.manipulation.fmx.delphi\Source\Registration;..\modules\zoomicon.manipulation.fmx.delphi\Source;..\modules\zoomicon.media.fmx.delphi\Source;..\modules\zoomicon.zui.fmx.delphi\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <VerInfo_Locale>1032</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
     </PropertyGroup>
@@ -163,6 +169,10 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
         <DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
         <DCC_RangeChecking>true</DCC_RangeChecking>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Android64)'!=''">
+        <VerInfo_Build>1</VerInfo_Build>
+        <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
