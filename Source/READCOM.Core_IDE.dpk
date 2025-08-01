@@ -27,6 +27,7 @@ package READCOM.Core_IDE;
 {$IMPLICITBUILD ON}
 
 {$DESIGNONLY ON}
+{$DESCRIPTION 'READCOM.Core design-time package'}
 
 requires
   rtl,

@@ -31,11 +31,12 @@ package READCOM.Core;
 {$IMPLICITBUILD ON}
 
 {$RUNONLY ON}
+{$DESCRIPTION 'READCOM.Core run-time package'}
 
 requires
   rtl,
   fmx,
-  FrameStandPackage_11_1,
+  FrameStandPackage_12,
   Zoomicon.Media.FMX,
   Zoomicon.ZUI.FMX,
   Zoomicon.Generics,
