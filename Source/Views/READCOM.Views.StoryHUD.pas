@@ -260,8 +260,8 @@ implementation
     Application.MainForm.FullScreen := Value;
     {$ENDIF}
 
-    //sync the toggle button state too (in case it was called directly and not from the event handler)
-    btnToggleFullscreen.IsPressed := Fullscreen; //don't use "Pressed" //not using Value to reflect on whether it did set fullscreen
+    //sync the toggle button state too (in case SetFullScreen was called directly - or via TStoryHUD's FullScreen property - and not from the btnToggleFullscreenClick event handler)
+    btnToggleFullscreen.IsPressed := Value; //don't use "Pressed :=" //don't use ":= FullScreen", seems to not immediately reflect the result
   end;
 
   {$endregion}

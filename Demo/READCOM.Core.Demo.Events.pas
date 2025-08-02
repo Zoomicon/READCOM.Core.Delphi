@@ -14,10 +14,13 @@ interface
 
 implementation
   uses
-    System.SysUtils; //for FreeAndNil
+    System.SysUtils, //for FreeAndNil
+    FMX.Forms; //for Application
 
   procedure TEventHandlers.StoryFormReady(const StoryForm: TStoryForm);
   begin
+    Application.MainForm := StoryForm; //do this since it may have not been done yet and code we call may expect it to have been done
+
     (* //Untoggle actionMenu / hide layoutButtons by default (assuming content has its own navigation StoryItems with UrlAction set)
     StoryForm.HUD.actionMenu.Checked := false; //don't just do StoryForm.HUD.layoutButtons.Visible := false since that would make the menu toggle button unsync
     StoryForm.HUD.layoutButtons.Visible := false;
