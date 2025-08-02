@@ -115,11 +115,14 @@ interface
       {EditMode}
       procedure SetEditMode(const Value: Boolean); virtual;
       {StructureVisible}
-      procedure SetStructureVisible(const Value: Boolean);
+      procedure SetStructureVisible(const Value: Boolean); virtual;
       {TargetsVisible}
-      procedure SetTargetsVisible(const Value: Boolean);
+      procedure SetTargetsVisible(const Value: Boolean); virtual;
       {UseStoryTimer}
-      procedure SetUseStoryTimer(const Value: Boolean);
+      procedure SetUseStoryTimer(const Value: Boolean); virtual;
+      {FullScreen}
+      function GetFullScreen: Boolean; virtual;
+      procedure SetFullScreen(const Value: Boolean); virtual;
 
     public
       constructor Create(AOwner: TComponent); override;
@@ -132,6 +135,7 @@ interface
       property StructureVisible: Boolean read FStructureVisible write SetStructureVisible default false;
       property TargetsVisible: Boolean read FTargetsVisible write SetTargetsVisible default false;
       property UseStoryTimer: Boolean read FUseStoryTimer write SetUseStoryTimer default false;
+      property FullScreen: Boolean read GetFullScreen write SetFullScreen default false;
 
       property OnEditModeChanged: TEditModeChangedEvent read FEditModeChanged write FEditModeChanged;
       property OnStructureVisibleChanged: TStructureVisibleChangedEvent read FStructureVisibleChanged write FStructureVisibleChanged;
@@ -180,7 +184,7 @@ implementation
     StructureVisible := false; //calling the "setter" to hide the side panel (which is open in design mode to define its width)
   end;
 
-  {$REGION 'Properties'}
+{$REGION 'Properties'}
 
   {$region 'EditMode'}
 
@@ -195,7 +199,7 @@ implementation
       FEditModeChanged(Self, Value);
   end;
 
-  {$endregion}
+{$endregion}
 
   {$region 'StrucureVisible'}
 
@@ -241,6 +245,27 @@ implementation
 
   {$endregion}
 
+  {$region 'FullScreen'}
+
+  function TStoryHUD.GetFullScreen: Boolean;
+  begin
+    result := Application.MainForm.FullScreen;
+  end;
+
+  procedure TStoryHUD.SetFullScreen(const Value: Boolean);
+  begin
+    {$IF DEFINED(MSWINDOWS)}
+    SetFullscreen_WindowsFix(Application.MainForm, Value); //TODO: temp fullscreen fix for Delphi 12.2 which can't exit fullscreen //TODO: causes issues with color combo boxes and options popup though
+    {$ELSE}
+    Application.MainForm.FullScreen := Value;
+    {$ENDIF}
+
+    //sync the toggle button state too (in case it was called directly and not from the event handler)
+    btnToggleFullscreen.IsPressed := Fullscreen; //don't use "Pressed" //not using Value to reflect on whether it did set fullscreen
+  end;
+
+  {$endregion}
+
   {$ENDREGION}
 
   {$REGION 'Actions'}
@@ -278,11 +303,7 @@ implementation
 
   procedure TStoryHUD.btnToggleFullscreenClick(Sender: TObject);
   begin
-    {$IF DEFINED(MSWINDOWS)}
-    SetFullscreen_WindowsFix(Application.MainForm, btnToggleFullscreen.IsPressed); //Note: don't use Pressed //TODO: temp fullscreen fix for Delphi 12.2 which can't exit fullscreen
-    {$ELSE}
-    Application.MainForm.FullScreen := not Application.MainForm.FullScreen;
-    {$ENDIF}
+    FullScreen := btnToggleFullscreen.IsPressed; //Note: don't use Pressed
   end;
 
   {$endregion}

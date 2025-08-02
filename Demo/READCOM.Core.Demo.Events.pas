@@ -22,10 +22,10 @@ implementation
     StoryForm.HUD.actionMenu.Checked := false; //don't just do StoryForm.HUD.layoutButtons.Visible := false since that would make the menu toggle button unsync
     StoryForm.HUD.layoutButtons.Visible := false;
     *)
-    
+
     //Use fullscreen by default
     {$IF Defined(Android)} //FullScreen still has issues on Windows (e.g. color popups don't show), only do on Android
-    StoryForm.HUD.btnToggleFullscreen.IsPressed := true; //set FullScreen //don't use "Pressed" instead
+    StoryForm.HUD.Fullscreen := true;
     {$ENDIF}
   end;
 
