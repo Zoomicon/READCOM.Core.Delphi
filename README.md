@@ -1,5 +1,5 @@
 # READCOM.Core.Delphi
-[READ-COM](https://github.com/zoomicon/READCOM_App) Core package for Delphi.
+[READ-COM](https://github.com/zoomicon/READCOM_App) Core package for [Delphi](https://www.embarcadero.com/products/delphi).
 An interactive story-telling engine.
 
 [![Ask DeepWiki][DeepWikiBadge]](https://deepwiki.com/Zoomicon/READCOM.Core.Delphi)
