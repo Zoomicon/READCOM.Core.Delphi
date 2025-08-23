@@ -17,6 +17,7 @@ uses
 
 resourcestring
   STR_URL = 'URL';
+  STR_FACTORY_CAPACITY = 'Factory Capacity';
   STR_TAGS = 'Tags';
 
 type
@@ -235,7 +236,7 @@ end;
 
 procedure TStoryItemOptions.ActChangeFactoryCapacity;
 begin
-  TDialogServiceAsync.InputQuery(STR_URL, [STR_URL], [StoryItem.GetFactoryCapacity.ToString],
+  TDialogServiceAsync.InputQuery(STR_FACTORY_CAPACITY, [STR_FACTORY_CAPACITY], [StoryItem.GetFactoryCapacity.ToString],
     procedure(const AResult: TModalResult; const AValues: array of string)
     begin
       if (AResult = mrOk) then
