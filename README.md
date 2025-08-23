@@ -7,8 +7,8 @@ An interactive story-telling engine.
 
 ## Used by
 
-* [READ-COM_App](https://github.com/Zoomicon/READCOM_App)
-* [iLearnTsakonika_App](https://github.com/Zoomicon/iLearnTsakonika_App)
+* [READ-COM: Reading Communities App](https://github.com/Zoomicon/READCOM_App)
+* [iLearnTsakonika language learning App](https://github.com/Zoomicon/iLearnTsakonika_App)
 
 
 [DeepwikiBadge]: https://deepwiki.com/badge.svg
