@@ -4,6 +4,8 @@ An interactive story-telling engine.
 
 [![License][MITlicenseBadge]](LICENSE.txt)
 
+## Architecture
+
 [![Ask DeepWiki][DeepWikiBadge]](https://deepwiki.com/Zoomicon/READCOM.Core.Delphi)
 
 ## Used by
