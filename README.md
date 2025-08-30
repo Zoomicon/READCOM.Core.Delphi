@@ -5,6 +5,7 @@ An interactive story-telling engine.
 [![License][MITlicenseBadge]](LICENSE.txt)
 
 ## Architecture
+- [Concepts](https://github.com/Zoomicon/READCOM.Core.Delphi/wiki/Concepts)
 
 [![Ask DeepWiki][DeepWikiBadge]](https://deepwiki.com/Zoomicon/READCOM.Core.Delphi)
 
