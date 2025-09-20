@@ -1686,7 +1686,7 @@ implementation
             {and //TODO: should have URLs clickable only for children of ActiveStoryItem (and for itself if it's the RootStoryItem maybe) //in non-EditMode should disable HitTest though at everything that isn't the current StoryItem or direct child of the ActiveStoryItem apart from the TextStoryItems maybe (could maybe just disble HitTest at all siblings of ActiveStoryItem and have everything under ActiveStoryItem HitTest-enabled)
             ((Assigned(LParent) and LParent.Active) or
             ((not Assigned(LParent)) and Active))}) then //only when ParentStoryItem is the ActiveStoryItem //assuming short-circuit evaluation //if no LParent then it's the RootStoryItem, allowing it to have URLAction too
-          FStory.DoUrlAction(FUrlAction);
+          FStory.DoUrlAction(FUrlAction); //TODO: if child item has a UrlAction it should consume the click event, currently it seems parent StoryItem will play its AudioStoryItem(s) even while navigating say to NextStoryPoint (when a child ImageStoryItem with '+' urlAction was clicked)
       end;
     end;
 

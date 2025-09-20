@@ -153,7 +153,9 @@ implementation
     inherited;
 
     SVGText := '';
-    Image := nil;
+    FreeAndNil(Image);
+
+    FreeAndNil(FDummyImage);
     FDummyImage := TImage.Create(Self);
   end;
 
