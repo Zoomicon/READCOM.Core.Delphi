@@ -11,18 +11,17 @@ program READCOM.Core.Demo;
 
   {$region 'Used units'} //Note: D12.3 can't fold/expand regions in .dpr files
   uses
-  System.StartUpCopy,
-  READCOM.App.Main,
-    //
-    Zoomicon.Media.FMX.ModalFrame in 'modules\zoomicon.media.fmx.delphi\Source\Zoomicon.Media.FMX.ModalFrame.pas' {ModalFrame: TFrame}, //needed for opening the demo's about dialog in the IDE
-    //
-  READCOM.Core.Demo.Views.Dialogs.About in 'Views\Dialogs\READCOM.Core.Demo.Views.Dialogs.About.pas' {AboutFrame: TFrame},
-  READCOM.Core.Demo.Messages in 'READCOM.Core.Demo.Messages.pas',
-  READCOM.Core.Demo.Events in 'READCOM.Core.Demo.Events.pas',
-  READCOM.Resources.Icons in '..\Source\Resources\READCOM.Resources.Icons.pas' {Icons: TDataModule},
-  READCOM.Resources.Themes in '..\Source\Resources\READCOM.Resources.Themes.pas' {Themes: TDataModule};
-
-{$endregion}
+    System.StartUpCopy,
+    READCOM.App.Main,
+      //
+      Zoomicon.Media.FMX.ModalFrame in 'modules\zoomicon.media.fmx.delphi\Source\Zoomicon.Media.FMX.ModalFrame.pas' {ModalFrame: TFrame}, //needed for opening the demo's about dialog in the IDE
+      //
+    READCOM.Core.Demo.Views.Dialogs.About in 'Views\Dialogs\READCOM.Core.Demo.Views.Dialogs.About.pas' {AboutFrame: TFrame},
+    READCOM.Core.Demo.Messages in 'READCOM.Core.Demo.Messages.pas',
+    READCOM.Core.Demo.Events in 'READCOM.Core.Demo.Events.pas',
+    READCOM.Resources.Icons in '..\Source\Resources\READCOM.Resources.Icons.pas' {Icons: TDataModule},
+    READCOM.Resources.Themes in '..\Source\Resources\READCOM.Resources.Themes.pas' {Themes: TDataModule};
+  {$endregion}
 
   {$R *.res} //for Windows App metadata defined via Project Options (App Icon, Versioning Info)
 
