@@ -36,13 +36,13 @@ requires
   rtl,
   fmx,
   Zoomicon.Media.FMX,
-  ObjectDebuggerFMX,
-  Zoomicon.Introspection.FMX,
-  Zoomicon.Helpers.FMX{BOSS},
-  Zoomicon.Helpers.RTL{BOSS},
+  Zoomicon.Introspection.FMX{BOSS},
   Zoomicon.Manipulation.FMX{BOSS},
+  Zoomicon.Manipulation.FMX_IDE{BOSS},
   Zoomicon.ZUI.FMX{BOSS},
-  Zoomicon.Generics{BOSS};
+  Zoomicon.Generics{BOSS},
+  Zoomicon.Helpers.FMX{BOSS},
+  Zoomicon.Helpers.RTL{BOSS};
 
 contains
   READCOM.Resources.Icons in 'Resources\READCOM.Resources.Icons.pas' {Icons: TDataModule},
