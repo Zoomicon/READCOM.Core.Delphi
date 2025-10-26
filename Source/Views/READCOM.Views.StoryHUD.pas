@@ -17,7 +17,7 @@ interface
     FMX.Layouts, FMX.ActnList,
     FMX.Colors,
     //
-    FMX.MultiView, SubjectStand, FrameStand,
+    FMX.MultiView,
     //
     Zoomicon.Media.FMX.ModalFrame, //for TModalFrameClass (used to reference the class for the About dialog)
     READCOM.Resources.Icons; //for Icons.SVGIconImageList
@@ -39,7 +39,6 @@ interface
       layoutButtons: TLayout;
       MultiView: TMultiView;
       btnToggleStructureVisible: TSpeedButton;
-      MultiViewFrameStand: TFrameStand;
       layoutContent: TLayout;
       btnToggleTargetsVisible: TSpeedButton;
       layoutButtonsMain: TFlowLayout;

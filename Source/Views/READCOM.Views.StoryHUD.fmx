@@ -708,15 +708,4 @@ object StoryHUD: TStoryHUD
       ImageIndex = 29
     end
   end
-  object MultiViewFrameStand: TFrameStand
-    AnimationShow = 'OnShow*'
-    AnimationHide = 'OnHide*'
-    CommonActionPrefix = 'ca_'
-    DefaultHideAndCloseDeferTimeMS = 100
-    DefaultStyleName = 'framestand'
-    DefaultStandName = 'framestand'
-    DefaultParent = MultiView
-    Left = 96
-    Top = 32
-  end
 end

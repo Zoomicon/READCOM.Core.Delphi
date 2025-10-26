@@ -19,9 +19,6 @@ interface
     FMX.Layouts,
     FMX.ActnList,
     //
-    SubjectStand,
-    FrameStand, //for TFrameInfo
-    //
     Zoomicon.Generics.Collections, //for TObjectListEx
     Zoomicon.Introspection.FMX.StructureView, //for TStructureView
     Zoomicon.ZUI.FMX.ZoomFrame, //for TZoomFrame
@@ -196,12 +193,12 @@ interface
       procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
 
     protected
-      Story: TEditableStory;
+      FStory: TEditableStory;
+      FStructureView: TStructureView;
       FShiftDown: Boolean; //set by event handlers for OnFormKeyDown, OnFormKeyUp to monitor SHIFT key standalone presses
       FShortcutCut, FShortcutCopy, FShortcutPaste: TShortCut;
       FTimerStarted: Boolean;
       FCheckedCommandLineActions: Boolean;
-      FStructureViewFrameInfo: FrameStand.TFrameInfo<TStructureView>;
 
       {Zooming}
       procedure StartInitialZoomTimer(const Delay: Cardinal = 100);
@@ -246,6 +243,7 @@ interface
 
       {StructureView}
       function GetStructureView: TStructureView;
+      procedure SetStructureView(const Value: TStructureView);
       procedure StructureViewShowFilter(Sender: TObject; const TheObject: TObject; var ShowObject: Boolean);
       procedure StructureViewSelection(Sender: TObject; const Selection: TObject);
       procedure StructureViewContextMenu(Sender: TObject; const Selection: TObject);
@@ -261,7 +259,8 @@ interface
         FOnStoryFormReady: TStoryFormReadyEvent;
 
     public
-      property StructureView: TStructureView read GetStructureView stored false;
+      property Story: TEditableStory read FStory write FStory stored false;
+      property StructureView: TStructureView read GetStructureView write SetStructureView stored false;
 
       class property OnStoryFormReady: TStoryFormReadyEvent read FOnStoryFormReady write FOnStoryFormReady;
 
@@ -618,8 +617,8 @@ implementation
       end;
     end;
 
-    if Assigned(UI.FStructureViewFrameInfo) then
-      with UI.FStructureViewFrameInfo.Frame do
+    if Assigned(UI.FStructureView) then //Note: don't use StructureView property here, will allocate FStructureView if not assigned
+      with UI.FStructureView do
       begin
         DragDropReorder := isEditMode; //allow moving items in the structure view to change parent or add to same parent again to change their Z-order
         DragDropReparent := isEditMode; //allow reparenting //TODO: should do after listening to some event so that the control is scaled/repositioned to show in their parent (note that maybe we should also have parent story items clip their children, esp if their panels)
@@ -837,7 +836,7 @@ implementation
 
   procedure TStoryForm.FormDestroy(Sender: TObject);
   begin
-    HUD.MultiViewFrameStand.CloseAll;
+    //NOP
   end;
 
   procedure TStoryForm.FormShow(Sender: TObject);
@@ -861,11 +860,11 @@ implementation
     //Remove old story
     var TheRootStoryItemView := RootStoryItemView;
     if Assigned(TheRootStoryItemView) and (Value <> TheRootStoryItemView) then //must check that the same one isn't set again to avoid destroying it
-      begin
+    begin
       //TheRootStoryItemView.Parent := nil; //shouldn't be needed
       Story.ActiveStoryItem := nil; //must clear reference to old ActiveStoryItem since all StoryItems will be destroyed
       FreeAndNil(TheRootStoryItemView); //destroy the old RootStoryItem //FREE THE CONTROL, DON'T FREE JUST THE INTERFACE
-      end;
+    end;
 
     //Add new story, if any
     if Assigned(Value) then //allowing to set the same one to update any zooming/positioning calculations if needed
@@ -1275,17 +1274,18 @@ implementation
     if not HUD.StructureVisible then
       Log('Ignoring UpdateStructureView, currently hidden')
     else
-    with Story do
+    with StructureView do
       begin
-        if (StoryMode <> EditMode) then
-          StructureView.FilterMode := tfFlatten
+        if (Story.StoryMode <> EditMode) then
+          FilterMode := tfFlatten
         else
-          StructureView.FilterMode := tfPrune;
+          FilterMode := tfPrune;
 
-        StructureView.GUIRoot := RootStoryItemView;
+        GUIRoot := RootStoryItemView;
 
-        if Assigned(ActiveStoryItem) then
-          StructureView.SelectedObject := ActiveStoryItem.View;
+        var LActiveStoryItem := Story.ActiveStoryItem;
+        if Assigned(LActiveStoryItem) then
+          SelectedObject := LActiveStoryItem.View;
       end;
 
     StopTiming_msec; //this will Log elapsed msec at DEBUG builds
@@ -1296,14 +1296,11 @@ implementation
   procedure TStoryForm.HUDStructureVisibleChanged(Sender: TObject; const Value: Boolean);
   begin
     if Value then
-    begin
-      HUD.MultiViewFrameStand.CloseAllExcept(TStructureView); //TODO: ???
-      UpdateStructureView; //in case the RootStoryItem has changed
-      FStructureViewFrameInfo.Show; //this will have been assigned by the StructureView getter if it wasn't (the side-panel has already opened, show the StructureView frame in it)
-    end;
+      UpdateStructureView;
 
-    with StructureView do //TODO: see why we need those for the hidden StructureView to not grab mouse events from the area it was before collapse on the form (Probably a MultiView bug with or without the combination of TFrameStand to put a frame at the side tray)
+    with FStructureView do //TODO: see why we need those for the hidden StructureView to not grab mouse events from the area it was before collapse on the form (Probably a MultiView bug with or without the combination of TFrameStand to put a frame at the side tray)
     begin
+      Visible := Value;
       Enabled := Value;
       HitTest := Value;
     end;
@@ -1347,10 +1344,16 @@ implementation
   // note: when app is getting destroyed this will return nil
   function TStoryForm.GetStructureView: TStructureView;
   begin
-    if not Assigned (FStructureViewFrameInfo) then
-    begin
-      FStructureViewFrameInfo := HUD.MultiViewFrameStand.GetFrameInfo<TStructureView>;
-      with FStructureViewFrameInfo.Frame do
+    if not Assigned(FStructureView) then
+      StructureView := TStructureView.Create(Self);
+
+    result := FStructureView;
+  end;
+
+  procedure TStoryForm.SetStructureView(const Value: TStructureView);
+  begin
+    FStructureView := Value;
+    with Value do
       begin
         ShowOnlyClasses := TClassList.Create([TStoryItem]); //TStructureView's destructor will FreeAndNil that TClassList instance
         ShowNames := false;
@@ -1370,13 +1373,10 @@ implementation
         OnSelection := StructureViewSelection;
         OnContextMenu := StructureViewContextMenu;
         OnShowFilter := StructureViewShowFilter;
-      end;
-    end;
 
-    if Assigned(FStructureViewFrameInfo) then //if we've managed to create a StructureView in a TFrameStand
-      result := FStructureViewFrameInfo.Frame
-    else
-      result := nil; //failed to create a StructureView in a TFrameStand (e.g. when app is getting destroyed)
+        Parent := HUD.MultiView;
+        Align := TAlignLayout.Client;
+      end;
   end;
 
   procedure TStoryForm.StructureViewShowFilter(Sender: TObject; const TheObject: TObject; var ShowObject: Boolean);

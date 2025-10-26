@@ -191,7 +191,6 @@
         </DelphiCompile>
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="fmx.dcp"/>
-        <DCCReference Include="FrameStandPackage_12.dcp"/>
         <DCCReference Include="Zoomicon.Media.FMX.dcp"/>
         <DCCReference Include="Zoomicon.ZUI.FMX.dcp"/>
         <DCCReference Include="Zoomicon.Generics.dcp"/>

@@ -35,7 +35,6 @@ package READCOM.Core;
 requires
   rtl,
   fmx,
-  FrameStandPackage_12,
   Zoomicon.Media.FMX,
   Zoomicon.ZUI.FMX,
   Zoomicon.Generics,
