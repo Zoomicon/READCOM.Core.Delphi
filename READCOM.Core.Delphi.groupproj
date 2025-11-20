@@ -6,7 +6,7 @@
         <Projects Include="Source\READCOM.Core.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="Source\READCOM.Core_IDE.dproj">
+        <Projects Include="Source\dclREADCOM.Core.dproj">
             <Dependencies>Source\READCOM.Core.dproj</Dependencies>
         </Projects>
         <Projects Include="Demo\READCOM.Core.Demo.dproj">
@@ -29,14 +29,14 @@
     <Target Name="READCOM_Core:Make">
         <MSBuild Projects="Source\READCOM.Core.dproj" Targets="Make"/>
     </Target>
-    <Target Name="READCOM_Core_IDE" DependsOnTargets="READCOM.Core">
-        <MSBuild Projects="Source\READCOM.Core_IDE.dproj"/>
+    <Target Name="dclREADCOM_Core" DependsOnTargets="READCOM.Core">
+        <MSBuild Projects="Source\dclREADCOM.Core.dproj"/>
     </Target>
-    <Target Name="READCOM_Core_IDE:Clean" DependsOnTargets="READCOM.Core:Clean">
-        <MSBuild Projects="Source\READCOM.Core_IDE.dproj" Targets="Clean"/>
+    <Target Name="dclREADCOM_Core:Clean" DependsOnTargets="READCOM.Core:Clean">
+        <MSBuild Projects="Source\dclREADCOM.Core.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="READCOM_Core_IDE:Make" DependsOnTargets="READCOM.Core:Make">
-        <MSBuild Projects="Source\READCOM.Core_IDE.dproj" Targets="Make"/>
+    <Target Name="dclREADCOM_Core:Make" DependsOnTargets="READCOM.Core:Make">
+        <MSBuild Projects="Source\dclREADCOM.Core.dproj" Targets="Make"/>
     </Target>
     <Target Name="READCOM_Core_Demo" DependsOnTargets="READCOM.Core">
         <MSBuild Projects="Demo\READCOM.Core.Demo.dproj"/>
@@ -48,13 +48,113 @@
         <MSBuild Projects="Demo\READCOM.Core.Demo.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="READCOM_Core;READCOM_Core_IDE;READCOM_Core_Demo"/>
+        <CallTarget Targets="READCOM_Core;dclREADCOM_Core;READCOM_Core_Demo"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="READCOM_Core:Clean;READCOM_Core_IDE:Clean;READCOM_Core_Demo:Clean"/>
+        <CallTarget Targets="READCOM_Core:Clean;dclREADCOM_Core:Clean;READCOM_Core_Demo:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="READCOM_Core:Make;READCOM_Core_IDE:Make;READCOM_Core_Demo:Make"/>
+        <CallTarget Targets="READCOM_Core:Make;dclREADCOM_Core:Make;READCOM_Core_Demo:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+    <ItemGroup Condition="'$(BuildGroup)'=='Android'">
+        <BuildGroupProject Include="Source\dclREADCOM.Core.dproj">
+            <ProjectGuid>{FF9821BE-81C1-4425-80DD-76B6F8031B0D}</ProjectGuid>
+            <Configurations/>
+            <Platforms/>
+            <Enabled>False</Enabled>
+        </BuildGroupProject>
+        <BuildGroupProject Include="Demo\READCOM.Core.Demo.dproj">
+            <ProjectGuid>{834E1023-6BD5-42E3-8249-13D3F1A9CE28}</ProjectGuid>
+            <Configurations>Release</Configurations>
+            <Platforms>Android;Android64</Platforms>
+            <Enabled>True</Enabled>
+        </BuildGroupProject>
+        <BuildGroupProject Include="Source\READCOM.Core.dproj">
+            <ProjectGuid>{F6E5F21F-E8D6-4900-87B5-232766514083}</ProjectGuid>
+            <Configurations>Release</Configurations>
+            <Platforms>Android;Android64</Platforms>
+            <Enabled>True</Enabled>
+        </BuildGroupProject>
+    </ItemGroup>
+    <ItemGroup Condition="'$(BuildGroup)'=='macOS'">
+        <BuildGroupProject Include="Source\dclREADCOM.Core.dproj">
+            <ProjectGuid>{FF9821BE-81C1-4425-80DD-76B6F8031B0D}</ProjectGuid>
+            <Configurations/>
+            <Platforms/>
+            <Enabled>False</Enabled>
+        </BuildGroupProject>
+        <BuildGroupProject Include="Demo\READCOM.Core.Demo.dproj">
+            <ProjectGuid>{834E1023-6BD5-42E3-8249-13D3F1A9CE28}</ProjectGuid>
+            <Configurations>Release</Configurations>
+            <Platforms>OSX64;OSXARM64</Platforms>
+            <Enabled>True</Enabled>
+        </BuildGroupProject>
+        <BuildGroupProject Include="Source\READCOM.Core.dproj">
+            <ProjectGuid>{F6E5F21F-E8D6-4900-87B5-232766514083}</ProjectGuid>
+            <Configurations>Release</Configurations>
+            <Platforms>OSX64;OSXARM64</Platforms>
+            <Enabled>True</Enabled>
+        </BuildGroupProject>
+    </ItemGroup>
+    <ItemGroup Condition="'$(BuildGroup)'=='iOS'">
+        <BuildGroupProject Include="Source\dclREADCOM.Core.dproj">
+            <ProjectGuid>{FF9821BE-81C1-4425-80DD-76B6F8031B0D}</ProjectGuid>
+            <Configurations/>
+            <Platforms/>
+            <Enabled>False</Enabled>
+        </BuildGroupProject>
+        <BuildGroupProject Include="Demo\READCOM.Core.Demo.dproj">
+            <ProjectGuid>{834E1023-6BD5-42E3-8249-13D3F1A9CE28}</ProjectGuid>
+            <Configurations>Release</Configurations>
+            <Platforms>iOSDevice64;iOSSimARM64</Platforms>
+            <Enabled>True</Enabled>
+        </BuildGroupProject>
+        <BuildGroupProject Include="Source\READCOM.Core.dproj">
+            <ProjectGuid>{F6E5F21F-E8D6-4900-87B5-232766514083}</ProjectGuid>
+            <Configurations>Release</Configurations>
+            <Platforms>iOSDevice64;iOSSimARM64</Platforms>
+            <Enabled>True</Enabled>
+        </BuildGroupProject>
+    </ItemGroup>
+    <ItemGroup Condition="'$(BuildGroup)'=='All platforms'">
+        <BuildGroupProject Include="Source\dclREADCOM.Core.dproj">
+            <ProjectGuid>{FF9821BE-81C1-4425-80DD-76B6F8031B0D}</ProjectGuid>
+            <Configurations>Debug</Configurations>
+            <Platforms>Android;Android64;iOSDevice64;iOSSimARM64;OSX64;OSXARM64;Win32;Win64;Win64x</Platforms>
+            <Enabled>True</Enabled>
+        </BuildGroupProject>
+        <BuildGroupProject Include="Demo\READCOM.Core.Demo.dproj">
+            <ProjectGuid>{834E1023-6BD5-42E3-8249-13D3F1A9CE28}</ProjectGuid>
+            <Configurations>Debug</Configurations>
+            <Platforms>Android;Android64;iOSDevice64;iOSSimARM64;OSX64;OSXARM64;Win32;Win64</Platforms>
+            <Enabled>True</Enabled>
+        </BuildGroupProject>
+        <BuildGroupProject Include="Source\READCOM.Core.dproj">
+            <ProjectGuid>{F6E5F21F-E8D6-4900-87B5-232766514083}</ProjectGuid>
+            <Configurations>Debug</Configurations>
+            <Platforms>Android;Android64;iOSDevice64;iOSSimARM64;OSX64;OSXARM64;Win32;Win64;Win64x</Platforms>
+            <Enabled>True</Enabled>
+        </BuildGroupProject>
+    </ItemGroup>
+    <ItemGroup Condition="'$(BuildGroup)'=='Windows'">
+        <BuildGroupProject Include="Source\dclREADCOM.Core.dproj">
+            <ProjectGuid>{FF9821BE-81C1-4425-80DD-76B6F8031B0D}</ProjectGuid>
+            <Configurations>Release</Configurations>
+            <Platforms>Win32;Win64</Platforms>
+            <Enabled>True</Enabled>
+        </BuildGroupProject>
+        <BuildGroupProject Include="Demo\READCOM.Core.Demo.dproj">
+            <ProjectGuid>{834E1023-6BD5-42E3-8249-13D3F1A9CE28}</ProjectGuid>
+            <Configurations>Release</Configurations>
+            <Platforms>Win32;Win64</Platforms>
+            <Enabled>True</Enabled>
+        </BuildGroupProject>
+        <BuildGroupProject Include="Source\READCOM.Core.dproj">
+            <ProjectGuid>{F6E5F21F-E8D6-4900-87B5-232766514083}</ProjectGuid>
+            <Configurations>Release</Configurations>
+            <Platforms>Win32;Win64;Win64x</Platforms>
+            <Enabled>True</Enabled>
+        </BuildGroupProject>
+    </ItemGroup>
 </Project>
