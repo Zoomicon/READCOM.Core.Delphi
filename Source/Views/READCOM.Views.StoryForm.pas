@@ -1345,9 +1345,9 @@ implementation
   function TStoryForm.GetStructureView: TStructureView;
   begin
     if not Assigned(FStructureView) then
-      StructureView := TStructureView.Create(Self);
+      StructureView := TStructureView.Create(HUD.MultiView); //don't set FStrucureView here, settings StructureView causes SetStructureView to be called
 
-    result := FStructureView;
+    result := FStructureView; //this will have been set by SetStructureView
   end;
 
   procedure TStoryForm.SetStructureView(const Value: TStructureView);
@@ -1374,8 +1374,8 @@ implementation
         OnContextMenu := StructureViewContextMenu;
         OnShowFilter := StructureViewShowFilter;
 
-        Parent := HUD.MultiView;
         Align := TAlignLayout.Client;
+        Parent := HUD.MultiView;
       end;
   end;
 

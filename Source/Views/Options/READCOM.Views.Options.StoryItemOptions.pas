@@ -9,7 +9,7 @@ uses
   FMX.Types, FMX.Graphics, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.StdCtrls,
   FMX.Layouts,
   FMX.Controls.Presentation, System.ImageList,
-  FMX.ImgList, FMX.SVGIconImageList, System.Actions, FMX.ActnList, FMX.Edit,
+  FMX.ImgList, System.Actions, FMX.ActnList, FMX.Edit,
   FMX.Objects,
   //
   READCOM.Resources.Icons, //for Icons.SVGIconImageList

@@ -36,7 +36,6 @@ inherited ImageStoryItemOptions: TImageStoryItemOptions
         Size.Height = 57.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
-        TextSettings.Trimming = None
       end
     end
   end

@@ -8,7 +8,7 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   System.Actions, FMX.ActnList,
-  System.ImageList, FMX.ImgList, FMX.SVGIconImageList, FMX.Edit,
+  System.ImageList, FMX.ImgList, FMX.Edit,
   FMX.Types, FMX.Graphics, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.StdCtrls,
   FMX.Controls.Presentation, FMX.Layouts, FMX.StdActns,
   FMX.MediaLibrary.Actions,

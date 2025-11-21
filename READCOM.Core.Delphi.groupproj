@@ -120,19 +120,19 @@
     <ItemGroup Condition="'$(BuildGroup)'=='All platforms'">
         <BuildGroupProject Include="Source\dclREADCOM.Core.dproj">
             <ProjectGuid>{FF9821BE-81C1-4425-80DD-76B6F8031B0D}</ProjectGuid>
-            <Configurations>Debug</Configurations>
-            <Platforms>Android;Android64;iOSDevice64;iOSSimARM64;OSX64;OSXARM64;Win32;Win64;Win64x</Platforms>
+            <Configurations>Release</Configurations>
+            <Platforms>Win32;Win64</Platforms>
             <Enabled>True</Enabled>
         </BuildGroupProject>
         <BuildGroupProject Include="Demo\READCOM.Core.Demo.dproj">
             <ProjectGuid>{834E1023-6BD5-42E3-8249-13D3F1A9CE28}</ProjectGuid>
-            <Configurations>Debug</Configurations>
+            <Configurations>Release</Configurations>
             <Platforms>Android;Android64;iOSDevice64;iOSSimARM64;OSX64;OSXARM64;Win32;Win64</Platforms>
             <Enabled>True</Enabled>
         </BuildGroupProject>
         <BuildGroupProject Include="Source\READCOM.Core.dproj">
             <ProjectGuid>{F6E5F21F-E8D6-4900-87B5-232766514083}</ProjectGuid>
-            <Configurations>Debug</Configurations>
+            <Configurations>Release</Configurations>
             <Platforms>Android;Android64;iOSDevice64;iOSSimARM64;OSX64;OSXARM64;Win32;Win64;Win64x</Platforms>
             <Enabled>True</Enabled>
         </BuildGroupProject>

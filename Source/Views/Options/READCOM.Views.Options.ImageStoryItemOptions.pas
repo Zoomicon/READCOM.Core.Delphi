@@ -9,7 +9,7 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   System.Messaging, //for TMessage
   System.Actions, FMX.ActnList,
-  System.ImageList, FMX.ImgList, FMX.SVGIconImageList, FMX.Edit,
+  System.ImageList, FMX.ImgList, FMX.Edit,
   FMX.Types, FMX.Graphics, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.StdCtrls,
   FMX.Controls.Presentation, FMX.Layouts, FMX.StdActns,
   FMX.MediaLibrary, //probably needed by FMX.MediaLibrary.Actions (saving the frame in D12.2 puts it into "interface" section's uses clause, causing compilation error if already at "implementation" section's uses clause)

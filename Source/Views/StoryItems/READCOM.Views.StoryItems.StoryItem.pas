@@ -20,8 +20,6 @@ interface
     FMX.Clipboard, //for IFMXExtendedClipboardService
     FMX.Layouts,
     //
-    FMX.SVGIconImage,
-    //
     Zoomicon.Media.FMX.Models, //for IClipboardEnabled, EXT_XX constants
     Zoomicon.Media.FMX.MediaDisplay, //for TMediaDisplay (Glyph)
     Zoomicon.Manipulation.FMX.CustomManipulator, //for TCustomManipulator

@@ -15,7 +15,6 @@ object StoryHUD: TStoryHUD
     Size.Height = 33.000000000000000000
     Size.PlatformDefault = False
     StyleLookup = 'drawertoolbutton'
-    TextSettings.Trimming = None
   end
   object layoutContent: TLayout
     Align = Client
@@ -56,7 +55,6 @@ object StoryHUD: TStoryHUD
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'priortoolbutton'
-        TextSettings.Trimming = None
       end
       object btnLoad: TSpeedButton
         Action = actionLoad
@@ -72,7 +70,6 @@ object StoryHUD: TStoryHUD
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
-        TextSettings.Trimming = None
       end
       object btnSave: TSpeedButton
         Action = actionSave
@@ -88,7 +85,6 @@ object StoryHUD: TStoryHUD
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
-        TextSettings.Trimming = None
       end
       object btnToggleEditMode: TSpeedButton
         StaysPressed = True
@@ -106,7 +102,6 @@ object StoryHUD: TStoryHUD
         Size.PlatformDefault = False
         StyleLookup = 'escapetoolbutton'
         Text = 'Edit'
-        TextSettings.Trimming = None
         OnClick = btnToggleEditModeClick
       end
       object btnToggleStructureVisible: TSpeedButton
@@ -128,7 +123,6 @@ object StoryHUD: TStoryHUD
         Size.PlatformDefault = False
         StyleLookup = 'bookmarkstoolbutton'
         Text = 'Structure'
-        TextSettings.Trimming = None
         OnClick = btnToggleStructureVisibleClick
       end
       object btnToggleTargetsVisible: TSpeedButton
@@ -151,7 +145,6 @@ object StoryHUD: TStoryHUD
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
         Text = 'Targets'
-        TextSettings.Trimming = None
         Visible = False
         OnClick = btnToggleTargetsVisibleClick
       end
@@ -173,7 +166,6 @@ object StoryHUD: TStoryHUD
         Size.PlatformDefault = False
         StyleLookup = 'playtoolbutton'
         Text = 'Story Timer'
-        TextSettings.Trimming = None
         OnClick = btnToggleUseStoryTimerClick
       end
       object btnNextTheme: TSpeedButton
@@ -190,7 +182,6 @@ object StoryHUD: TStoryHUD
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
-        TextSettings.Trimming = None
       end
       object btnToggleFullscreen: TSpeedButton
         StaysPressed = True
@@ -208,7 +199,6 @@ object StoryHUD: TStoryHUD
         Size.PlatformDefault = False
         StyleLookup = 'playtoolbutton'
         Text = 'Fullscreen'
-        TextSettings.Trimming = None
         OnClick = btnToggleFullscreenClick
       end
       object btnAbout: TSpeedButton
@@ -225,7 +215,6 @@ object StoryHUD: TStoryHUD
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'infotoolbutton'
-        TextSettings.Trimming = None
       end
     end
     object layoutButtonsEdit: TFlowLayout
@@ -251,7 +240,6 @@ object StoryHUD: TStoryHUD
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'additembutton'
-        TextSettings.Trimming = None
       end
       object btnAddImageStoryItem: TSpeedButton
         Action = actionAddImageStoryItem
@@ -268,7 +256,6 @@ object StoryHUD: TStoryHUD
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
-        TextSettings.Trimming = None
       end
       object btnAddTextStoryItem: TSpeedButton
         Action = actionAddTextStoryItem
@@ -285,7 +272,6 @@ object StoryHUD: TStoryHUD
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
-        TextSettings.Trimming = None
       end
       object btnDelete: TSpeedButton
         Action = actionDelete
@@ -302,7 +288,6 @@ object StoryHUD: TStoryHUD
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
-        TextSettings.Trimming = None
         Visible = False
       end
       object btnCut: TSpeedButton
@@ -320,7 +305,6 @@ object StoryHUD: TStoryHUD
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
-        TextSettings.Trimming = None
       end
       object btnCopy: TSpeedButton
         Action = actionCopy
@@ -337,7 +321,6 @@ object StoryHUD: TStoryHUD
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
-        TextSettings.Trimming = None
       end
       object btnPaste: TSpeedButton
         Action = actionPaste
@@ -354,7 +337,6 @@ object StoryHUD: TStoryHUD
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
-        TextSettings.Trimming = None
       end
       object btnFlipHorizontally: TSpeedButton
         Action = actionFlipHorizontally
@@ -371,7 +353,6 @@ object StoryHUD: TStoryHUD
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
-        TextSettings.Trimming = None
       end
       object btnFlipVertically: TSpeedButton
         Action = actionFlipVertically
@@ -388,7 +369,6 @@ object StoryHUD: TStoryHUD
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
-        TextSettings.Trimming = None
       end
       object comboForeColor: TComboColorBox
         Color = claWhite
@@ -438,7 +418,6 @@ object StoryHUD: TStoryHUD
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
-        TextSettings.Trimming = None
       end
     end
     object layoutButtonsNavigation: TLayout
@@ -462,7 +441,6 @@ object StoryHUD: TStoryHUD
         Size.Height = 42.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'arrowrighttoolbutton'
-        TextSettings.Trimming = None
       end
       object btnPrevious: TSpeedButton
         Action = actionPrevious
@@ -473,7 +451,6 @@ object StoryHUD: TStoryHUD
         Size.Height = 42.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'arrowlefttoolbutton'
-        TextSettings.Trimming = None
       end
       object btnHome: TSpeedButton
         Action = actionHome
@@ -484,7 +461,6 @@ object StoryHUD: TStoryHUD
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'refreshtoolbutton'
-        TextSettings.Trimming = None
       end
     end
     object Localizations: TLang
