@@ -1690,29 +1690,16 @@ implementation
 
   function TStoryForm.LoadDefaultDocument: Boolean;
   begin
-    result := false; //don't place inside the try, else you get warning that result might be undefined
+    var Stream: TResourceStream := nil; //must initialize to nil else FreeAndNil could try to free some random reference
     try
-      var Stream := TResourceStream.Create(HInstance, 'DefaultDocument', RT_RCDATA); //TODO: added via Project/Deployment, but not sure where the "DefaultDocument" resource name was defined (isn't shown there)
       try
-        if Stream.Size > 0 then
-        begin
-          try
-            //TODO: why not use LoadFromStream?
-            RootStoryItemView := TStoryItem.LoadNew(Stream, EXT_READCOM); //a new instance of the TStoryItem descendent serialized in the Stream will be created //only set RootStoryItemView (this affects RootStoryItem too)
-            result := true;
-          except
-            on E: Exception do
-              begin
-              Log(E);
-              ShowException(E, @TStoryForm.LoadDefaultDocument);
-              end;
-          end;
-        end;
-      finally
-        Stream.Free;
+        Stream := TResourceStream.Create(HInstance, 'DefaultDocument', RT_RCDATA); //TODO: added via Project/Deployment, but not sure where the "DefaultDocument" resource name was defined (isn't shown there) - there's an RcItem at .dproj named as such and a Resource.rc file has a DefaultDocument entry with value "Default.readcom"
+        result := LoadFromStream(Stream);
+      except
+        result := false;
       end;
-    except
-      //NOP
+    finally
+      FreeAndNil(Stream); //also accepts nil
     end;
   end;
 
