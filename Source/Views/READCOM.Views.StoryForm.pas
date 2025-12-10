@@ -278,6 +278,7 @@ implementation
   {$region 'Used units'}
   uses
     System.Contnrs, //for TClassList
+    System.Diagnostics, //for TStopWatch
     System.IOUtils, //for TPath
     System.Math, //for Max
     System.Net.HttpClient, //for HTTP/HTTPS url scheme support in TURLStream (Delphi 11.1+)
@@ -292,6 +293,7 @@ implementation
     Zoomicon.Helpers.FMX.Forms.FormHelper, //for TForm.Orientation
     Zoomicon.Helpers.FMX.Memo.MemoHelpers, //for TMemo.DisableFontSizeToFit
     Zoomicon.Introspection.FMX.Debugging, //for ToggleObjectDebuggerVisibility
+    Zoomicon.Media.FMX.ModalFrame, //for TModalFrame
     //
     READCOM.Models, //for EXT_READCOM
     READCOM.App.Main, //for StorySource
@@ -540,7 +542,7 @@ implementation
       ActiveStoryItem := HomeStoryItem; //there's always a HomeStoryItem (code that loads the story takes care of that if none found, setting the RootStoryItem as HomeStoryItem)
 
       if (TagsMatching = TagsMatching_OkFail_Prompt) then
-        TLockFrame.Hide_Modal(OPENLOCK_DELAY);
+        TLockFrame.HideModal(OPENLOCK_DELAY);
     end;
   end;
 
@@ -560,7 +562,7 @@ implementation
       UI.SetActiveStoryItemIfAssigned(PreviousStoryPoint);
 
       if (TagsMatching = TagsMatching_OkFail_Prompt) then
-        TLockFrame.Hide_Modal(OPENLOCK_DELAY);
+        TLockFrame.HideModal(OPENLOCK_DELAY);
     end;
   end;
 
@@ -573,7 +575,7 @@ implementation
       UI.SetActiveStoryItemIfAssigned(NextStoryPoint); //either bypassing Tags Matcing, or Tags are Matched, advance to NextStoryPoint
 
       if (TagsMatching = TagsMatching_OkFail_Prompt) then
-        TLockFrame.Hide_Modal(OPENLOCK_DELAY);
+        TLockFrame.HideModal(OPENLOCK_DELAY);
     end;
   end;
 
@@ -588,8 +590,8 @@ implementation
       else
         Application.OpenUrl(Url); //else open in system browser
 
-      if (TagsMatching = TagsMatching_OkFail_Prompt) then
-        TLockFrame.Hide_Modal(OPENLOCK_DELAY);
+      //if (TagsMatching = TagsMatching_OkFail_Prompt) then //REMOVED: LoadFromUrl is asynchronous
+        //TLockFrame.HideModal(OPENLOCK_DELAY);
     end;
   end;
 
@@ -758,7 +760,7 @@ implementation
       );
 
     finally
-      TWaitFrame.ShowModal(ParentForm, false); //this is the last command so doesn't need a TThread.Synchronize, UI will refresh after the event handler returns and hide the wait prompt
+      TWaitFrame.HideModal; //this is the last command so doesn't need a TThread.Synchronize, UI will refresh after the event handler returns and hide the wait prompt
     end;
   end;
 
@@ -1643,21 +1645,31 @@ implementation
   end;
 
   function TStoryForm.LoadFromUrl(const Url: String): Boolean; //TODO: should add LoadFromUrl and AddFromUrl to TStoryItem too
+  var FStopWatch: TStopWatch;
   begin
     try
+      FStopwatch := TStopwatch.StartNew; // Start timing
+      Log('Started download [%s]', [Url]);
+
       TWaitFrame.ShowModal(Self);
 
       TURLStream.Create(Url,
-        procedure(AStream: TStream) //assuming this gets called while downloading, not AFTER download. Else need to show Wait frame beforehand
+        procedure(AStream: TStream)
         begin
           try
-            Log('Started download');
             LoadFromStream(AStream); //probably it can start loading while the content is coming
-            Log('Finished download');
+            StorySource := Url;
+            Log('Finished download [%s]', [Url]);
           finally
-            TWaitFrame.ShowModal(Self, false);
+            FStopwatch.Stop; //stop timing
+
+            var FElapsedTime := FStopwatch.ElapsedMilliseconds;
+            Log('Elapsed time (ms) [%d]', [FElapsedTime]);
+
+            var FRemainingModalDelay := Max(0, OPENLOCK_DELAY - FElapsedTime); // Calculate remaining delay (if negative cause more time passed to download than the display delay, then it will use 0 - no delay - instead)
+            TModalFrame.HideModal(FRemainingModalDelay); //this will hide either the TLockPrompt or the TWaitPrompt (both are descendents of TModalFrame
+            //Note: this has the side-effect of having a minimum prompt display delay for Wait prompt too (not just for the Lock prompt), but it's ok since URL content takes some time to load anyway (it's not like when transitioning quickly from one StoryPoint to another inside the same Story where a minimum delay for Wait prompt would be annoying)
           end;
-          StorySource := Url;
         end,
         true, //ASynchronizeProvide: call the anonymous proc (AProvider parameter) in the context of the main thread //IMPORTANT (if not done various AV errors occur later: we shouldn't touch the UI from other than the main thread)
         true //free on completion
@@ -1667,9 +1679,13 @@ implementation
     except
       on e: Exception do
       begin
-        TWaitFrame.ShowModal(Self, false);
+        FStopWatch.Stop; //stop timing
+
+        TModalFrame.HideModal;
+
         ShowMessageFmt(ERR_DOWNLOAD, [e.Message]);
         Log(e);
+
         result := false; //probably no network connection etc.
       end;
     end;

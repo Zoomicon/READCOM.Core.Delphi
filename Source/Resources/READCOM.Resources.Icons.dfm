@@ -91,7 +91,8 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 24
+            Width = 19
+            Height = 24
           end>
         IconName = 'Diagram'
         SVGText = 
