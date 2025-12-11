@@ -1118,7 +1118,7 @@ implementation
 
   procedure TStoryItem.SetContent(const Value: TBytes); //Note: descendents should override this method to act upon change of content
   begin
-    FContent := Value;
+    FContent := Value; //just keep the content data, what it means depends on ContentExt property - at Loaded we act upon (Content, ContentExt) pair
   end;
 
   {$endregion}
@@ -1132,7 +1132,7 @@ implementation
 
   procedure TStoryItem.SetContentExt(const Value: String);
   begin
-    FContentExt := Value;
+    FContentExt := Value; //just keep the content file extension (type), will act upon (Content, ContentExt) at Loaded
   end;
 
   {$endregion}
