@@ -3,7 +3,7 @@
         <ProjectGuid>{FF9821BE-81C1-4425-80DD-76B6F8031B0D}</ProjectGuid>
         <MainSource>dclREADCOM.Core.dpk</MainSource>
         <ProjectVersion>20.3</ProjectVersion>
-        <FrameworkType>None</FrameworkType>
+        <FrameworkType>FMX</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
@@ -195,7 +195,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\37.0\Bpl\dclREADCOM.Core.bpl" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="..\..\..\..\..\Public\Documents\Embarcadero\Studio\37.0\Bpl\dclREADCOM.Core.bpl" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>dclREADCOM.Core.bpl</RemoteName>
                         <Overwrite>true</Overwrite>

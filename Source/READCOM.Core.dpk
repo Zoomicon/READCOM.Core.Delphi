@@ -38,12 +38,12 @@ requires
   fmx,
   SVGIconImageListFMX,
   Zoomicon.Media.FMX,
-  Zoomicon.Generics,
-  Zoomicon.Helpers.FMX,
-  Zoomicon.Helpers.RTL,
-  Zoomicon.Introspection.FMX,
-  Zoomicon.Manipulation.FMX,
-  Zoomicon.ZUI.FMX;
+  Zoomicon.Generics{BOSS},
+  Zoomicon.Helpers.FMX{BOSS},
+  Zoomicon.Helpers.RTL{BOSS},
+  Zoomicon.Introspection.FMX{BOSS},
+  Zoomicon.Manipulation.FMX{BOSS},
+  Zoomicon.ZUI.FMX{BOSS};
 
 contains
   READCOM.Resources.Icons in 'Resources\READCOM.Resources.Icons.pas' {Icons: TDataModule},

@@ -37,27 +37,12 @@ object StoryForm: TStoryForm
       end
     end
     inherited layoutButtons: TLayout
-      Size.Width = 876.000000000000000000
-      Size.Height = 616.000000000000000000
-      inherited layoutButtonsMain: TFlowLayout
-        Size.Height = 616.000000000000000000
-      end
-      inherited layoutButtonsEdit: TFlowLayout
-        Position.X = 816.000000000000000000
-        Size.Height = 616.000000000000000000
-        TabOrder = 174
+      inherited scrollButtonsEdit: TVertScrollBox
         inherited comboForeColor: TComboColorBox
           OnChange = HUDcomboForeColorChange
         end
         inherited comboBackColor: TComboColorBox
           OnChange = HUDcomboBackColorChange
-        end
-      end
-      inherited layoutButtonsNavigation: TLayout
-        Position.Y = 569.000000000000000000
-        Size.Width = 746.000000000000000000
-        inherited btnNext: TSpeedButton
-          Position.X = 690.000000000000000000
         end
       end
       inherited Localizations: TLang

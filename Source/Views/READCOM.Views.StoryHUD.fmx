@@ -1,7 +1,7 @@
 object StoryHUD: TStoryHUD
   Align = Client
-  Size.Width = 912.000000000000000000
-  Size.Height = 572.000000000000000000
+  Size.Width = 788.000000000000000000
+  Size.Height = 712.000000000000000000
   Size.PlatformDefault = False
   ParentShowHint = False
   ShowHint = True
@@ -19,30 +19,30 @@ object StoryHUD: TStoryHUD
   object layoutContent: TLayout
     Align = Client
     HitTest = True
-    Size.Width = 662.000000000000000000
-    Size.Height = 572.000000000000000000
+    Size.Width = 538.000000000000000000
+    Size.Height = 712.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 5
   end
   object layoutButtons: TLayout
     Align = Client
-    Size.Width = 662.000000000000000000
-    Size.Height = 572.000000000000000000
+    Size.Width = 538.000000000000000000
+    Size.Height = 712.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 4
-    object layoutButtonsMain: TFlowLayout
+    object scrollButtonsMain: TVertScrollBoxWithArrows
       Align = MostLeft
-      HitTest = False
       Padding.Top = 40.000000000000000000
       Size.Width = 50.000000000000000000
-      Size.Height = 572.000000000000000000
+      Size.Height = 712.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 2
-      Justify = Left
-      JustifyLastLine = Left
-      FlowDirection = LeftToRight
+      ShowScrollBars = False
+      Viewport.Width = 50.000000000000000000
+      Viewport.Height = 712.000000000000000000
       object btnNew: TSpeedButton
         Action = actionNew
+        Align = Top
         Images = Icons.SVGIconImageList
         ImageIndex = 9
         Margins.Left = 3.000000000000000000
@@ -51,13 +51,14 @@ object StoryHUD: TStoryHUD
         Margins.Bottom = 3.000000000000000000
         Position.X = 3.000000000000000000
         Position.Y = 43.000000000000000000
-        Size.Width = 40.000000000000000000
+        Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'priortoolbutton'
       end
       object btnLoad: TSpeedButton
         Action = actionLoad
+        Align = Top
         Images = Icons.SVGIconImageList
         ImageIndex = 6
         Margins.Left = 3.000000000000000000
@@ -66,13 +67,14 @@ object StoryHUD: TStoryHUD
         Margins.Bottom = 3.000000000000000000
         Position.X = 3.000000000000000000
         Position.Y = 89.000000000000000000
-        Size.Width = 40.000000000000000000
+        Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
       end
       object btnSave: TSpeedButton
         Action = actionSave
+        Align = Top
         Images = Icons.SVGIconImageList
         ImageIndex = 7
         Margins.Left = 3.000000000000000000
@@ -81,31 +83,14 @@ object StoryHUD: TStoryHUD
         Margins.Bottom = 6.000000000000000000
         Position.X = 3.000000000000000000
         Position.Y = 135.000000000000000000
-        Size.Width = 40.000000000000000000
+        Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
       end
-      object btnToggleEditMode: TSpeedButton
-        StaysPressed = True
-        Hint = 'Toggle Edit mode'#13#13'Enables/Disables story editing functionality'
-        Images = Icons.SVGIconImageList
-        ImageIndex = 0
-        Margins.Left = 3.000000000000000000
-        Margins.Top = 3.000000000000000000
-        Margins.Right = 3.000000000000000000
-        Margins.Bottom = 3.000000000000000000
-        Position.X = 3.000000000000000000
-        Position.Y = 184.000000000000000000
-        Size.Width = 40.000000000000000000
-        Size.Height = 40.000000000000000000
-        Size.PlatformDefault = False
-        StyleLookup = 'escapetoolbutton'
-        Text = 'Edit'
-        OnClick = btnToggleEditModeClick
-      end
       object btnToggleStructureVisible: TSpeedButton
         StaysPressed = True
+        Align = Top
         Hint = 
           'Toggle Structure View'#13#13'Shows/Hides the Structure View side-pane,' +
           ' which allows to select ActiveStoryItem and to rearrange StoryIt' +
@@ -117,8 +102,8 @@ object StoryHUD: TStoryHUD
         Margins.Right = 3.000000000000000000
         Margins.Bottom = 3.000000000000000000
         Position.X = 3.000000000000000000
-        Position.Y = 230.000000000000000000
-        Size.Width = 40.000000000000000000
+        Position.Y = 184.000000000000000000
+        Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'bookmarkstoolbutton'
@@ -127,6 +112,7 @@ object StoryHUD: TStoryHUD
       end
       object btnToggleTargetsVisible: TSpeedButton
         StaysPressed = True
+        Align = Top
         Hint = 
           'Toggles links to StoryItem Targets'#13#13'Shows/Hides links to StoryIt' +
           'em Targets. Targets are used to define where non-Anchored StoryI' +
@@ -138,8 +124,6 @@ object StoryHUD: TStoryHUD
         Margins.Top = 3.000000000000000000
         Margins.Right = 3.000000000000000000
         Margins.Bottom = 6.000000000000000000
-        Position.X = 49.000000000000000000
-        Position.Y = 230.000000000000000000
         Size.Width = 40.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
@@ -148,8 +132,28 @@ object StoryHUD: TStoryHUD
         Visible = False
         OnClick = btnToggleTargetsVisibleClick
       end
+      object btnToggleEditMode: TSpeedButton
+        StaysPressed = True
+        Align = Top
+        Hint = 'Toggle Edit mode'#13#13'Enables/Disables story editing functionality'
+        Images = Icons.SVGIconImageList
+        ImageIndex = 0
+        Margins.Left = 3.000000000000000000
+        Margins.Top = 3.000000000000000000
+        Margins.Right = 3.000000000000000000
+        Margins.Bottom = 3.000000000000000000
+        Position.X = 3.000000000000000000
+        Position.Y = 230.000000000000000000
+        Size.Width = 44.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'escapetoolbutton'
+        Text = 'Edit'
+        OnClick = btnToggleEditModeClick
+      end
       object btnToggleUseStoryTimer: TSpeedButton
         StaysPressed = True
+        Align = Top
         Hint = 
           'Toggle Story Timer mode'#13#13'Starts/stops automated Next StoryPoint ' +
           'navigation'
@@ -161,30 +165,16 @@ object StoryHUD: TStoryHUD
         Margins.Bottom = 6.000000000000000000
         Position.X = 3.000000000000000000
         Position.Y = 276.000000000000000000
-        Size.Width = 40.000000000000000000
+        Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'playtoolbutton'
         Text = 'Story Timer'
         OnClick = btnToggleUseStoryTimerClick
       end
-      object btnNextTheme: TSpeedButton
-        Action = actionNextTheme
-        Images = Icons.SVGIconImageList
-        ImageIndex = 26
-        Margins.Left = 3.000000000000000000
-        Margins.Top = 3.000000000000000000
-        Margins.Right = 3.000000000000000000
-        Margins.Bottom = 3.000000000000000000
-        Position.X = 3.000000000000000000
-        Position.Y = 325.000000000000000000
-        Size.Width = 40.000000000000000000
-        Size.Height = 40.000000000000000000
-        Size.PlatformDefault = False
-        StyleLookup = 'actiontoolbutton'
-      end
       object btnToggleFullscreen: TSpeedButton
         StaysPressed = True
+        Align = Top
         Hint = 'Toggle Fullscreen mode'#13#13'Resize view to/from full screen size'
         Images = Icons.SVGIconImageList
         ImageIndex = 44
@@ -193,16 +183,33 @@ object StoryHUD: TStoryHUD
         Margins.Right = 3.000000000000000000
         Margins.Bottom = 6.000000000000000000
         Position.X = 3.000000000000000000
-        Position.Y = 371.000000000000000000
-        Size.Width = 40.000000000000000000
+        Position.Y = 325.000000000000000000
+        Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'playtoolbutton'
         Text = 'Fullscreen'
         OnClick = btnToggleFullscreenClick
       end
+      object btnNextTheme: TSpeedButton
+        Action = actionNextTheme
+        Align = Top
+        Images = Icons.SVGIconImageList
+        ImageIndex = 26
+        Margins.Left = 3.000000000000000000
+        Margins.Top = 3.000000000000000000
+        Margins.Right = 3.000000000000000000
+        Margins.Bottom = 3.000000000000000000
+        Position.X = 3.000000000000000000
+        Position.Y = 374.000000000000000000
+        Size.Width = 44.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'actiontoolbutton'
+      end
       object btnAbout: TSpeedButton
         Action = actionAbout
+        Align = Top
         Images = Icons.SVGIconImageList
         ImageIndex = 15
         Margins.Left = 3.000000000000000000
@@ -211,39 +218,40 @@ object StoryHUD: TStoryHUD
         Margins.Bottom = 3.000000000000000000
         Position.X = 3.000000000000000000
         Position.Y = 420.000000000000000000
-        Size.Width = 40.000000000000000000
+        Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'infotoolbutton'
       end
     end
-    object layoutButtonsEdit: TFlowLayout
+    object scrollButtonsEdit: TVertScrollBoxWithArrows
       Align = MostRight
       HitTest = False
       Margins.Right = 10.000000000000000000
-      Position.X = 602.000000000000000000
+      Position.X = 478.000000000000000000
       Size.Width = 50.000000000000000000
-      Size.Height = 572.000000000000000000
+      Size.Height = 712.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 3
-      Justify = Left
-      JustifyLastLine = Left
-      FlowDirection = LeftToRight
+      ShowScrollBars = False
+      Viewport.Width = 50.000000000000000000
+      Viewport.Height = 712.000000000000000000
       object btnAdd: TSpeedButton
         Action = actionAdd
-        Align = Client
+        Align = Top
         Images = Icons.SVGIconImageList
         ImageIndex = 10
         Margins.Left = 3.000000000000000000
         Margins.Right = 3.000000000000000000
-        Size.Width = 40.000000000000000000
+        Position.X = 3.000000000000000000
+        Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'additembutton'
       end
       object btnAddImageStoryItem: TSpeedButton
         Action = actionAddImageStoryItem
-        Anchors = [akTop, akRight]
+        Align = Top
         Images = Icons.SVGIconImageList
         ImageIndex = 23
         Margins.Left = 3.000000000000000000
@@ -252,14 +260,14 @@ object StoryHUD: TStoryHUD
         Margins.Bottom = 3.000000000000000000
         Position.X = 3.000000000000000000
         Position.Y = 43.000000000000000000
-        Size.Width = 40.000000000000000000
+        Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
       end
       object btnAddTextStoryItem: TSpeedButton
         Action = actionAddTextStoryItem
-        Anchors = [akTop, akRight]
+        Align = Top
         Images = Icons.SVGIconImageList
         ImageIndex = 21
         Margins.Left = 3.000000000000000000
@@ -268,22 +276,20 @@ object StoryHUD: TStoryHUD
         Margins.Bottom = 6.000000000000000000
         Position.X = 3.000000000000000000
         Position.Y = 89.000000000000000000
-        Size.Width = 40.000000000000000000
+        Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
       end
       object btnDelete: TSpeedButton
         Action = actionDelete
-        Anchors = [akTop, akRight]
+        Align = Top
         Images = Icons.SVGIconImageList
         ImageIndex = 8
         Margins.Left = 3.000000000000000000
         Margins.Top = 3.000000000000000000
         Margins.Right = 3.000000000000000000
         Margins.Bottom = 3.000000000000000000
-        Position.X = 49.000000000000000000
-        Position.Y = 89.000000000000000000
         Size.Width = 40.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
@@ -292,7 +298,7 @@ object StoryHUD: TStoryHUD
       end
       object btnCut: TSpeedButton
         Action = actionCut
-        Anchors = [akTop, akRight]
+        Align = Top
         Images = Icons.SVGIconImageList
         ImageIndex = 25
         Margins.Left = 3.000000000000000000
@@ -301,14 +307,14 @@ object StoryHUD: TStoryHUD
         Margins.Bottom = 3.000000000000000000
         Position.X = 3.000000000000000000
         Position.Y = 138.000000000000000000
-        Size.Width = 40.000000000000000000
+        Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
       end
       object btnCopy: TSpeedButton
         Action = actionCopy
-        Anchors = [akTop, akRight]
+        Align = Top
         Images = Icons.SVGIconImageList
         ImageIndex = 17
         Margins.Left = 3.000000000000000000
@@ -317,14 +323,14 @@ object StoryHUD: TStoryHUD
         Margins.Bottom = 3.000000000000000000
         Position.X = 3.000000000000000000
         Position.Y = 184.000000000000000000
-        Size.Width = 40.000000000000000000
+        Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
       end
       object btnPaste: TSpeedButton
         Action = actionPaste
-        Anchors = [akTop, akRight]
+        Align = Top
         Images = Icons.SVGIconImageList
         ImageIndex = 18
         Margins.Left = 3.000000000000000000
@@ -333,14 +339,14 @@ object StoryHUD: TStoryHUD
         Margins.Bottom = 6.000000000000000000
         Position.X = 3.000000000000000000
         Position.Y = 230.000000000000000000
-        Size.Width = 40.000000000000000000
+        Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
       end
       object btnFlipHorizontally: TSpeedButton
         Action = actionFlipHorizontally
-        Anchors = [akTop, akRight]
+        Align = Top
         Images = Icons.SVGIconImageList
         ImageIndex = 19
         Margins.Left = 3.000000000000000000
@@ -349,14 +355,14 @@ object StoryHUD: TStoryHUD
         Margins.Bottom = 3.000000000000000000
         Position.X = 3.000000000000000000
         Position.Y = 279.000000000000000000
-        Size.Width = 40.000000000000000000
+        Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
       end
       object btnFlipVertically: TSpeedButton
         Action = actionFlipVertically
-        Anchors = [akTop, akRight]
+        Align = Top
         Images = Icons.SVGIconImageList
         ImageIndex = 20
         Margins.Left = 3.000000000000000000
@@ -365,12 +371,13 @@ object StoryHUD: TStoryHUD
         Margins.Bottom = 6.000000000000000000
         Position.X = 3.000000000000000000
         Position.Y = 325.000000000000000000
-        Size.Width = 40.000000000000000000
+        Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
       end
       object comboForeColor: TComboColorBox
+        Align = Top
         Color = claWhite
         Hint = 
           'Set Foreground Color'#13#13'Sets the foreground color and its transpar' +
@@ -382,12 +389,13 @@ object StoryHUD: TStoryHUD
         Margins.Bottom = 3.000000000000000000
         Position.X = 3.000000000000000000
         Position.Y = 374.000000000000000000
-        Size.Width = 43.000000000000000000
+        Size.Width = 44.000000000000000000
         Size.Height = 33.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 5
       end
       object comboBackColor: TComboColorBox
+        Align = Top
         Color = claWhite
         Hint = 
           'Set Background Color'#13#13'Sets the background color and its transpar' +
@@ -398,14 +406,14 @@ object StoryHUD: TStoryHUD
         Margins.Bottom = 6.000000000000000000
         Position.X = 3.000000000000000000
         Position.Y = 413.000000000000000000
-        Size.Width = 43.000000000000000000
+        Size.Width = 44.000000000000000000
         Size.Height = 33.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 4
       end
       object btnOptions: TSpeedButton
         Action = actionOptions
-        Anchors = [akTop, akRight]
+        Align = Top
         Images = Icons.SVGIconImageList
         ImageIndex = 29
         Margins.Left = 3.000000000000000000
@@ -414,7 +422,7 @@ object StoryHUD: TStoryHUD
         Margins.Bottom = 3.000000000000000000
         Position.X = 3.000000000000000000
         Position.Y = 455.000000000000000000
-        Size.Width = 40.000000000000000000
+        Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
@@ -426,8 +434,8 @@ object StoryHUD: TStoryHUD
       Margins.Right = 10.000000000000000000
       Margins.Bottom = 5.000000000000000000
       Position.X = 60.000000000000000000
-      Position.Y = 525.000000000000000000
-      Size.Width = 532.000000000000000000
+      Position.Y = 665.000000000000000000
+      Size.Width = 408.000000000000000000
       Size.Height = 42.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 1
@@ -436,7 +444,7 @@ object StoryHUD: TStoryHUD
         Align = MostRight
         Images = Icons.SVGIconImageList
         ImageIndex = 2
-        Position.X = 476.000000000000000000
+        Position.X = 352.000000000000000000
         Size.Width = 56.000000000000000000
         Size.Height = 42.000000000000000000
         Size.PlatformDefault = False
@@ -517,7 +525,7 @@ object StoryHUD: TStoryHUD
     Mode = Panel
     HitTest = False
     Size.Width = 250.000000000000000000
-    Size.Height = 572.000000000000000000
+    Size.Height = 712.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 3
   end

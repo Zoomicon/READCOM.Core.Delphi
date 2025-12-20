@@ -20,6 +20,7 @@ interface
     FMX.MultiView,
     //
     Zoomicon.Media.FMX.ModalFrame, //for TModalFrameClass (used to reference the class for the About dialog)
+    Zoomicon.Media.FMX.VertScrollBoxWithArrows, //for TVertScrollBoxWithArrows
     READCOM.Resources.Icons; //for Icons.SVGIconImageList
   {$endregion}
 
@@ -41,8 +42,9 @@ interface
       btnToggleStructureVisible: TSpeedButton;
       layoutContent: TLayout;
       btnToggleTargetsVisible: TSpeedButton;
-      layoutButtonsMain: TFlowLayout;
-      layoutButtonsEdit: TFlowLayout;
+
+      scrollButtonsMain: TVertScrollBoxWithArrows;
+      scrollButtonsEdit: TVertScrollBoxWithArrows;
 
       actionMenu: TAction;
 
@@ -153,7 +155,7 @@ implementation
     inherited;
 
     {$IF DEFINED(ANDROID) OR DEFINED(IOS)}
-    //layoutButtonsMain//
+    //Main buttons//
     //btnLoad.Visible := false; //TODO: implement some simple Load file dialog for mobile devices (flat list of documents). Should have some button to delete files too
     //btnSave.Visible := false; //TODO: implement a dialog to ask for a filename (and ask if want to replace if exists) or use sharing dialog on mobiles (could have some way to do so on Win8/10/11 too)
     //btnToggleEditMode.Visible := false; //TODO: enable edit again after implementing a Save (and ideally adding Share support too) dialog. Plus need to make the toolbars somehow fit in small screens
@@ -162,7 +164,7 @@ implementation
 
     //Workaround (removing from Parent instead of Hiding) for Delphi 12.2 TFlowLayout bug on Android (https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2571)
     //since code may refer to these controls, not destroying, but assuming former Parent still remains the Owner if it was, so that it will destroy the component when it is itself destroyed
-    //layoutButtonsMain//
+    //Main buttons//
     btnLoad.Parent := nil;
     btnSave.Parent := nil;
     //btnToggleEditMode.Parent := nil;
@@ -192,7 +194,7 @@ implementation
     FEditMode := Value;
     btnToggleEditMode.IsPressed := Value; //don't use "Pressed", need to use "IsPressed"
 
-    layoutButtonsEdit.Visible := Value;
+    scrollButtonsEdit.Visible := Value;
 
     if Assigned(FEditModeChanged) then
       FEditModeChanged(Self, Value);
