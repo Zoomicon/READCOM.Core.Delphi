@@ -32,14 +32,15 @@ object StoryHUD: TStoryHUD
     TabOrder = 4
     object scrollButtonsMain: TVertScrollBoxWithArrows
       Align = MostLeft
-      Padding.Top = 40.000000000000000000
+      Margins.Top = 40.000000000000000000
+      Position.Y = 40.000000000000000000
       Size.Width = 50.000000000000000000
-      Size.Height = 712.000000000000000000
+      Size.Height = 672.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 2
       ShowScrollBars = False
       Viewport.Width = 50.000000000000000000
-      Viewport.Height = 712.000000000000000000
+      Viewport.Height = 672.000000000000000000
       object btnNew: TSpeedButton
         Action = actionNew
         Align = Top
@@ -50,7 +51,7 @@ object StoryHUD: TStoryHUD
         Margins.Right = 3.000000000000000000
         Margins.Bottom = 3.000000000000000000
         Position.X = 3.000000000000000000
-        Position.Y = 43.000000000000000000
+        Position.Y = 3.000000000000000000
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
@@ -66,7 +67,7 @@ object StoryHUD: TStoryHUD
         Margins.Right = 3.000000000000000000
         Margins.Bottom = 3.000000000000000000
         Position.X = 3.000000000000000000
-        Position.Y = 89.000000000000000000
+        Position.Y = 49.000000000000000000
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
@@ -82,7 +83,7 @@ object StoryHUD: TStoryHUD
         Margins.Right = 3.000000000000000000
         Margins.Bottom = 6.000000000000000000
         Position.X = 3.000000000000000000
-        Position.Y = 135.000000000000000000
+        Position.Y = 95.000000000000000000
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
@@ -102,7 +103,7 @@ object StoryHUD: TStoryHUD
         Margins.Right = 3.000000000000000000
         Margins.Bottom = 3.000000000000000000
         Position.X = 3.000000000000000000
-        Position.Y = 184.000000000000000000
+        Position.Y = 144.000000000000000000
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
@@ -143,7 +144,7 @@ object StoryHUD: TStoryHUD
         Margins.Right = 3.000000000000000000
         Margins.Bottom = 3.000000000000000000
         Position.X = 3.000000000000000000
-        Position.Y = 230.000000000000000000
+        Position.Y = 190.000000000000000000
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
@@ -164,7 +165,7 @@ object StoryHUD: TStoryHUD
         Margins.Right = 3.000000000000000000
         Margins.Bottom = 6.000000000000000000
         Position.X = 3.000000000000000000
-        Position.Y = 276.000000000000000000
+        Position.Y = 236.000000000000000000
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
@@ -183,7 +184,7 @@ object StoryHUD: TStoryHUD
         Margins.Right = 3.000000000000000000
         Margins.Bottom = 6.000000000000000000
         Position.X = 3.000000000000000000
-        Position.Y = 325.000000000000000000
+        Position.Y = 285.000000000000000000
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
@@ -201,7 +202,7 @@ object StoryHUD: TStoryHUD
         Margins.Right = 3.000000000000000000
         Margins.Bottom = 3.000000000000000000
         Position.X = 3.000000000000000000
-        Position.Y = 374.000000000000000000
+        Position.Y = 334.000000000000000000
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
@@ -217,7 +218,7 @@ object StoryHUD: TStoryHUD
         Margins.Right = 3.000000000000000000
         Margins.Bottom = 3.000000000000000000
         Position.X = 3.000000000000000000
-        Position.Y = 420.000000000000000000
+        Position.Y = 380.000000000000000000
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
