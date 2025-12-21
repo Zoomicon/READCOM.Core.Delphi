@@ -16,6 +16,7 @@ uses
   READCOM.Models.Stories; //for IStoryItemOptions
 
 resourcestring
+  STR_ID = 'ID';
   STR_URL = 'URL';
   STR_FACTORY_CAPACITY = 'Factory Capacity';
   STR_TAGS = 'Tags';
@@ -262,8 +263,23 @@ end;
 
 procedure TStoryItemOptions.actionToggleStoryPointExecute(Sender: TObject);
 begin
-  StoryItem.SetStoryPoint(btnToggleStoryPoint.IsPressed);
+  //StoryItem.SetStoryPoint(btnToggleStoryPoint.IsPressed);
   //ShowPopup; //show popup again to make the toggle evident
+
+  TDialogServiceAsync.InputQuery(STR_ID, [STR_ID], [StoryItem.GetID],
+    procedure(const AResult: TModalResult; const AValues: array of string)
+    begin
+      if (AResult = mrOk) then
+      begin
+        var LID := AValues[0];
+        StoryItem.ID := LID;
+        StoryItem.StoryPoint := (LID <> ''); //old StoryPoints may not have an ID, but new ones will always need to have one. Clearing the ID from this button's popup will also unset the storypoint. Note that just setting ID programmatically doesn't set the StoryItem as a StoryPoint
+        btnToggleFactory.IsPressed := StoryItem.StoryPoint;
+      end;
+      //ShowPopup; //TODO: doesn't work (popup gets hidden after OK/Cancel). Probably it is executed at other thread (and ignore), haven't tried telling it to do from the UI thread, or try else with a timeout to do it a moment later
+    end
+  );
+  //ShowPopup; //see comment above //doesn't work either (popup shown in the background but closes after OK/Cancel at input prompt)
 end;
 
 procedure TStoryItemOptions.actionToggleSnappingExecute(Sender: TObject);

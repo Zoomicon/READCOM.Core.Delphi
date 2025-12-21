@@ -250,7 +250,8 @@ implementation
 
   function TStoryHUD.GetFullScreen: Boolean;
   begin
-    result := Application.MainForm.FullScreen;
+    result := (csDesigning not in ComponentState) and //seems to crash in Delphi 13's design mode, so guard for it
+              Application.MainForm.FullScreen;
   end;
 
   procedure TStoryHUD.SetFullScreen(const Value: Boolean);

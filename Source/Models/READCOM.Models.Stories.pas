@@ -59,6 +59,10 @@ interface
       {Lifetime management}
       procedure Reset;
 
+      {ID}
+      function GetID: String;
+      procedure SetID(const Value: String);
+
       {Audio}
       procedure PlayRandomAudioStoryItem;
 
@@ -72,6 +76,9 @@ interface
       {StoryItems}
       function GetStoryItems: TIStoryItemList;
       procedure SetStoryItems(const Value: TIStoryItemList);
+      //
+      function GetStoryItem(const Index: Integer): IStoryItem; overload;
+      function GetStoryItem(const ID: String; const HomeOrStoryPoint: Boolean = false): IStoryItem; overload; //ID can be a path of IDs, / meaning Story.RootStoryItem, ~ meaning Story.HomeStoryItem, empty or . meaning current StoryItem and .. ParentStoryItem //if HomeOrStoryPoint=true behavior is that of GetStoryPoint(ID)
 
       {ImageStoryItems}
       function GetImageStoryItems: TIImageStoryItemList;
@@ -106,7 +113,9 @@ interface
       function IsStoryPoint: boolean;
       procedure SetStoryPoint(const Value: boolean);
 
-      {Previous/Next StoryPoint}
+      {StoryPoints}
+      function GetStoryPoint(const ID: String): IStoryItem; //ID can be a path of IDs, / meaning Story.HomeStoryItem, ~ meaning Story.HomeStoryItem, empty or . meaning current StoryItem if it is a StoryPoint or Home (else AncestorStoryPoint) and .. meaning AncestorStoryPoint
+      //
       function GetPreviousStoryPoint: IStoryItem;
       function GetNextStoryPoint: IStoryItem;
       //
@@ -186,6 +195,7 @@ interface
 
       //--- Properties ---
 
+      property ID: String read GetID write SetID; //default ''
       property View: TControl read GetView;
       property ParentStoryItem: IStoryItem read GetParentStoryItem write SetParentStoryItem; //stored false //default nil
       property StoryItems: TIStoryItemList read GetStoryItems write SetStoryItems; //default nil
@@ -199,6 +209,7 @@ interface
       property StoryPoint: Boolean read IsStoryPoint write SetStoryPoint; //default false
       property PreviousStoryPoint: IStoryItem read GetPreviousStoryPoint; //stored false
       property NextStoryPoint: IStoryItem read GetNextStoryPoint; //stored false
+      property AncestorStoryPoint: IStoryItem read GetAncestorStoryPoint; //stored false
       property Content: TBytes read GetContent write SetContent; //default nil
       property ContentExt: String read GetContentExt write SetContentExt; //default ''
       property AllText: TStrings read GetAllText write SetAllText; //stored false //Note: used to replace Text at applicable items in StoryItem's whole subtree (to be used recursively)

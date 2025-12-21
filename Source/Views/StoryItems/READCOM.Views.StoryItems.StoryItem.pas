@@ -42,11 +42,11 @@ interface
       Background: TRectangle;
       Glyph: TMediaDisplay;
 
-    //-- Fields ---
+    {$region '-- Fields ---'}
 
     protected
       var
-        //FID: TGUID;
+        FID: String;
         FContent: TBytes; //opaque content storage (dynamic array of bytes)
         FContentExt: String;
         FStoryPoint: Boolean;
@@ -76,7 +76,9 @@ interface
         //TODO: maybe move to IStory so that we don't have many class variables
         FHomeStoryItem: IStoryItem;
 
-    //--- Methods ---
+    {$endregion}
+
+    {$region '--- Methods ---'}
 
     protected
       class destructor Destroy;
@@ -131,6 +133,10 @@ interface
       {StoryItems}
       function GetStoryItems: TIStoryItemList; inline; //Note: using inline since this just returns the field value (have a method at the property's get accessor instead of the field directly, since we implement an interface with Get/Set accessors)
       procedure SetStoryItems(const Value: TIStoryItemList);
+      //
+      function GetStoryItem(const Index: Integer): IStoryItem; overload;
+      function GetStoryItem(const ID: String; const HomeOrStoryPoint: Boolean = false): IStoryItem; overload; //ID can be a path of IDs, / meaning Story.RootStoryItem, ~ meaning Story.HomeStoryItem, empty or . meaning current StoryItem and .. ParentStoryItem //if HomeOrStoryPoint=true behavior is that of GetStoryPoint(ID)
+      //
       procedure RefreshStoryItemsList;
 
       {ImageStoryItems}
@@ -138,6 +144,7 @@ interface
 
       {AudioStoryItems}
       function GetAudioStoryItems: TIAudioStoryItemList; inline;
+      //
       procedure RefreshAudioStoryItemsList;
 
       {TextStoryItems}
@@ -162,7 +169,9 @@ interface
       function IsStoryPoint: Boolean; virtual;
       procedure SetStoryPoint(const Value: Boolean); virtual;
 
-      {Previous/Next StoryPoint}
+      {StoryPoints}
+      function GetStoryPoint(const ID: String): IStoryItem; //ID can be a path of IDs, / meaning Story.HomeStoryItem, ~ meaning Story.HomeStoryItem, empty or . meaning current StoryItem if it is a StoryPoint or Home (else AncestorStoryPoint) and .. meaning AncestorStoryPoint
+      //
       function GetPreviousStoryPoint: IStoryItem;
       function GetNextStoryPoint: IStoryItem;
       //
@@ -247,6 +256,10 @@ interface
 
       //procedure Paint; override; //TODO: not doing any custom drawing like target lines
 
+      {ID}
+      function GetID: String; inline;
+      procedure SetID(const Value: String); inline;
+
       {Audio}
       procedure PlayRandomAudioStoryItem;
 
@@ -294,7 +307,9 @@ interface
       procedure ActivateRootStoryItem;
       procedure ActivateParentStoryItem;
 
-    //--- Events ---
+    {$endregion}
+
+    {$region '--- Events ---'}
 
     protected
       procedure ActiveChanged;
@@ -308,7 +323,9 @@ interface
       //procedure DoMouseExit; override;
       procedure Tap(const Point: TPointF); override;
 
-    //--- Properties ---
+    {$endregion}
+
+    {$region '--- Properties ---'}
 
     public
       property Options: IStoryItemOptions read GetOptions stored false; //TODO: should we make published? (think it was causing side-effects by getting somehow stored)
@@ -342,11 +359,13 @@ interface
       property ImageStoryItems: TIImageStoryItemList read GetImageStoryItems stored false; //default nil //Note: need to free returned object when done, isn't cached by the StoryItem
       property AudioStoryItems: TIAudioStoryItemList read GetAudioStoryItems stored false; //default nil
       property TextStoryItems: TITextStoryItemList read GetTextStoryItems stored false; //default nil //Note: need to free returned object when done, isn't cached by the StoryItem
+      property ID: String read GetID write SetID; //default ''
       property Active: Boolean read IsActive write SetActive default DEFAULT_ACTIVE;
       property Home: Boolean read IsHome write SetHome default DEFAULT_HOME;
       property StoryPoint: Boolean read IsStoryPoint write SetStoryPoint default DEFAULT_STORYPOINT;
       property PreviousStoryPoint: IStoryItem read GetPreviousStoryPoint stored false;
       property NextStoryPoint: IStoryItem read GetNextStoryPoint stored false;
+      property AncestorStoryPoint: IStoryItem read GetAncestorStoryPoint stored false;
       property Content: TBytes read GetContent write SetContent stored false; //seems Delphi (at least till v12.2) doesn't stream TBytes, so serializing it via DefineProperties as "ContentBin" //TODO: defining as published instead of public in case a Property Editor is implemented in the future
       property ContentExt: String read GetContentExt write SetContentExt; //default nil
       property AllText: TStrings read GetAllText write SetAllText stored false; //Note: used to replace Text at applicable items in StoryItem's whole subtree (to be used recursively) //Note: need to free returned object when done, isn't cached by the StoryItem
@@ -362,6 +381,9 @@ interface
       property UrlAction: String read GetUrlAction write SetUrlAction; //default '' (implied, not allows to use '')
       property FactoryCapacity: Integer read GetFactoryCapacity write SetFactoryCapacity default DEFAULT_FACTORY_CAPACITY;
       property TargetsVisible: Boolean read GetTargetsVisible write SetTargetsVisible stored false default DEFAULT_TARGETS_VISIBLE; //TODO: not using concept of explicit targets now, but since anchored items with Tags serve as targets could use that property to highlight them (as hint for user). Maybe in that case add the Targets visible toggle button again
+
+      {$endregion}
+
     end;
 
     TStoryItemClass = class of TStoryItem;
@@ -638,6 +660,20 @@ implementation
   end;
   *)
 
+  {$region 'ID'}
+
+  function TStoryItem.GetID: String;
+  begin
+    result := fID;
+  end;
+
+  procedure TStoryItem.SetID(const Value: String);
+  begin
+    fID := Value;
+  end;
+
+  {$region 'Audio'}
+
   procedure TStoryItem.PlayRandomAudioStoryItem;
   begin
     if not Assigned(FAudioStoryItems) then
@@ -647,6 +683,8 @@ implementation
     if Assigned(LRandomAudioStoryItem) then
       LRandomAudioStoryItem.Play;
   end;
+
+  {$endregion}
 
   {$region 'Z-order'}
 
@@ -778,7 +816,97 @@ implementation
       AddObject(item.GetView As TStoryItem); //TODO: this is probably wrong, should first remove all StoryItems, then use Add(StoryItem), not AddObject
   end;
 
-  {$endregion}
+  function TStoryItem.GetStoryItem(const Index: Integer): IStoryItem;
+  begin
+    result := StoryItems.Items[Index];
+  end;
+
+  function TStoryItem.GetStoryItem(const ID: String; const HomeOrStoryPoint: Boolean = False): IStoryItem;
+  begin
+    var Path := ID;
+    var StartItem: IStoryItem;
+
+    // --- Determine starting point ---
+    if Path.StartsWith('/') then
+    begin
+      StartItem := Story.RootStoryItem;
+      Path := Path.Substring(1);
+    end
+    else if Path = '~' then
+    begin
+      StartItem := Story.HomeStoryItem;
+      Path := '';
+    end
+    else if Path.StartsWith('~/') then
+    begin
+      StartItem := Story.HomeStoryItem;
+      Path := Path.Substring(2);
+    end
+    else
+    begin
+      // Relative path: StoryPoint mode vs StoryItem mode
+      if (not HomeOrStoryPoint) or Self.IsStoryPoint or Self.IsHome then
+        StartItem := Self
+      else
+        StartItem := Self.AncestorStoryPoint;
+    end;
+
+    // --- Normalize ---
+    Path := Path.Trim(['/']);
+
+    // --- Base case ---
+    if Path.IsEmpty then
+      Exit(StartItem);
+
+    // --- Split head/tail ---
+    var SlashPos := Path.IndexOf('/');
+    var Head := '';
+    var Tail := '';
+
+    if (SlashPos < 0) then
+      Head := Path
+    else
+    begin
+      Head := Path.Substring(0, SlashPos);
+      Tail := Path.Substring(SlashPos + 1);
+    end;
+
+    // --- Self segment ---
+    if Head.IsEmpty or SameText(Head, '.') then
+      Exit(StartItem.GetStoryItem(Tail, HomeOrStoryPoint));
+
+    // --- Parent segment ---
+    if SameText(Head, '..') then
+    begin
+      var Parent: IStoryItem;
+
+      if HomeOrStoryPoint then
+        Parent := StartItem.AncestorStoryPoint
+      else
+        Parent := StartItem.ParentStoryItem;
+
+      if not Assigned(Parent) then
+        Exit(nil);
+
+      Exit(Parent.GetStoryItem(Tail, HomeOrStoryPoint));
+    end;
+
+    // --- Child lookup ---
+    var Next := StartItem.StoryItems.GetFirst(
+      function(Child: IStoryItem): Boolean
+      begin
+        Result :=
+          ((not HomeOrStoryPoint) or Child.IsStoryPoint or Child.IsHome) and
+          SameText(Child.ID, Head);
+      end
+    );
+
+    if not Assigned(Next) then
+      Exit(nil);
+
+    // --- Recurse downward ---
+    Result := Next.GetStoryItem(Tail, HomeOrStoryPoint);
+  end;
 
   {$region 'ImageStoryItems'}
 
@@ -970,7 +1098,12 @@ implementation
 
   {$endregion}
 
-  {$region 'Previous/Next StoryPoint'}
+  {$region 'StoryPoints'}
+
+  function TStoryItem.GetStoryPoint(const ID: String): IStoryItem;
+  begin
+    Result := GetStoryItem(ID, true);
+  end;
 
   function TStoryItem.GetPreviousStoryPoint: IStoryItem; //TODO: this logic doesn't work ok when there is an isolated StoryPoint deep in the hierarchy (it's ignored)
   begin

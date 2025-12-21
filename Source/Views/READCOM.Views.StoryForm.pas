@@ -4,6 +4,7 @@
 {-$DEFINE NOSTYLE}
 
 //WARNING: if Delphi corrupts the form (sometimes it fails to load the StoryHUD frame first), revert only the StoryForm.fmx file from version control
+//WARNING: if Icons are not shown in the designer, also open Resources\READCOM.Resources.Icons
 
 unit READCOM.Views.StoryForm;
 
@@ -481,13 +482,13 @@ implementation
 
     //--- In-Story Navigation URLs (with Tags Matching is set to do so, or for + [NextStoryPoint] by default [unless + tag matching is bypassed with ! prefix]) ---
 
-    if LUrl = '-' then
+    if LUrl = '-' then //TODO: could use StartsWith and pass an optional number (default 1) on how many previous steps
     begin
       ActivatePreviousStoryPoint(TagsMatching); //?-, ??-, ???- will do tags matching
       exit;
     end;
 
-    if LUrl = '+' then
+    if LUrl = '+' then //TODO: could use StartsWith and pass an optional number (default 1) on how many next steps
     begin
       ActivateNextStoryPoint(TagsMatching); //!+ will skip tags matching
       exit;
@@ -585,10 +586,19 @@ implementation
        CheckTagsMatched(TagsMatching) //pass it to CheckTagsMatched to do close-only or open/close lock prompting and return matching state
     then
     begin
-      if Url.EndsWith(EXT_READCOM, True) then //if it's a LUrl to a .readcom file (case-insensitive comparison)
-        UI.LoadFromUrl(Url) //either bypassing Tags Matcing, or Tags are Matched, advance to LUrl
+
+      if Url.StartsWith('http:', True) or Url.StartsWith('https:', True) then
+      begin
+        if Url.EndsWith(EXT_READCOM, True) then //if it's a LUrl to a .readcom file (case-insensitive comparison)
+          UI.LoadFromUrl(Url) //either bypassing Tags Matcing, or Tags are Matched, advance to LUrl
+        else
+          Application.OpenUrl(Url); //else open in system browser
+      end
       else
-        Application.OpenUrl(Url); //else open in system browser
+      begin
+        var LTargetStoryPoint := ActiveStoryItem.GetStoryPoint(Url);
+        UI.SetActiveStoryItemIfAssigned(LTargetStoryPoint);
+      end;
 
       //if (TagsMatching = TagsMatching_OkFail_Prompt) then //REMOVED: LoadFromUrl is asynchronous
         //TLockFrame.HideModal(OPENLOCK_DELAY);

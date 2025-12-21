@@ -28,22 +28,21 @@ package READCOM.Core;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$IMPLICITBUILD ON}
-
-{$RUNONLY ON}
 {$DESCRIPTION 'READCOM.Core run-time package'}
+{$RUNONLY}
+{$IMPLICITBUILD ON}
 
 requires
   rtl,
   fmx,
   SVGIconImageListFMX,
   Zoomicon.Media.FMX,
-  Zoomicon.Generics{BOSS},
-  Zoomicon.Helpers.FMX{BOSS},
-  Zoomicon.Helpers.RTL{BOSS},
-  Zoomicon.Introspection.FMX{BOSS},
-  Zoomicon.Manipulation.FMX{BOSS},
-  Zoomicon.ZUI.FMX{BOSS};
+  Zoomicon.Generics,
+  Zoomicon.Helpers.FMX,
+  Zoomicon.Helpers.RTL,
+  Zoomicon.Introspection.FMX,
+  Zoomicon.Manipulation.FMX,
+  Zoomicon.ZUI.FMX;
 
 contains
   READCOM.Resources.Icons in 'Resources\READCOM.Resources.Icons.pas' {Icons: TDataModule},
