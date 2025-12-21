@@ -821,92 +821,112 @@ implementation
     result := StoryItems.Items[Index];
   end;
 
-  function TStoryItem.GetStoryItem(const ID: String; const HomeOrStoryPoint: Boolean = False): IStoryItem;
+function TStoryItem.GetStoryItem(const ID: String; const HomeOrStoryPoint: Boolean = False): IStoryItem;
+begin
+  var Path := ID;
+  var StartItem: IStoryItem;
+
+  // --- Determine starting point ---
+  if Path.StartsWith('/') then
   begin
-    var Path := ID;
-    var StartItem: IStoryItem;
-
-    // --- Determine starting point ---
-    if Path.StartsWith('/') then
-    begin
-      StartItem := Story.RootStoryItem;
-      Path := Path.Substring(1);
-    end
-    else if Path = '~' then
-    begin
-      StartItem := Story.HomeStoryItem;
-      Path := '';
-    end
-    else if Path.StartsWith('~/') then
-    begin
-      StartItem := Story.HomeStoryItem;
-      Path := Path.Substring(2);
-    end
+    StartItem := Story.RootStoryItem;
+    Path := Path.Substring(1);
+  end
+  else if Path = '~' then
+  begin
+    StartItem := Story.HomeStoryItem;
+    Path := '';
+  end
+  else if Path.StartsWith('~/') then
+  begin
+    StartItem := Story.HomeStoryItem;
+    Path := Path.Substring(2);
+  end
+  else
+  begin
+    if (not HomeOrStoryPoint) or Self.IsStoryPoint or Self.IsHome then
+      StartItem := Self
     else
-    begin
-      // Relative path: StoryPoint mode vs StoryItem mode
-      if (not HomeOrStoryPoint) or Self.IsStoryPoint or Self.IsHome then
-        StartItem := Self
-      else
-        StartItem := Self.AncestorStoryPoint;
-    end;
+      StartItem := Self.AncestorStoryPoint;
+  end;
 
-    // --- Normalize ---
-    Path := Path.Trim(['/']);
+  // --- Normalize ---
+  Path := Path.Trim(['/']);
 
-    // --- Base case ---
-    if Path.IsEmpty then
-      Exit(StartItem);
+  if Path.IsEmpty then
+    Exit(StartItem);
 
-    // --- Split head/tail ---
-    var SlashPos := Path.IndexOf('/');
-    var Head := '';
-    var Tail := '';
+  // --- Split head/tail ---
+  var SlashPos := Path.IndexOf('/');
+  var Head := '';
+  var Tail := '';
 
-    if (SlashPos < 0) then
-      Head := Path
+  if (SlashPos < 0) then
+    Head := Path
+  else
+  begin
+    Head := Path.Substring(0, SlashPos);
+    Tail := Path.Substring(SlashPos + 1);
+  end;
+
+  // Empty segment or "." gives Self
+  if Head.IsEmpty or SameText(Head, '.') then
+    Exit(StartItem.GetStoryItem(Tail, HomeOrStoryPoint));
+
+  // Parent segment ("..")
+  if SameText(Head, '..') then
+  begin
+    var Parent: IStoryItem;
+
+    if HomeOrStoryPoint then
+      Parent := StartItem.AncestorStoryPoint
     else
-    begin
-      Head := Path.Substring(0, SlashPos);
-      Tail := Path.Substring(SlashPos + 1);
-    end;
+      Parent := StartItem.ParentStoryItem;
 
-    // --- Self segment ---
-    if Head.IsEmpty or SameText(Head, '.') then
-      Exit(StartItem.GetStoryItem(Tail, HomeOrStoryPoint));
-
-    // --- Parent segment ---
-    if SameText(Head, '..') then
-    begin
-      var Parent: IStoryItem;
-
-      if HomeOrStoryPoint then
-        Parent := StartItem.AncestorStoryPoint
-      else
-        Parent := StartItem.ParentStoryItem;
-
-      if not Assigned(Parent) then
-        Exit(nil);
-
-      Exit(Parent.GetStoryItem(Tail, HomeOrStoryPoint));
-    end;
-
-    // --- Child lookup ---
-    var Next := StartItem.StoryItems.GetFirst(
-      function(Child: IStoryItem): Boolean
-      begin
-        Result :=
-          ((not HomeOrStoryPoint) or Child.IsStoryPoint or Child.IsHome) and
-          SameText(Child.ID, Head);
-      end
-    );
-
-    if not Assigned(Next) then
+    if not Assigned(Parent) then
       Exit(nil);
 
-    // --- Recurse downward ---
-    Result := Next.GetStoryItem(Tail, HomeOrStoryPoint);
+    Exit(Parent.GetStoryItem(Tail, HomeOrStoryPoint));
   end;
+
+  // --- Parse #n suffix (only for real IDs) ---
+  var BaseID := Head;
+  var Skip := 0;
+
+  var HashPos := BaseID.IndexOf('#');
+  if HashPos >= 0 then
+  begin
+    var IndexStr := BaseID.Substring(HashPos + 1);
+    BaseID := BaseID.Substring(0, HashPos);
+
+    if IndexStr.IsEmpty then
+      Exit(nil);
+
+    var Index := IndexStr.ToInteger;
+
+    if Index <= 0 then
+      Exit(nil);
+
+    Skip := Index - 1;
+  end;
+
+  // --- Child lookup with Skip support ---
+  var Next := StartItem.StoryItems.GetFirst(
+    function(Child: IStoryItem): Boolean
+    begin
+      Result :=
+        ((not HomeOrStoryPoint) or Child.IsStoryPoint or Child.IsHome) and
+        (BaseID.IsEmpty or SameText(Child.ID, BaseID));
+    end,
+    Skip
+  );
+
+  if not Assigned(Next) then
+    Exit(nil);
+
+  // --- Recurse downward ---
+  Result := Next.GetStoryItem(Tail, HomeOrStoryPoint);
+end;
 
   {$region 'ImageStoryItems'}
 
