@@ -1,0 +1,223 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Import Condition="Exists('$(BDS)\bin\CodeGear.Deployment.targets')" Project="$(BDS)\bin\CodeGear.Deployment.targets"/>
+    <ProjectExtensions>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <PropertyGroup>
+        <DeviceId Condition="'$(Platform)'=='Android'"/>
+        <DeviceId Condition="'$(Platform)'=='Android64'"/>
+        <DeviceId Condition="'$(Platform)'=='iOSDevice64'"/>
+        <DeviceId Condition="'$(Platform)'=='iOSSimARM64'">506DAD54-DF13-4CC6-AC16-4626478468DA</DeviceId>
+    </PropertyGroup>
+    <ItemGroup Condition="'$(Platform)'=='OSX64'"/>
+    <ItemGroup Condition="'$(Platform)'=='Win32'">
+        <DeployFile Include="..\..\..\..\..\Public\Documents\Embarcadero\Studio\37.0\Bpl\READCOM.Core.bpl" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>READCOM.Core\</RemoteDir>
+            <RemoteName>READCOM.Core.bpl</RemoteName>
+            <DeployClass>ProjectOutput</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+    </ItemGroup>
+    <ItemGroup Condition="'$(Platform)'=='OSXARM64'">
+        <DeployFile Include="..\..\..\..\..\Public\Documents\Embarcadero\Studio\37.0\Bpl\OSXARM64\bplREADCOM.Core.dylib" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>READCOM.Core\</RemoteDir>
+            <RemoteName>bplREADCOM_Core.dylib</RemoteName>
+            <DeployClass>ProjectOutput</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="$(BDSCOMMONDIR)\Bpl\$(Platform)\bplZoomicon.Generics.dylib" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>READCOM.Core\</RemoteDir>
+            <RemoteName>bplZoomicon.Generics.dylib</RemoteName>
+            <DeployClass>DependencyPackage</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="$(BDSCOMMONDIR)\Bpl\$(Platform)\bplZoomicon.Introspection.FMX.dylib" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>READCOM.Core\</RemoteDir>
+            <RemoteName>bplZoomicon.Introspection.FMX.dylib</RemoteName>
+            <DeployClass>DependencyPackage</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="$(BDSCOMMONDIR)\Bpl\$(Platform)\bplZoomicon.Helpers.FMX.dylib" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>READCOM.Core\</RemoteDir>
+            <RemoteName>bplZoomicon.Helpers.FMX.dylib</RemoteName>
+            <DeployClass>DependencyPackage</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\Redist\OSX64\bplbindengine370.dylib" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>READCOM.Core\</RemoteDir>
+            <RemoteName>bplbindengine370.dylib</RemoteName>
+            <DeployClass>DependencyPackage</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\Redist\OSX64\bplSkia.Package.FMX370.dylib" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>READCOM.Core\</RemoteDir>
+            <RemoteName>bplSkia.Package.FMX370.dylib</RemoteName>
+            <DeployClass>DependencyPackage</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\Redist\OSX64\bpldbrtl370.dylib" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>READCOM.Core\</RemoteDir>
+            <RemoteName>bpldbrtl370.dylib</RemoteName>
+            <DeployClass>DependencyPackage</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="$(BDSCOMMONDIR)\Bpl\$(Platform)\bplZoomicon.Manipulation.FMX.dylib" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>READCOM.Core\</RemoteDir>
+            <RemoteName>bplZoomicon.Manipulation.FMX.dylib</RemoteName>
+            <DeployClass>DependencyPackage</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\Redist\OSX64\bplfmx370.dylib" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>READCOM.Core\</RemoteDir>
+            <RemoteName>bplfmx370.dylib</RemoteName>
+            <DeployClass>DependencyPackage</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\Redist\OSX64\bplrtl370.dylib" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>READCOM.Core\</RemoteDir>
+            <RemoteName>bplrtl370.dylib</RemoteName>
+            <DeployClass>DependencyPackage</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="$(BDSCOMMONDIR)\Bpl\$(Platform)\bplSVGImage32Package370.dylib" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>READCOM.Core\</RemoteDir>
+            <RemoteName>bplSVGImage32Package370.dylib</RemoteName>
+            <DeployClass>DependencyPackage</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\Redist\OSX64\bplSkia.Package.RTL370.dylib" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>READCOM.Core\</RemoteDir>
+            <RemoteName>bplSkia.Package.RTL370.dylib</RemoteName>
+            <DeployClass>DependencyPackage</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="$(BDSCOMMONDIR)\Bpl\$(Platform)\bplZoomicon.ZUI.FMX.dylib" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>READCOM.Core\</RemoteDir>
+            <RemoteName>bplZoomicon.ZUI.FMX.dylib</RemoteName>
+            <DeployClass>DependencyPackage</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="$(BDSCOMMONDIR)\Bpl\$(Platform)\bplSVGIconImageListFMX370.dylib" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>READCOM.Core\</RemoteDir>
+            <RemoteName>bplSVGIconImageListFMX370.dylib</RemoteName>
+            <DeployClass>DependencyPackage</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\Redist\OSX64\bplbindcomp370.dylib" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>READCOM.Core\</RemoteDir>
+            <RemoteName>bplbindcomp370.dylib</RemoteName>
+            <DeployClass>DependencyPackage</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="$(BDSCOMMONDIR)\Bpl\$(Platform)\bplZoomicon.Media.FMX.dylib" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>READCOM.Core\</RemoteDir>
+            <RemoteName>bplZoomicon.Media.FMX.dylib</RemoteName>
+            <DeployClass>DependencyPackage</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="$(BDSCOMMONDIR)\Bpl\$(Platform)\bplZoomicon.Helpers.RTL.dylib" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>READCOM.Core\</RemoteDir>
+            <RemoteName>bplZoomicon.Helpers.RTL.dylib</RemoteName>
+            <DeployClass>DependencyPackage</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="$(BDSCOMMONDIR)\Bpl\$(Platform)\bplObjectDebuggerFMX.dylib" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>READCOM.Core\</RemoteDir>
+            <RemoteName>bplObjectDebuggerFMX.dylib</RemoteName>
+            <DeployClass>DependencyPackage</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\Redist\OSX64\bplbindcompfmx370.dylib" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>READCOM.Core\</RemoteDir>
+            <RemoteName>bplbindcompfmx370.dylib</RemoteName>
+            <DeployClass>DependencyPackage</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+    </ItemGroup>
+    <ItemGroup Condition="'$(Platform)'=='Android'"/>
+    <ItemGroup Condition="'$(Platform)'=='Win64'"/>
+    <ItemGroup Condition="'$(Platform)'=='Android64'"/>
+    <ItemGroup Condition="'$(Platform)'=='iOSDevice64'"/>
+    <ItemGroup Condition="'$(Platform)'=='iOSSimARM64'"/>
+    <ItemGroup Condition="'$(Platform)'=='Win64x'"/>
+</Project>

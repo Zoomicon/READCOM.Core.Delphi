@@ -1,51 +1,65 @@
 object StoryItemOptions: TStoryItemOptions
-  Size.Width = 590.000000000000000000
-  Size.Height = 64.000000000000000000
+  Size.Width = 478.000000000000000000
+  Size.Height = 118.000000000000000000
   Size.PlatformDefault = False
   object Background: TRectangle
     Align = Contents
     Fill.Color = claLightgoldenrodyellow
-    Size.Width = 590.000000000000000000
-    Size.Height = 64.000000000000000000
+    Size.Width = 478.000000000000000000
+    Size.Height = 118.000000000000000000
     Size.PlatformDefault = False
   end
   object AddDialog: TOpenDialog
     Options = [ofHideReadOnly, ofAllowMultiSelect, ofPathMustExist, ofFileMustExist, ofEnableSizing]
-    Left = 152
-    Top = 112
+    Left = 408
+    Top = 8
   end
   object SaveDialog: TSaveDialog
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
-    Left = 88
-    Top = 112
+    Left = 344
+    Top = 8
   end
   object OpenDialog: TOpenDialog
     Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
-    Left = 16
-    Top = 112
+    Left = 276
+    Top = 8
   end
   object Layout: TFlowLayout
-    Align = Contents
-    Size.Width = 590.000000000000000000
-    Size.Height = 64.000000000000000000
+    Align = MostTop
+    Size.Width = 478.000000000000000000
+    Size.Height = 116.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 16
     Justify = Left
     JustifyLastLine = Left
     FlowDirection = LeftToRight
-    object LayoutStoryItemButtons: TFlowLayout
-      Align = Contents
-      Margins.Left = 4.000000000000000000
-      Margins.Top = 4.000000000000000000
-      Margins.Right = 4.000000000000000000
-      Margins.Bottom = 4.000000000000000000
-      Size.Width = 581.000000000000000000
-      Size.Height = 56.000000000000000000
+    object LayoutStoryItemMain: TFlowLayout
+      Anchors = [akLeft, akTop, akRight]
+      Size.Width = 476.000000000000000000
+      Size.Height = 58.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 12
+      TabOrder = 13
       Justify = Left
       JustifyLastLine = Left
       FlowDirection = LeftToRight
+      object btnToggleVisible: TSpeedButton
+        StaysPressed = True
+        Align = Client
+        Anchors = []
+        Hint = 'Toggle Visible'#13#10#13#10'Sets/unsets the Visibility of the StoryPoint'
+        Images = Icons.SVGIconImageList
+        ImageIndex = 47
+        Margins.Left = 4.000000000000000000
+        Margins.Top = 4.000000000000000000
+        Margins.Right = 4.000000000000000000
+        Margins.Bottom = 4.000000000000000000
+        Size.Width = 50.000000000000000000
+        Size.Height = 50.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'actiontoolbutton'
+        Text = 'Is Visible'
+        OnClick = actionToggleVisibleExecute
+      end
       object btnToggleHome: TSpeedButton
         StaysPressed = True
         Align = Client
@@ -55,8 +69,12 @@ object StoryItemOptions: TStoryItemOptions
           'hich is activated when the Story is loaded'
         Images = Icons.SVGIconImageList
         ImageIndex = 13
-        Size.Width = 64.000000000000000000
-        Size.Height = 57.000000000000000000
+        Margins.Left = 4.000000000000000000
+        Margins.Top = 4.000000000000000000
+        Margins.Right = 4.000000000000000000
+        Margins.Bottom = 4.000000000000000000
+        Size.Width = 50.000000000000000000
+        Size.Height = 50.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
         Text = 'Toggle Home'
@@ -71,13 +89,60 @@ object StoryItemOptions: TStoryItemOptions
           'int, taking part in normal flow of the Story (via Previous/Next)'
         Images = Icons.SVGIconImageList
         ImageIndex = 14
-        Size.Width = 64.000000000000000000
-        Size.Height = 57.000000000000000000
+        Margins.Left = 4.000000000000000000
+        Margins.Top = 4.000000000000000000
+        Margins.Right = 4.000000000000000000
+        Margins.Bottom = 4.000000000000000000
+        Size.Width = 50.000000000000000000
+        Size.Height = 50.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
         Text = 'Is StoryPoint'
         OnClick = actionToggleStoryPointExecute
       end
+      object txtID: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Client
+        TabOrder = 1
+        Margins.Left = 8.000000000000000000
+        Margins.Top = 14.000000000000000000
+        Margins.Right = 8.000000000000000000
+        Size.Width = 224.000000000000000000
+        Size.Height = 30.000000000000000000
+        Size.PlatformDefault = False
+        OnChange = txtIDChange
+        OnKeyDown = txtIDKeyDown
+      end
+      object btnClose: TSpeedButton
+        Align = MostRight
+        Images = Icons.SVGIconImageList
+        ImageIndex = 36
+        ModalResult = 8
+        Margins.Left = 4.000000000000000000
+        Margins.Top = 4.000000000000000000
+        Margins.Right = 4.000000000000000000
+        Margins.Bottom = 4.000000000000000000
+        Position.X = 418.000000000000000000
+        Position.Y = 4.000000000000000000
+        Size.Width = 50.000000000000000000
+        Size.Height = 50.000000000000000000
+        Size.PlatformDefault = False
+        ParentShowHint = False
+        ShowHint = True
+        StyleLookup = 'stoptoolbutton'
+        Text = 'stoptoolbutton'
+      end
+    end
+    object LayoutStoryItemButtons: TFlowLayout
+      Align = Top
+      Position.Y = 58.000000000000000000
+      Size.Width = 476.000000000000000000
+      Size.Height = 58.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 12
+      Justify = Left
+      JustifyLastLine = Left
+      FlowDirection = LeftToRight
       object btnToggleSnapping: TSpeedButton
         StaysPressed = True
         Align = Client
@@ -87,8 +152,12 @@ object StoryItemOptions: TStoryItemOptions
           ' to the center of this StoryItem when in non-Edit mode'
         Images = Icons.SVGIconImageList
         ImageIndex = 30
-        Size.Width = 64.000000000000000000
-        Size.Height = 57.000000000000000000
+        Margins.Left = 4.000000000000000000
+        Margins.Top = 4.000000000000000000
+        Margins.Right = 4.000000000000000000
+        Margins.Bottom = 4.000000000000000000
+        Size.Width = 50.000000000000000000
+        Size.Height = 50.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
         Text = 'Is Anchored'
@@ -103,8 +172,12 @@ object StoryItemOptions: TStoryItemOptions
           'em in non-Edit mode'
         Images = Icons.SVGIconImageList
         ImageIndex = 5
-        Size.Width = 64.000000000000000000
-        Size.Height = 57.000000000000000000
+        Margins.Left = 4.000000000000000000
+        Margins.Top = 4.000000000000000000
+        Margins.Right = 4.000000000000000000
+        Margins.Bottom = 4.000000000000000000
+        Size.Width = 50.000000000000000000
+        Size.Height = 50.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
         Text = 'Is Anchored'
@@ -120,8 +193,12 @@ object StoryItemOptions: TStoryItemOptions
           'eeding to Next StoryPoint'
         Images = Icons.SVGIconImageList
         ImageIndex = 27
-        Size.Width = 64.000000000000000000
-        Size.Height = 57.000000000000000000
+        Margins.Left = 4.000000000000000000
+        Margins.Top = 4.000000000000000000
+        Margins.Right = 4.000000000000000000
+        Margins.Bottom = 4.000000000000000000
+        Size.Width = 50.000000000000000000
+        Size.Height = 50.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
         Text = 'Change Tags'
@@ -136,8 +213,12 @@ object StoryItemOptions: TStoryItemOptions
           ' Active StoryItem is clicked in non-Edit mode'
         Images = Icons.SVGIconImageList
         ImageIndex = 9
-        Size.Width = 64.000000000000000000
-        Size.Height = 57.000000000000000000
+        Margins.Left = 4.000000000000000000
+        Margins.Top = 4.000000000000000000
+        Margins.Right = 4.000000000000000000
+        Margins.Bottom = 4.000000000000000000
+        Size.Width = 50.000000000000000000
+        Size.Height = 50.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
         Text = 'Change URL Action'
@@ -154,8 +235,12 @@ object StoryItemOptions: TStoryItemOptions
           'cked to allow procedding to Next StoryPoint'
         Images = Icons.SVGIconImageList
         ImageIndex = 45
-        Size.Width = 64.000000000000000000
-        Size.Height = 57.000000000000000000
+        Margins.Left = 4.000000000000000000
+        Margins.Top = 4.000000000000000000
+        Margins.Right = 4.000000000000000000
+        Margins.Bottom = 4.000000000000000000
+        Size.Width = 50.000000000000000000
+        Size.Height = 50.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
         Text = 'Change URL Action'
@@ -167,8 +252,12 @@ object StoryItemOptions: TStoryItemOptions
         Hint = 'Load Content'#13#13'Replaces Content of Active StoryItem'
         Images = Icons.SVGIconImageList
         ImageIndex = 6
-        Size.Width = 64.000000000000000000
-        Size.Height = 57.000000000000000000
+        Margins.Left = 4.000000000000000000
+        Margins.Top = 4.000000000000000000
+        Margins.Right = 4.000000000000000000
+        Margins.Bottom = 4.000000000000000000
+        Size.Width = 50.000000000000000000
+        Size.Height = 50.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
       end
@@ -178,8 +267,12 @@ object StoryItemOptions: TStoryItemOptions
         Hint = 'Save StoryItem'#13#13'Saves Content of Active StoryItem'
         Images = Icons.SVGIconImageList
         ImageIndex = 7
-        Size.Width = 64.000000000000000000
-        Size.Height = 57.000000000000000000
+        Margins.Left = 4.000000000000000000
+        Margins.Top = 4.000000000000000000
+        Margins.Right = 4.000000000000000000
+        Margins.Bottom = 4.000000000000000000
+        Size.Width = 50.000000000000000000
+        Size.Height = 50.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
       end
@@ -193,7 +286,7 @@ object StoryItemOptions: TStoryItemOptions
   end
   object ActionList: TActionList
     Left = 216
-    Top = 112
+    Top = 8
     object actionLoad: TAction
       Category = 'File'
       Text = 'Load'

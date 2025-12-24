@@ -409,7 +409,7 @@ interface
       function CheckTagsMatched(const TagsMatching: TTagsMatching = TagsMatching_Default): Boolean;
 
       {URLs}
-      procedure DoUrlAction(const UrlAction: String);
+      procedure DoUrlAction(const UrlAction: String; const BaseStoryItem: IStoryItem = nil);
 
       {ActiveStoryItem}
       function GetActiveStoryItem: IStoryItem;
@@ -423,7 +423,7 @@ interface
       procedure ActivatePreviousStoryPoint(const TagsMatching: TTagsMatching = TagsMatching_Default);
       procedure ActivateNextStoryPoint(const TagsMatching: TTagsMatching = TagsMatching_Default);
       //
-      procedure ActivateUrl(const Url:string; const TagsMatching: TTagsMatching = TagsMatching_Default); //open new story when ending in .readcom, else open url in browser
+      procedure ActivateUrl(const Url:string; const BaseStoryItem: IStoryItem = nil; const TagsMatching: TTagsMatching = TagsMatching_Default); //open new story when ending in .readcom, else open url in browser
 
       {StoryMode}
       function GetStoryMode: TStoryMode;

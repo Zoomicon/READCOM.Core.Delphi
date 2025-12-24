@@ -79,7 +79,7 @@ interface
       function CheckTagsMatched(const TagsMatching: TTagsMatching = TagsMatching_Default): Boolean;
 
       {URLs}
-      procedure DoUrlAction(const UrlAction: String);
+      procedure DoUrlAction(const UrlAction: String; const BaseStoryItem: IStoryItem = nil);
 
       {ActiveStoryItem}
       function GetActiveStoryItem: IStoryItem;
@@ -93,7 +93,7 @@ interface
       procedure ActivatePreviousStoryPoint(const TagsMatching: TTagsMatching = TagsMatching_Default);
       procedure ActivateNextStoryPoint(const TagsMatching: TTagsMatching = TagsMatching_Default);
       //
-      procedure ActivateUrl(const Url:string; const TagsMatching: TTagsMatching = TagsMatching_Default); //open new story when ending in .readcom, else open url in browser
+      procedure ActivateUrl(const Url:string; const BaseStoryItem: IStoryItem = nil; const TagsMatching: TTagsMatching = TagsMatching_Default); //open new story when ending in .readcom, else open url in browser
 
       {StoryMode}
       function GetStoryMode: TStoryMode;
@@ -439,7 +439,7 @@ implementation
 
   {$region 'URLs'}
 
-  procedure TStory.DoUrlAction(const UrlAction: String);
+  procedure TStory.DoUrlAction(const UrlAction: String; const BaseStoryItem: IStoryItem = nil);
   begin
     if UrlAction = '' then exit;
 
@@ -505,7 +505,7 @@ implementation
 
     //--- Resource URLs - including navigation to other .readcom story (with Tags Matching checking if not bypassed with "!" prefix and only if explicitly asked for with "+" prefix) ---
 
-    ActivateUrl(LUrl, TagsMatching);
+    ActivateUrl(LUrl, BaseStoryItem, TagsMatching);
   end;
 
   {$endregion}
@@ -580,7 +580,7 @@ implementation
     end;
   end;
 
-  procedure TStory.ActivateUrl(const Url:string; const TagsMatching: TTagsMatching = TagsMatching_Default); //open new story when ending in .readcom, else open url in browser
+  procedure TStory.ActivateUrl(const Url:string; const BaseStoryItem: IStoryItem = nil; const TagsMatching: TTagsMatching = TagsMatching_Default); //open new story when ending in .readcom, else open url in browser
   begin
     if (TagsMatching = TagsMatching_Default) or //skip tags matching by default for URLs
        CheckTagsMatched(TagsMatching) //pass it to CheckTagsMatched to do close-only or open/close lock prompting and return matching state
@@ -596,8 +596,22 @@ implementation
       end
       else
       begin
-        var LTargetStoryPoint := ActiveStoryItem.GetStoryPoint(Url);
-        UI.SetActiveStoryItemIfAssigned(LTargetStoryPoint);
+        var Base := BaseStoryItem;
+        if not Assigned(Base) then
+          Base := ActiveStoryItem;
+        var LTargetStoryItem := Base.GetStoryPoint(Url); //try to resolve ID path among StoryPoings only
+        if Assigned(LTargetStoryItem) then
+        begin
+          LTargetStoryItem.Hidden := false; //unhide StoryPoint
+          UI.Story.SetActiveStoryItem(LTargetStoryItem); //make StoryPoint active (zoom to it)
+        end
+        else //ID path not resolved for StoryPoint
+        begin
+          LTargetStoryItem := Base.GetStoryItem(Url); //try to resolve ID path among all StoryItems
+          if Assigned(LTargetStoryItem) then
+            LTargetStoryItem.Hidden := not LTargetStoryItem.Hidden; //since this isn't a StoryPoint, just toggle its Hidden state (can be used to Show/Hide info cards)
+        end;
+
       end;
 
       //if (TagsMatching = TagsMatching_OkFail_Prompt) then //REMOVED: LoadFromUrl is asynchronous
@@ -1367,11 +1381,12 @@ implementation
     FStructureView := Value;
     with Value do
       begin
+        var isEditMode := (Story.StoryMode = EditMode);
+
         ShowOnlyClasses := TClassList.Create([TStoryItem]); //TStructureView's destructor will FreeAndNil that TClassList instance
+        ShowOnlyVisible := not isEditMode; //show Hidden StoryItems too in EditMode
         ShowNames := false;
         ShowTypes := false;
-
-        var isEditMode := (Story.StoryMode = EditMode);
 
         if (isEditMode) then
           FilterMode := tfPrune //if in edit mode then prune the tree (e.g. remove hidden StoryItems like AudioStoryItems)

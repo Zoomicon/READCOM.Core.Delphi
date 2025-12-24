@@ -1,30 +1,41 @@
 inherited TextStoryItemOptions: TTextStoryItemOptions
-  Size.Height = 132.000000000000000000
+  Size.Width = 516.000000000000000000
+  Size.Height = 180.000000000000000000
   inherited Background: TRectangle
-    Size.Height = 132.000000000000000000
+    Size.Width = 516.000000000000000000
+    Size.Height = 180.000000000000000000
   end
   inherited AddDialog: TOpenDialog
-    Top = 136
+    Left = 456
   end
   inherited SaveDialog: TSaveDialog
-    Top = 136
+    Left = 384
   end
   inherited OpenDialog: TOpenDialog
-    Top = 136
+    Left = 316
   end
   inherited Layout: TFlowLayout
-    Size.Height = 132.000000000000000000
+    Size.Width = 516.000000000000000000
+    Size.Height = 174.000000000000000000
+    inherited LayoutStoryItemMain: TFlowLayout
+      Size.Width = 512.000000000000000000
+      TabOrder = 14
+      inherited txtID: TEdit
+        Size.Width = 259.000000000000000000
+      end
+      inherited btnClose: TSpeedButton
+        Position.X = 453.000000000000000000
+      end
+    end
     inherited LayoutStoryItemButtons: TFlowLayout
+      Size.Width = 512.000000000000000000
       TabOrder = 13
     end
     object LayoutTextStoryItemButtons: TFlowLayout
-      Align = Contents
-      Margins.Left = 4.000000000000000000
-      Margins.Top = 4.000000000000000000
-      Margins.Right = 4.000000000000000000
-      Margins.Bottom = 4.000000000000000000
-      Size.Width = 512.000000000000000000
-      Size.Height = 56.000000000000000000
+      Align = Top
+      Position.Y = 116.000000000000000000
+      Size.Width = 581.000000000000000000
+      Size.Height = 58.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 12
       Justify = Left
@@ -37,8 +48,12 @@ inherited TextStoryItemOptions: TTextStoryItemOptions
         Hint = 'Toggle Editable'#13#13'Enable/Disable text editing in non-Edit mode.'
         Images = Icons.SVGIconImageList
         ImageIndex = 28
-        Size.Width = 64.000000000000000000
-        Size.Height = 57.000000000000000000
+        Margins.Left = 4.000000000000000000
+        Margins.Top = 4.000000000000000000
+        Margins.Right = 4.000000000000000000
+        Margins.Bottom = 4.000000000000000000
+        Size.Width = 50.000000000000000000
+        Size.Height = 50.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
         Text = 'Change URL Action'
@@ -47,7 +62,7 @@ inherited TextStoryItemOptions: TTextStoryItemOptions
       object LayoutHorzAlign: TFlowLayout
         Align = Contents
         Size.Width = 192.000000000000000000
-        Size.Height = 48.000000000000000000
+        Size.Height = 58.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 1
         Justify = Left
@@ -63,8 +78,12 @@ inherited TextStoryItemOptions: TTextStoryItemOptions
             'he beginning of the TextStoryItem.'
           Images = Icons.SVGIconImageList
           ImageIndex = 38
-          Size.Width = 64.000000000000000000
-          Size.Height = 57.000000000000000000
+          Margins.Left = 4.000000000000000000
+          Margins.Top = 4.000000000000000000
+          Margins.Right = 4.000000000000000000
+          Margins.Bottom = 4.000000000000000000
+          Size.Width = 50.000000000000000000
+          Size.Height = 50.000000000000000000
           Size.PlatformDefault = False
           StyleLookup = 'actiontoolbutton'
           Text = 'Change URL Action'
@@ -80,8 +99,12 @@ inherited TextStoryItemOptions: TTextStoryItemOptions
             'e center of the TextStoryItem.'
           Images = Icons.SVGIconImageList
           ImageIndex = 37
-          Size.Width = 64.000000000000000000
-          Size.Height = 57.000000000000000000
+          Margins.Left = 4.000000000000000000
+          Margins.Top = 4.000000000000000000
+          Margins.Right = 4.000000000000000000
+          Margins.Bottom = 4.000000000000000000
+          Size.Width = 50.000000000000000000
+          Size.Height = 50.000000000000000000
           Size.PlatformDefault = False
           StyleLookup = 'actiontoolbutton'
           Text = 'Change URL Action'
@@ -97,8 +120,12 @@ inherited TextStoryItemOptions: TTextStoryItemOptions
             'the end of the TextStoryItem.'
           Images = Icons.SVGIconImageList
           ImageIndex = 39
-          Size.Width = 64.000000000000000000
-          Size.Height = 57.000000000000000000
+          Margins.Left = 4.000000000000000000
+          Margins.Top = 4.000000000000000000
+          Margins.Right = 4.000000000000000000
+          Margins.Bottom = 4.000000000000000000
+          Size.Width = 50.000000000000000000
+          Size.Height = 50.000000000000000000
           Size.PlatformDefault = False
           StyleLookup = 'actiontoolbutton'
           Text = 'Change URL Action'
@@ -107,8 +134,8 @@ inherited TextStoryItemOptions: TTextStoryItemOptions
       end
       object LayoutTextStyle: TFlowLayout
         Align = Contents
-        Size.Width = 256.000000000000000000
-        Size.Height = 48.000000000000000000
+        Size.Width = 262.000000000000000000
+        Size.Height = 58.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 0
         Justify = Left
@@ -121,8 +148,12 @@ inherited TextStoryItemOptions: TTextStoryItemOptions
           Hint = 'Toggle Bold'#13#13'Sets/Unsets bold style to TextStoryItem.'
           Images = Icons.SVGIconImageList
           ImageIndex = 40
-          Size.Width = 64.000000000000000000
-          Size.Height = 57.000000000000000000
+          Margins.Left = 4.000000000000000000
+          Margins.Top = 4.000000000000000000
+          Margins.Right = 4.000000000000000000
+          Margins.Bottom = 4.000000000000000000
+          Size.Width = 50.000000000000000000
+          Size.Height = 50.000000000000000000
           Size.PlatformDefault = False
           StyleLookup = 'actiontoolbutton'
           Text = 'Change URL Action'
@@ -135,8 +166,12 @@ inherited TextStoryItemOptions: TTextStoryItemOptions
           Hint = 'Toggle Italic'#13#13'Sets/Unsets italic style to TextStoryItem.'
           Images = Icons.SVGIconImageList
           ImageIndex = 41
-          Size.Width = 64.000000000000000000
-          Size.Height = 57.000000000000000000
+          Margins.Left = 4.000000000000000000
+          Margins.Top = 4.000000000000000000
+          Margins.Right = 4.000000000000000000
+          Margins.Bottom = 4.000000000000000000
+          Size.Width = 50.000000000000000000
+          Size.Height = 50.000000000000000000
           Size.PlatformDefault = False
           StyleLookup = 'actiontoolbutton'
           Text = 'Change URL Action'
@@ -149,8 +184,12 @@ inherited TextStoryItemOptions: TTextStoryItemOptions
           Hint = 'Toggle Underline'#13#13'Sets/Unsets underline style to TextStoryItem.'
           Images = Icons.SVGIconImageList
           ImageIndex = 42
-          Size.Width = 64.000000000000000000
-          Size.Height = 57.000000000000000000
+          Margins.Left = 4.000000000000000000
+          Margins.Top = 4.000000000000000000
+          Margins.Right = 4.000000000000000000
+          Margins.Bottom = 4.000000000000000000
+          Size.Width = 50.000000000000000000
+          Size.Height = 50.000000000000000000
           Size.PlatformDefault = False
           StyleLookup = 'actiontoolbutton'
           Text = 'Change URL Action'
@@ -163,8 +202,12 @@ inherited TextStoryItemOptions: TTextStoryItemOptions
           Hint = 'Toggle Strikeout'#13#13'Sets/Unsets strikeout style to TextStoryItem.'
           Images = Icons.SVGIconImageList
           ImageIndex = 43
-          Size.Width = 64.000000000000000000
-          Size.Height = 57.000000000000000000
+          Margins.Left = 4.000000000000000000
+          Margins.Top = 4.000000000000000000
+          Margins.Right = 4.000000000000000000
+          Margins.Bottom = 4.000000000000000000
+          Size.Width = 50.000000000000000000
+          Size.Height = 50.000000000000000000
           Size.PlatformDefault = False
           StyleLookup = 'actiontoolbutton'
           Text = 'Change URL Action'
@@ -180,7 +223,7 @@ inherited TextStoryItemOptions: TTextStoryItemOptions
     end
   end
   inherited ActionList: TActionList
-    Top = 136
+    Left = 528
     inherited actionLoad: TAction
       ImageIndex = 6
     end

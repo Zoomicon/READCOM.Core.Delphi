@@ -832,23 +832,29 @@ begin
     StartItem := Story.RootStoryItem;
     Path := Path.Substring(1);
   end
+
   else if Path = '~' then
   begin
     StartItem := Story.HomeStoryItem;
     Path := '';
   end
+
   else if Path.StartsWith('~/') then
   begin
     StartItem := Story.HomeStoryItem;
     Path := Path.Substring(2);
   end
+
   else
   begin
     if (not HomeOrStoryPoint) or Self.IsStoryPoint or Self.IsHome then
       StartItem := Self
     else
-      StartItem := Self.AncestorStoryPoint;
+      StartItem := Self.AncestorStoryPoint; //may return nil
   end;
+
+  if not Assigned(StartItem) then
+    StartItem := Story.RootStoryItem; //if can't resolve StartItem use RootStoryItem
 
   // --- Normalize ---
   Path := Path.Trim(['/']);
@@ -857,12 +863,13 @@ begin
     Exit(StartItem);
 
   // --- Split head/tail ---
+  var Head, Tail: string;
   var SlashPos := Path.IndexOf('/');
-  var Head := '';
-  var Tail := '';
-
   if (SlashPos < 0) then
-    Head := Path
+  begin
+    Head := Path;
+    Tail := '';
+  end
   else
   begin
     Head := Path.Substring(0, SlashPos);
@@ -884,7 +891,7 @@ begin
       Parent := StartItem.ParentStoryItem;
 
     if not Assigned(Parent) then
-      Exit(nil);
+      Parent := Story.RootStoryItem; //never go above the RootStoryItem
 
     Exit(Parent.GetStoryItem(Tail, HomeOrStoryPoint));
   end;
@@ -894,7 +901,7 @@ begin
   var Skip := 0;
 
   var HashPos := BaseID.IndexOf('#');
-  if HashPos >= 0 then
+  if (HashPos >= 0) then
   begin
     var IndexStr := BaseID.Substring(HashPos + 1);
     BaseID := BaseID.Substring(0, HashPos);
@@ -1811,7 +1818,7 @@ end;
           Options.ShowPopup; //if no child at this position show options popup
       end
       else if (ssAlt in Shift) and HasUrlAction then //load new story from UrlAction of ActiveStoryItem with ALT+CLICK
-        FStory.DoUrlAction(FUrlAction) //this includes special URLs too (like -/0/+) used for navigation in the story
+        FStory.DoUrlAction(FUrlAction, Self) //this includes special URLs too (like -/0/+) used for navigation in the story
       else
         PlayRandomAudioStoryItem; //TODO: maybe should play AudioStoryItems in the order they exist in their parent StoryItem (but would need to remember last one played in that case which may be problematic if they are reordered etc.)
         //PlayNextAudioStoryItem;
@@ -1837,7 +1844,7 @@ end;
             {and //TODO: should have URLs clickable only for children of ActiveStoryItem (and for itself if it's the RootStoryItem maybe) //in non-EditMode should disable HitTest though at everything that isn't the current StoryItem or direct child of the ActiveStoryItem apart from the TextStoryItems maybe (could maybe just disble HitTest at all siblings of ActiveStoryItem and have everything under ActiveStoryItem HitTest-enabled)
             ((Assigned(LParent) and LParent.Active) or
             ((not Assigned(LParent)) and Active))}) then //only when ParentStoryItem is the ActiveStoryItem //assuming short-circuit evaluation //if no LParent then it's the RootStoryItem, allowing it to have URLAction too
-          FStory.DoUrlAction(FUrlAction); //TODO: if child item has a UrlAction it should consume the click event, currently it seems parent StoryItem will play its AudioStoryItem(s) even while navigating say to NextStoryPoint (when a child ImageStoryItem with '+' urlAction was clicked)
+          FStory.DoUrlAction(FUrlAction, Self); //TODO: if child item has a UrlAction it should consume the click event, currently it seems parent StoryItem will play its AudioStoryItem(s) even while navigating say to NextStoryPoint (when a child ImageStoryItem with '+' urlAction was clicked)
       end;
     end;
 

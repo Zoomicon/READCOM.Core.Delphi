@@ -6,7 +6,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'Edit'
         SVGText = 
@@ -51,7 +51,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'reverse'
         SVGText = 
@@ -71,7 +71,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'play'
         SVGText = 
@@ -91,8 +91,8 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Width = 87
-            Height = 109
+            Width = 19
+            Height = 24
           end>
         IconName = 'Diagram'
         SVGText = 
@@ -188,7 +188,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'OpenFileFolder'
         SVGText = 
@@ -224,7 +224,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'Save'
         SVGText = 
@@ -292,7 +292,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'GlobeWithMeridians'
         SVGText = 
@@ -321,7 +321,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'Plus'
         SVGText = 
@@ -442,7 +442,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'Home'
         SVGText = 
@@ -500,7 +500,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'Info'
         SVGText = 
@@ -565,7 +565,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'CopyAction'
         SVGText = 
@@ -600,7 +600,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'PasteAction'
         SVGText = 
@@ -650,7 +650,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'FlipHorizontally'
         SVGText = 
@@ -686,7 +686,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'FlipVertically'
         SVGText = 
@@ -722,7 +722,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'ThoughtEllipsis'
         SVGText = 
@@ -750,7 +750,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'Timer'
         SVGText = 
@@ -782,7 +782,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'FramedPicture'
         SVGText = 
@@ -908,7 +908,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'Scissors'
         SVGText = 
@@ -978,7 +978,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'Sun'
         SVGText = 
@@ -1101,7 +1101,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'Gear8Teeth'
         SVGText = 
@@ -1689,7 +1689,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 24
           end>
         IconName = 'FullScreen_SVGrepo_505892'
         SVGText = 
@@ -1777,36 +1777,62 @@ object Icons: TIcons
           item
             Size = 136
           end>
-        IconName = 'backpack'
+        IconName = 'Backpack_FluentEmoji'
         SVGText = 
           '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"' +
-          ' viewBox="0 0 32 32"><g fill="currentColor"><path d="M7.609 24.3' +
-          '6c0 .24.19.43.43.43s.43-.19.43-.43s-.19-.43-.43-.43s-.43.19-.43.' +
-          '43"/><path d="M20.944 6.201a4.921 4.921 0 0 0-9.7-.043A11.05 11.' +
-          '05 0 0 0 5 16.11v10.15A3.74 3.74 0 0 0 8.74 30h14.61c2.07 0 3.74' +
-          '-1.68 3.75-3.74V16.11c0-4.343-2.51-8.103-6.156-9.909m-8.222 1.40' +
-          '7a8.1 8.1 0 0 0-2.687 1.704a8.3 8.3 0 0 0-1.293 1.578a7 7 0 0 0-' +
-          '.373.681l-.003.006v.001a.5.5 0 0 1-.922-.387l.001-.002l.002-.005' +
-          'l.006-.014l.022-.05l.084-.171c.074-.146.184-.35.337-.591a9.3 9.3' +
-          ' 0 0 1 1.45-1.77A9.1 9.1 0 0 1 12.7 6.552c.966-.33 2.087-.536 3.' +
-          '377-.536c1.31 0 2.438.212 3.404.552a8.7 8.7 0 0 1 3.242 2.026a9 ' +
-          '9 0 0 1 1.386 1.775a7 7 0 0 1 .393.766q.014.03.02.05l.006.014l.0' +
-          '02.005v.001s-.092-.243.001.002a.5.5 0 0 1-.934.356l-.003-.007l-.' +
-          '007-.018l-.006-.014l-.061-.136a6 6 0 0 0-.272-.51a7.8 7.8 0 0 0-' +
-          '2.42-2.538a7.7 7.7 0 0 0-1.374-.714c-.928-.37-2.044-.61-3.377-.6' +
-          '1c-1.312 0-2.422.232-3.356.592m.824 1.687a1.2 1.2 0 0 1 .704-.22' +
-          '5h3.59a1.206 1.206 0 0 1 1.21 1.21v.661a1.2 1.2 0 0 1-.205.626a1' +
-          '.2 1.2 0 0 1-.995.523h-3.6a1.207 1.207 0 0 1-1.21-1.21v-.6c0-.40' +
-          '7.2-.766.506-.985m5.616-3.79a11 11 0 0 0-3.112-.445c-1.046 0-2.0' +
-          '59.146-3.018.418a3.42 3.42 0 0 1 6.13.027M8.039 23.59c.39 0 .72.' +
-          '29.77.67l.27 1.86c.06.46-.3.88-.77.88h-.53a.77.77 0 0 1-.77-.88l' +
-          '.26-1.86c.06-.39.38-.67.77-.67m2.67-4.467c-1.194 1.32-1.821 3.00' +
-          '7-2.061 4.438l-.986-.165c.262-1.565.95-3.446 2.305-4.944c1.368-1' +
-          '.512 3.392-2.608 6.252-2.608c3.166 0 5.248 1.588 6.518 3.505c1.2' +
-          '55 1.895 1.732 4.126 1.732 5.526a.5.5 0 0 1-1 0c0-1.225-.43-3.26' +
-          '-1.565-4.974c-1.121-1.692-2.914-3.057-5.685-3.057c-2.573 0-4.329' +
-          '.973-5.51 2.279"/></g></svg>'
-        FixedColor = xFF4AAE09
+          ' viewBox="0 0 32 32"><g fill="#4AAE09FF"><path d="M7.609 24.36c0' +
+          ' .24.19.43.43.43s.43-.19.43-.43s-.19-.43-.43-.43s-.43.19-.43.43"' +
+          '/><path d="M20.944 6.201a4.921 4.921 0 0 0-9.7-.043A11.05 11.05 ' +
+          '0 0 0 5 16.11v10.15A3.74 3.74 0 0 0 8.74 30h14.61c2.07 0 3.74-1.' +
+          '68 3.75-3.74V16.11c0-4.343-2.51-8.103-6.156-9.909m-8.222 1.407a8' +
+          '.1 8.1 0 0 0-2.687 1.704a8.3 8.3 0 0 0-1.293 1.578a7 7 0 0 0-.37' +
+          '3.681l-.003.006v.001a.5.5 0 0 1-.922-.387l.001-.002l.002-.005l.0' +
+          '06-.014l.022-.05l.084-.171c.074-.146.184-.35.337-.591a9.3 9.3 0 ' +
+          '0 1 1.45-1.77A9.1 9.1 0 0 1 12.7 6.552c.966-.33 2.087-.536 3.377' +
+          '-.536c1.31 0 2.438.212 3.404.552a8.7 8.7 0 0 1 3.242 2.026a9 9 0' +
+          ' 0 1 1.386 1.775a7 7 0 0 1 .393.766q.014.03.02.05l.006.014l.002.' +
+          '005v.001s-.092-.243.001.002a.5.5 0 0 1-.934.356l-.003-.007l-.007' +
+          '-.018l-.006-.014l-.061-.136a6 6 0 0 0-.272-.51a7.8 7.8 0 0 0-2.4' +
+          '2-2.538a7.7 7.7 0 0 0-1.374-.714c-.928-.37-2.044-.61-3.377-.61c-' +
+          '1.312 0-2.422.232-3.356.592m.824 1.687a1.2 1.2 0 0 1 .704-.225h3' +
+          '.59a1.206 1.206 0 0 1 1.21 1.21v.661a1.2 1.2 0 0 1-.205.626a1.2 ' +
+          '1.2 0 0 1-.995.523h-3.6a1.207 1.207 0 0 1-1.21-1.21v-.6c0-.407.2' +
+          '-.766.506-.985m5.616-3.79a11 11 0 0 0-3.112-.445c-1.046 0-2.059.' +
+          '146-3.018.418a3.42 3.42 0 0 1 6.13.027M8.039 23.59c.39 0 .72.29.' +
+          '77.67l.27 1.86c.06.46-.3.88-.77.88h-.53a.77.77 0 0 1-.77-.88l.26' +
+          '-1.86c.06-.39.38-.67.77-.67m2.67-4.467c-1.194 1.32-1.821 3.007-2' +
+          '.061 4.438l-.986-.165c.262-1.565.95-3.446 2.305-4.944c1.368-1.51' +
+          '2 3.392-2.608 6.252-2.608c3.166 0 5.248 1.588 6.518 3.505c1.255 ' +
+          '1.895 1.732 4.126 1.732 5.526a.5.5 0 0 1-1 0c0-1.225-.43-3.26-1.' +
+          '565-4.974c-1.121-1.692-2.914-3.057-5.685-3.057c-2.573 0-4.329.97' +
+          '3-5.51 2.279"/></g></svg>'
+        Opacity = 1.000000000000000000
+      end
+      item
+        MultiResBitmap = <
+          item
+            Size = 136
+          end>
+        IconName = 'Eye_OpenMoji_1F441'
+        SVGText = 
+          '<svg id="emoji" viewBox="0 0 72 72" xmlns="http://www.w3.org/200' +
+          '0/svg">'#10'  <g id="color">'#10'    <ellipse cx="35.75" cy="36.4282" rx' +
+          '="34.8096" ry="20.4282" fill="#FFFFFF" stroke="none"/>'#10'    <elli' +
+          'pse cx="35.75" cy="36.4282" rx="34.8096" ry="20.4282" fill="#FFF' +
+          'FFF" stroke="none" stroke-linecap="round" stroke-linejoin="round' +
+          '" stroke-miterlimit="10" stroke-width="2"/>'#10'    <circle cx="36" ' +
+          'cy="35.9583" r="15.484" fill="#a57939" stroke="none"/>'#10'  </g>'#10'  ' +
+          '<g id="hair"/>'#10'  <g id="skin"/>'#10'  <g id="skin-shadow"/>'#10'  <g id=' +
+          '"line">'#10'    <ellipse cx="35.75" cy="36.4282" rx="34.8096" ry="20' +
+          '.4282" fill="none" stroke="#000000" stroke-linecap="round" strok' +
+          'e-linejoin="round" stroke-miterlimit="10" stroke-width="2"/>'#10'   ' +
+          ' <circle cx="36" cy="35.9583" r="8.4416" fill="#000000" stroke="' +
+          'none"/>'#10'    <circle cx="36" cy="35.9583" r="8.4416" fill="none" ' +
+          'stroke="#000000" stroke-linecap="round" stroke-linejoin="round" ' +
+          'stroke-miterlimit="10" stroke-width="2"/>'#10'    <circle cx="36" cy' +
+          '="35.9583" r="15.484" fill="none" stroke="#000000" stroke-lineca' +
+          'p="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-' +
+          'width="2"/>'#10'  </g>'#10'</svg>'#10
         Opacity = 1.000000000000000000
       end>
     Destination = <
@@ -1814,32 +1840,32 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'Edit'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'reverse'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'play'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Diagram'
-            SourceRect.Right = 109.000000000000000000
-            SourceRect.Bottom = 109.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
@@ -1862,16 +1888,16 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'OpenFileFolder'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Save'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
@@ -1886,16 +1912,16 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'GlobeWithMeridians'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Plus'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
@@ -1918,8 +1944,8 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'Home'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
@@ -1934,8 +1960,8 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'Info'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
@@ -1950,56 +1976,56 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'CopyAction'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'PasteAction'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'FlipHorizontally'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'FlipVertically'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'ThoughtEllipsis'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Timer'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'FramedPicture'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
@@ -2014,16 +2040,16 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'Scissors'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Sun'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
@@ -2046,8 +2072,8 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'Gear8Teeth'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
@@ -2166,8 +2192,8 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'FullScreen_SVGrepo_505892'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 24.000000000000000000
+            SourceRect.Bottom = 24.000000000000000000
           end>
       end
       item
@@ -2181,7 +2207,15 @@ object Icons: TIcons
       item
         Layers = <
           item
-            Name = 'backpack'
+            Name = 'Backpack_FluentEmoji'
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
+          end>
+      end
+      item
+        Layers = <
+          item
+            Name = 'Eye_OpenMoji_1F441'
             SourceRect.Right = 136.000000000000000000
             SourceRect.Bottom = 136.000000000000000000
           end>

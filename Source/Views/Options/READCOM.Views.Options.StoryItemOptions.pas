@@ -31,6 +31,8 @@ type
     OpenDialog: TOpenDialog;
     SaveDialog: TSaveDialog;
     AddDialog: TOpenDialog;
+    btnToggleVisible: TSpeedButton;
+    txtID: TEdit;
     btnToggleHome: TSpeedButton;
     btnToggleStoryPoint: TSpeedButton;
     btnToggleAnchored: TSpeedButton;
@@ -43,6 +45,10 @@ type
     btnToggleSnapping: TSpeedButton;
     Layout: TFlowLayout;
     LayoutStoryItemBreak: TFlowLayoutBreak;
+    LayoutStoryItemMain: TFlowLayout;
+    btnClose: TSpeedButton;
+    procedure actionToggleVisibleExecute(Sender: TObject);
+    procedure txtIDChange(Sender: TObject);
     procedure actionToggleHomeExecute(Sender: TObject);
     procedure actionToggleStoryPointExecute(Sender: TObject);
     procedure actionToggleSnappingExecute(Sender: TObject);
@@ -52,6 +58,9 @@ type
     procedure actionChangeFactoryCapacityExecute(Sender: TObject);
     procedure actionLoadExecute(Sender: TObject);
     procedure actionSaveExecute(Sender: TObject);
+    procedure txtIDKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
+
+    //Note: not using a btnCloseClick handler, but using btnClose.ModalResult := mrClose so that it can also handle the ESC key to close the popup (before the app catches it)
 
   protected
     FStoryItem: IStoryItem;
@@ -71,13 +80,13 @@ type
     procedure ShowPopup; //TODO: use PopupVisible boolean property instead
     procedure HidePopup;
 
+    procedure ActChangeTags;
+    procedure ActChangeUrlAction;
+    procedure ActChangeFactoryCapacity;
     function ActAdd: Boolean;
     function ActLoad_GetFilename: String;
     function ActLoad: Boolean;
     function ActSave: Boolean;
-    procedure ActChangeTags;
-    procedure ActChangeUrlAction;
-    procedure ActChangeFactoryCapacity;
 
     property Popup: TPopup read FPopup write FPopup stored false;
 
@@ -131,6 +140,7 @@ begin
     btnToggleTags.IsPressed := (Tags <> '');
     btnToggleUrlAction.IsPressed := (UrlAction <> '');
     btnToggleFactory.IsPressed := (FactoryCapacity <> 0);
+    btnToggleVisible.IsPressed := not Hidden;
 
     {$IF DEFINED(ANDROID) OR DEFINED(IOS)}
     btnLoad.Visible := false; //TODO: implement some simple Load file dialog for mobile devices (flat list of documents). Should have some button to delete files too
@@ -154,6 +164,119 @@ end;
 
 {$region 'Actions'}
 
+//--- Visible (Hidden) ---
+
+procedure TStoryItemOptions.actionToggleVisibleExecute(Sender: TObject);
+begin
+  StoryItem.Hidden := not btnToggleVisible.IsPressed;
+  if StoryItem.Hidden and Assigned(FPopup) then
+    HidePopup;
+end;
+
+//--- ID ---
+
+procedure TStoryItemOptions.txtIDChange(Sender: TObject);
+begin
+  StoryItem.ID := txtID.Text;
+end;
+
+//--- Home ---
+
+procedure TStoryItemOptions.actionToggleHomeExecute(Sender: TObject);
+begin
+  StoryItem.Home := btnToggleHome.IsPressed;
+end;
+
+//--- StoryPoint ---
+
+procedure TStoryItemOptions.actionToggleStoryPointExecute(Sender: TObject);
+begin
+  StoryItem.StoryPoint := btnToggleStoryPoint.IsPressed;
+end;
+
+//--- Anchored (non Moveable) ---
+
+procedure TStoryItemOptions.actionToggleAnchoredExecute(Sender: TObject);
+begin
+  StoryItem.Anchored := btnToggleAnchored.IsPressed;
+end;
+
+//--- Snapping (Magnet) ---
+
+procedure TStoryItemOptions.actionToggleSnappingExecute(Sender: TObject);
+begin
+  StoryItem.Snapping := btnToggleSnapping.IsPressed;
+end;
+
+//--- Tags ---
+
+procedure TStoryItemOptions.ActChangeTags;
+begin
+  TDialogServiceAsync.InputQuery(STR_TAGS, [STR_TAGS], [StoryItem.GetTags],
+    procedure(const AResult: TModalResult; const AValues: array of string)
+    begin
+      if (AResult = mrOk) then
+      begin
+        var LTags := Trim(AValues[0]);
+        StoryItem.Tags := LTags;
+        btnToggleTags.IsPressed := (LTags <> '');
+      end;
+    end
+  );
+end;
+
+procedure TStoryItemOptions.actionChangeTagsExecute(Sender: TObject);
+begin
+  actChangeTags;
+end;
+
+//--- UrlAction ---
+
+procedure TStoryItemOptions.ActChangeUrlAction;
+begin
+  TDialogServiceAsync.InputQuery(STR_URL, [STR_URL], [StoryItem.GetUrlAction],
+    procedure(const AResult: TModalResult; const AValues: array of string)
+    begin
+      if (AResult = mrOk) then
+      begin
+        var LUrl := Trim(AValues[0]);
+        StoryItem.SetUrlAction(LUrl);
+        btnToggleUrlAction.IsPressed := (LUrl <> '');
+      end;
+    end
+  );
+end;
+
+procedure TStoryItemOptions.actionChangeUrlActionExecute(Sender: TObject);
+begin
+  actChangeUrlAction;
+end;
+
+//--- Factory Capacity ---
+
+procedure TStoryItemOptions.ActChangeFactoryCapacity;
+begin
+  TDialogServiceAsync.InputQuery(STR_FACTORY_CAPACITY, [STR_FACTORY_CAPACITY], [StoryItem.GetFactoryCapacity.ToString],
+    procedure(const AResult: TModalResult; const AValues: array of string)
+    begin
+      if (AResult = mrOk) then
+      begin
+        var LFactoryCapacity: Integer := 0;
+        TryStrToInt(AValues[0], LFactoryCapacity); //ignoring any parsing error, will default to 0 (non-factory behaviour)
+        StoryItem.SetFactoryCapacity(LFactoryCapacity);
+        btnToggleFactory.IsPressed := (LFactoryCapacity <> 0);
+      end;
+    end
+  );
+end;
+
+procedure TStoryItemOptions.actionChangeFactoryCapacityExecute(Sender: TObject);
+begin
+  actChangeFactoryCapacity;
+end;
+
+//--- Add FileDialog ---
+
 function TStoryItemOptions.ActAdd: Boolean;
 begin
   with AddDialog do
@@ -166,6 +289,9 @@ begin
       StoryItem.Add(Files.ToStringArray);
   end;
 end;
+
+
+//--- Load FileDialog ---
 
 function TStoryItemOptions.ActLoad_GetFilename: String;
 begin
@@ -189,129 +315,23 @@ begin
     result := Assigned(StoryItem.Load(Filename)); //TODO: seems to cause error (on MouseUp at Form) due to MouseCapture (probably from the popup) not having been released for some (child?) item that gets freed. Should try to get the Root (the form) and do SetCapture(nil) on it or similar, or try to get Capture to us here and release immediately (OR MAYBE THERE IS SOME OTHER ERROR AND WE SHOULD TRY TO REPLACE THE WHOLE ITEM VIA ITS PARENT INSTEAD OF LOADING CONTENT IN IT REMOVING ITS CHILDREN FIRST - THAT WAY WE'LL BE ABLE TO REPLACE AN ITEM WITH ANY OTHER ITEM)
 end; //TODO: need to change ActLoad to load any file and replace the current one (if not the RootStoryItem should maybe resize to take current bounds), then return the StoryItem instance that was created from that file info (not assume it's same class of StoryItem, TPanelStoryItem in the case of the story [want to load any StoryItem as root - also make sure when RootStoryItem changes the old one is released to not leak]). Can pass true to 2nd optional parameter of load, but need to return the storyitem instead of boolean (can return nil on fail/cancel - also add try/catch maybe?)
 
+procedure TStoryItemOptions.actionLoadExecute(Sender: TObject);
+begin
+  actLoad;
+end;
+
+//--- Save FileDialog ---
+
 function TStoryItemOptions.ActSave: Boolean;
 begin
   with SaveDialog do
   begin
     DefaultExt := EXT_READCOM;
     Filter := StoryItem.GetSaveFilesFilter;
-    result := Execute; //TODO: see if supported on Android (https://stackoverflow.com/questions/69138504/why-does-fmx-topendialog-not-work-in-android)
+    result := Execute; //TODO: need a file dialog for mobile (https://stackoverflow.com/questions/69138504/why-does-fmx-topendialog-not-work-in-android)
     if result then
       StoryItem.Save(Filename);
   end;
-end;
-
-procedure TStoryItemOptions.ActChangeTags;
-begin
-  TDialogServiceAsync.InputQuery(STR_TAGS, [STR_TAGS], [StoryItem.GetTags],
-    procedure(const AResult: TModalResult; const AValues: array of string)
-    begin
-      if (AResult = mrOk) then
-      begin
-        var LTags := Trim(AValues[0]);
-        StoryItem.Tags := LTags;
-        btnToggleTags.IsPressed := (LTags <> '');
-      end;
-      //ShowPopup; //TODO: doesn't work (popup gets hidden after OK/Cancel). Probably it is executed at other thread (and ignore), haven't tried telling it to do from the UI thread, or try else with a timeout to do it a moment later
-    end
-  );
-  //ShowPopup; //see comment above //doesn't work either (popup shown in the background but closes after OK/Cancel at input prompt)
-end;
-
-procedure TStoryItemOptions.ActChangeUrlAction;
-begin
-  TDialogServiceAsync.InputQuery(STR_URL, [STR_URL], [StoryItem.GetUrlAction],
-    procedure(const AResult: TModalResult; const AValues: array of string)
-    begin
-      if (AResult = mrOk) then
-      begin
-        var LUrl := Trim(AValues[0]);
-        StoryItem.SetUrlAction(LUrl);
-        btnToggleUrlAction.IsPressed := (LUrl <> '');
-      end;
-      //ShowPopup; //TODO: doesn't work (popup gets hidden after OK/Cancel). Probably it is executed at other thread (and ignore), haven't tried telling it to do from the UI thread, or try else with a timeout to do it a moment later
-    end
-  );
-  //ShowPopup; //see comment above //doesn't work either (popup shown in the background but closes after OK/Cancel at input prompt)
-end;
-
-procedure TStoryItemOptions.ActChangeFactoryCapacity;
-begin
-  TDialogServiceAsync.InputQuery(STR_FACTORY_CAPACITY, [STR_FACTORY_CAPACITY], [StoryItem.GetFactoryCapacity.ToString],
-    procedure(const AResult: TModalResult; const AValues: array of string)
-    begin
-      if (AResult = mrOk) then
-      begin
-        var LFactoryCapacity: Integer := 0;
-        TryStrToInt(AValues[0], LFactoryCapacity); //ignoring any parsing error, will default to 0 (non-factory behaviour)
-        StoryItem.SetFactoryCapacity(LFactoryCapacity);
-        btnToggleFactory.IsPressed := (LFactoryCapacity <> 0);
-      end;
-      //ShowPopup; //TODO: doesn't work (popup gets hidden after OK/Cancel). Probably it is executed at other thread (and ignore), haven't tried telling it to do from the UI thread, or try else with a timeout to do it a moment later
-    end
-  );
-  //ShowPopup; //see comment above //doesn't work either (popup shown in the background but closes after OK/Cancel at input prompt)
-end;
-
-///
-
-procedure TStoryItemOptions.actionToggleHomeExecute(Sender: TObject);
-begin
-  StoryItem.SetHome(btnToggleHome.IsPressed);
-  //ShowPopup; //show popup again to make the toggle evident
-end;
-
-procedure TStoryItemOptions.actionToggleStoryPointExecute(Sender: TObject);
-begin
-  //StoryItem.SetStoryPoint(btnToggleStoryPoint.IsPressed);
-  //ShowPopup; //show popup again to make the toggle evident
-
-  TDialogServiceAsync.InputQuery(STR_ID, [STR_ID], [StoryItem.GetID],
-    procedure(const AResult: TModalResult; const AValues: array of string)
-    begin
-      if (AResult = mrOk) then
-      begin
-        var LID := AValues[0];
-        StoryItem.ID := LID;
-        StoryItem.StoryPoint := (LID <> ''); //old StoryPoints may not have an ID, but new ones will always need to have one. Clearing the ID from this button's popup will also unset the storypoint. Note that just setting ID programmatically doesn't set the StoryItem as a StoryPoint
-        btnToggleFactory.IsPressed := StoryItem.StoryPoint;
-      end;
-      //ShowPopup; //TODO: doesn't work (popup gets hidden after OK/Cancel). Probably it is executed at other thread (and ignore), haven't tried telling it to do from the UI thread, or try else with a timeout to do it a moment later
-    end
-  );
-  //ShowPopup; //see comment above //doesn't work either (popup shown in the background but closes after OK/Cancel at input prompt)
-end;
-
-procedure TStoryItemOptions.actionToggleSnappingExecute(Sender: TObject);
-begin
-  StoryItem.SetSnapping(btnToggleSnapping.IsPressed);
-  //ShowPopup; //show popup again to make the toggle evident
-end;
-
-procedure TStoryItemOptions.actionToggleAnchoredExecute(Sender: TObject);
-begin
-  StoryItem.SetAnchored(btnToggleAnchored.IsPressed);
-  //ShowPopup; //show popup again to make the toggle evident
-end;
-
-procedure TStoryItemOptions.actionChangeTagsExecute(Sender: TObject);
-begin
-  actChangeTags;
-end;
-
-procedure TStoryItemOptions.actionChangeUrlActionExecute(Sender: TObject);
-begin
-  actChangeUrlAction;
-end;
-
-procedure TStoryItemOptions.actionChangeFactoryCapacityExecute(Sender: TObject);
-begin
-  actChangeFactoryCapacity;
-end;
-
-procedure TStoryItemOptions.actionLoadExecute(Sender: TObject);
-begin
-  actLoad;
 end;
 
 procedure TStoryItemOptions.actionSaveExecute(Sender: TObject);
@@ -327,7 +347,7 @@ procedure TStoryItemOptions.CheckCreatePopup;
 begin
   if not Assigned(FPopup) then
   begin
-    var popup := TPopup.Create(nil); //don't set StoryItem.View as owner, seems to always store it (irrespective of "Stored := false") //can't set Self as owner either, makes a circular reference
+    var popup := TPopup.Create(Application.MainForm); //don't set StoryItem.View as owner, seems to always store it (irrespective of "Stored := false") //can't set Self as owner either, makes a circular reference
     var options := Self;
     with popup do
     begin
@@ -351,7 +371,8 @@ begin
 
   if Assigned(FPopup) then
     begin
-    FPopup.IsOpen := true;
+    //FPopup.IsOpen := true; //don't use - autocloses on popup click
+    FPopup.Popup(true); //don't autoclose - this allows the popup to receive focus
     StoryItem := StoryItem; //cause re-init of toggle buttons //Note: Have to do it after opening the popup else SpeedButtons that had StaysPressed=true and Pressed=true don't appear pressed till one of them is clicked
     end;
 end;
@@ -362,6 +383,16 @@ begin
   begin
     FPopup.IsOpen := false;
     //FreeAndNil(FPopup); //TODO: maybe should do to save resources
+  end;
+end;
+
+procedure TStoryItemOptions.txtIDKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
+begin
+  if Key = vkReturn then
+  begin
+    HidePopup;
+    Key := 0;
+    KeyChar := #0;
   end;
 end;
 

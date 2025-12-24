@@ -1,10 +1,19 @@
 inherited ImageStoryItemOptions: TImageStoryItemOptions
-  Size.Height = 128.000000000000000000
+  Size.Width = 481.000000000000000000
+  Size.Height = 177.000000000000000000
   inherited Background: TRectangle
-    Size.Height = 128.000000000000000000
+    Size.Width = 481.000000000000000000
+    Size.Height = 177.000000000000000000
+  end
+  inherited OpenDialog: TOpenDialog
+    Left = 324
   end
   inherited Layout: TFlowLayout
-    Size.Height = 128.000000000000000000
+    Size.Width = 481.000000000000000000
+    Size.Height = 188.000000000000000000
+    inherited LayoutStoryItemMain: TFlowLayout
+      TabOrder = 14
+    end
     inherited LayoutStoryItemButtons: TFlowLayout
       TabOrder = 13
     end
@@ -15,13 +24,10 @@ inherited ImageStoryItemOptions: TImageStoryItemOptions
       FlowDirection = LeftToRight
     end
     object LayoutImageStoryItemButtons: TFlowLayout
-      Align = Contents
-      Margins.Left = 4.000000000000000000
-      Margins.Top = 4.000000000000000000
-      Margins.Right = 4.000000000000000000
-      Margins.Bottom = 4.000000000000000000
-      Size.Width = 512.000000000000000000
-      Size.Height = 56.000000000000000000
+      Align = Top
+      Position.Y = 116.000000000000000000
+      Size.Width = 581.000000000000000000
+      Size.Height = 58.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 12
       Justify = Left
@@ -32,8 +38,12 @@ inherited ImageStoryItemOptions: TImageStoryItemOptions
         Align = Client
         Images = Icons.SVGIconImageList
         ImageIndex = 11
-        Size.Width = 64.000000000000000000
-        Size.Height = 57.000000000000000000
+        Margins.Left = 4.000000000000000000
+        Margins.Top = 4.000000000000000000
+        Margins.Right = 4.000000000000000000
+        Margins.Bottom = 4.000000000000000000
+        Size.Width = 50.000000000000000000
+        Size.Height = 50.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
       end
