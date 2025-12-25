@@ -100,6 +100,26 @@ object StoryItemOptions: TStoryItemOptions
         Text = 'Is StoryPoint'
         OnClick = actionToggleStoryPointExecute
       end
+      object btnToggleCollectable: TSpeedButton
+        StaysPressed = True
+        Align = Client
+        Anchors = []
+        Hint = 
+          'Toggle Collectable'#13#13'Sets/unsets the Active StoryItem as a Collec' +
+          'table,allowing removal and storage in Backpack'
+        Images = Icons.SVGIconImageList
+        ImageIndex = 46
+        Margins.Left = 4.000000000000000000
+        Margins.Top = 4.000000000000000000
+        Margins.Right = 4.000000000000000000
+        Margins.Bottom = 4.000000000000000000
+        Size.Width = 50.000000000000000000
+        Size.Height = 50.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'actiontoolbutton'
+        Text = 'Is Collectable'
+        OnClick = actionToggleCollectableExecute
+      end
       object txtID: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]
         Align = Client
@@ -107,7 +127,7 @@ object StoryItemOptions: TStoryItemOptions
         Margins.Left = 8.000000000000000000
         Margins.Top = 14.000000000000000000
         Margins.Right = 8.000000000000000000
-        Size.Width = 224.000000000000000000
+        Size.Width = 166.000000000000000000
         Size.Height = 30.000000000000000000
         Size.PlatformDefault = False
         OnChange = txtIDChange

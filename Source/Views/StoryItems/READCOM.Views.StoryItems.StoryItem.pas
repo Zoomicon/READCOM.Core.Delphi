@@ -50,6 +50,7 @@ interface
         FContent: TBytes; //opaque content storage (dynamic array of bytes)
         FContentExt: String;
         FStoryPoint: Boolean;
+        FCollectable: Boolean;
         FHidden: Boolean;
         FSnapping: Boolean;
         FUrlAction: String;
@@ -168,6 +169,10 @@ interface
       {StoryPoint}
       function IsStoryPoint: Boolean; virtual;
       procedure SetStoryPoint(const Value: Boolean); virtual;
+
+      {Collectable}
+      function isCollectable: Boolean; virtual;
+      procedure SetCollectable(const Value: Boolean); virtual;
 
       {StoryPoints}
       function GetStoryPoint(const ID: String): IStoryItem; //ID can be a path of IDs, / meaning Story.HomeStoryItem, ~ meaning Story.HomeStoryItem, empty or . meaning current StoryItem if it is a StoryPoint or Home (else AncestorStoryPoint) and .. meaning AncestorStoryPoint
@@ -343,6 +348,7 @@ interface
         DEFAULT_ACTIVE = false;
         DEFAULT_HOME = false;
         DEFAULT_STORYPOINT = false;
+        DEFAULT_COLLECTABLE = false;
         DEFAULT_FOREGROUND_COLOR = TAlphaColorRec.Null; //claNull
         DEFAULT_BACKGROUND_COLOR = TAlphaColorRec.Null; //claNull
         DEFAULT_SNAPPING = false;
@@ -363,6 +369,7 @@ interface
       property Active: Boolean read IsActive write SetActive default DEFAULT_ACTIVE;
       property Home: Boolean read IsHome write SetHome default DEFAULT_HOME;
       property StoryPoint: Boolean read IsStoryPoint write SetStoryPoint default DEFAULT_STORYPOINT;
+      property Collectable: Boolean read IsCollectable write SetCollectable default DEFAULT_COLLECTABLE;
       property PreviousStoryPoint: IStoryItem read GetPreviousStoryPoint stored false;
       property NextStoryPoint: IStoryItem read GetNextStoryPoint stored false;
       property AncestorStoryPoint: IStoryItem read GetAncestorStoryPoint stored false;
@@ -1125,6 +1132,22 @@ end;
 
   {$endregion}
 
+  {$region 'StoryPoint'}
+
+  function TStoryItem.IsCollectable: Boolean;
+  begin
+    Result := FCollectable;
+  end;
+
+  procedure TStoryItem.SetCollectable(const Value: Boolean);
+  begin
+    FCollectable := Value;
+
+    UpdateHint;
+  end;
+
+  {$endregion}
+
   {$region 'StoryPoints'}
 
   function TStoryItem.GetStoryPoint(const ID: String): IStoryItem;
@@ -1667,9 +1690,10 @@ end;
     else
     begin
       //Hint := Options.GetDescription; //TODO: move below code to method
-      var LHint: string := '';
+      var LHint: string := ID;
       if Home then LHint := LHint + ' Home';
       if StoryPoint then LHint := LHint + ' StoryPoint';
+      if Collectable then LHint := LHint + ' Collectable';
       if Snapping then LHint := LHint + ' Snapping';
       if Anchored then LHint := LHint + ' Anchored';
       if (Tags <> '') then LHint := LHint + ' Tags=[' + Tags + ']';
@@ -1837,8 +1861,15 @@ end;
         PlayRandomAudioStoryItem; //TODO: maybe should play AudioStoryItems in the order they exist in their parent StoryItem (but would need to remember last one played in that case which may be problematic if they are reordered etc.)
         //PlayNextAudioStoryItem;
 
+        if IsCollectable then
+        begin
+          ShowMessage('Collected ' + ID + '@' + Tags);
+          //TODO: place in backpack
+          FreeAndNil(Self);
+        end
+
         //var LParent := ParentStoryItem;
-        if (HasUrlAction
+        else if (HasUrlAction
             and Assigned(FStory)
             and (FStory.StoryMode <> TStoryMode.EditMode) //make sure we don't do UrlActions of child items when editing a story //should we use EditMode property instead? it doesn't seem to check StoryMode, but seems to store to local storable field (//TODO THAT EDITMODE PROPERTY IS FOR BEING ABLE TO DISABLE CHILDREN THAT ARE DEEPER INSIDE, SHOULD CHANGE THAT LOGIC ANYWAY AND DISABLE SUBTREES UNDER NESTED STORYPOINTS WHEN WE ARE AT SOME ANCESTOR STORYPOINT)
             {and //TODO: should have URLs clickable only for children of ActiveStoryItem (and for itself if it's the RootStoryItem maybe) //in non-EditMode should disable HitTest though at everything that isn't the current StoryItem or direct child of the ActiveStoryItem apart from the TextStoryItems maybe (could maybe just disble HitTest at all siblings of ActiveStoryItem and have everything under ActiveStoryItem HitTest-enabled)

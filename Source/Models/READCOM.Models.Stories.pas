@@ -54,7 +54,7 @@ interface
     IStoryItem = interface(IStoreable)
       ['{238909DD-45E6-463A-9698-C7C6DC1A6DFE}']
 
-      //--- Methods ---
+      {$region '--- Methods ---'}
 
       {Lifetime management}
       procedure Reset;
@@ -112,6 +112,10 @@ interface
       {StoryPoint}
       function IsStoryPoint: boolean;
       procedure SetStoryPoint(const Value: boolean);
+
+      {Collectable}
+      function IsCollectable: boolean;
+      procedure SetCollectable(const Value: boolean);
 
       {StoryPoints}
       function GetStoryPoint(const ID: String): IStoryItem; //ID can be a path of IDs, / meaning Story.HomeStoryItem, ~ meaning Story.HomeStoryItem, empty or . meaning current StoryItem if it is a StoryPoint or Home (else AncestorStoryPoint) and .. meaning AncestorStoryPoint
@@ -193,45 +197,55 @@ interface
       procedure SaveReadCom(const Stream: TStream);
       procedure SaveReadComBin(const Stream: TStream);
 
-      //--- Properties ---
+      {$endregion}
 
+      {$region '--- Properties ---'}
+
+      property Hidden: Boolean read IsHidden write SetHidden; //default false
       property ID: String read GetID write SetID; //default ''
-      property View: TControl read GetView;
-      property ParentStoryItem: IStoryItem read GetParentStoryItem write SetParentStoryItem; //stored false //default nil
-      property StoryItems: TIStoryItemList read GetStoryItems write SetStoryItems; //default nil
-      property ImageStoryItems: TIImageStoryItemList read GetImageStoryItems; //stored false
-      property AudioStoryItems: TIAudioStoryItemList read GetAudioStoryItems; //stored false
-      property TextStoryItems: TITextStoryItemList read GetTextStoryItems; //stored false
       property Active: Boolean read IsActive write SetActive; //default false
-      property EditMode: Boolean read IsEditMode write SetEditMode; //stored false //default false
-      property BorderVisible: Boolean read IsBorderVisible write SetBorderVisible; //stored false default false
       property Home: Boolean read IsHome write SetHome; //default false
       property StoryPoint: Boolean read IsStoryPoint write SetStoryPoint; //default false
-      property PreviousStoryPoint: IStoryItem read GetPreviousStoryPoint; //stored false
-      property NextStoryPoint: IStoryItem read GetNextStoryPoint; //stored false
-      property AncestorStoryPoint: IStoryItem read GetAncestorStoryPoint; //stored false
-      property Content: TBytes read GetContent write SetContent; //default nil
-      property ContentExt: String read GetContentExt write SetContentExt; //default ''
-      property AllText: TStrings read GetAllText write SetAllText; //stored false //Note: used to replace Text at applicable items in StoryItem's whole subtree (to be used recursively)
-      property ForegroundColor: TAlphaColor read GetForegroundColor write SetForegroundColor; //default TAlphaColorRec.Null
-      property BackgroundColor: TAlphaColor read GetBackgroundColor write SetBackgroundColor; //default TAlphaColorRec.Null
-      property FlippedHorizontally: Boolean read IsFlippedHorizontally write setFlippedHorizontally; //stored false //default false //Scale.X stores related info
-      property FlippedVertically: Boolean read IsFlippedVertically write setFlippedVertically; //stored false //default false //Scale.Y stores related info
-      property Hidden: Boolean read IsHidden write SetHidden; //default false
+      property Collectable: Boolean read IsCollectable write SetCollectable; //default false
       property Snapping: Boolean read IsSnapping write SetSnapping; //default false
       property Anchored: Boolean read IsAnchored write SetAnchored; //default true
       property Tags: String read GetTags write SetTags; //default ''
-      property TagsMatched: Boolean read AreTagsMatched;
       property UrlAction: String read GetUrlAction write SetUrlAction; //default ''
       property FactoryCapacity: Integer read GetFactoryCapacity write SetFactoryCapacity; //default 0
-      property TargetsVisible: Boolean read GetTargetsVisible write SetTargetsVisible; //default false
+      property Content: TBytes read GetContent write SetContent; //default nil
+      property ContentExt: String read GetContentExt write SetContentExt; //default ''
       property Options: IStoryItemOptions read GetOptions; //stored false //TODO: currently to be as PUBLIC, NOT PUBLISHED
+      //
+      property FlippedHorizontally: Boolean read IsFlippedHorizontally write setFlippedHorizontally; //stored false //default false //Scale.X stores related info
+      property FlippedVertically: Boolean read IsFlippedVertically write setFlippedVertically; //stored false //default false //Scale.Y stores related info
+      property ForegroundColor: TAlphaColor read GetForegroundColor write SetForegroundColor; //default TAlphaColorRec.Null
+      property BackgroundColor: TAlphaColor read GetBackgroundColor write SetBackgroundColor; //default TAlphaColorRec.Null
+      //
+      property View: TControl read GetView;
+      property EditMode: Boolean read IsEditMode write SetEditMode; //stored false //default false
+      property TargetsVisible: Boolean read GetTargetsVisible write SetTargetsVisible; //default false //TODO: Hint on Tags Matching?
+      property BorderVisible: Boolean read IsBorderVisible write SetBorderVisible; //stored false default false
+      //
+      property ParentStoryItem: IStoryItem read GetParentStoryItem write SetParentStoryItem; //stored false //default nil
+      property StoryItems: TIStoryItemList read GetStoryItems write SetStoryItems; //stored false
+      property ImageStoryItems: TIImageStoryItemList read GetImageStoryItems; //stored false
+      property AudioStoryItems: TIAudioStoryItemList read GetAudioStoryItems; //stored false
+      property TextStoryItems: TITextStoryItemList read GetTextStoryItems; //stored false
+      //
+      property PreviousStoryPoint: IStoryItem read GetPreviousStoryPoint; //stored false
+      property NextStoryPoint: IStoryItem read GetNextStoryPoint; //stored false
+      property AncestorStoryPoint: IStoryItem read GetAncestorStoryPoint; //stored false
+      //
+      property TagsMatched: Boolean read AreTagsMatched;
+      property AllText: TStrings read GetAllText write SetAllText; //stored false //Note: used to replace Text at applicable items in StoryItem's whole subtree (to be used recursively)
+
+      {$endregion}
     end;
 
     IStoryItemOptions = interface
       ['{1AEC7512-1E1D-4720-9D74-9A5411A64377}']
 
-      //--- Methods ---
+      {$region '--- Methods ---'}
 
       {View}
       function GetView: TControl;
@@ -250,10 +264,14 @@ interface
       function ActLoad: Boolean;
       function ActSave: Boolean;
 
-      //--- Properties ---
+      {$endregion}
+
+      {$region '--- Properties ---'}
 
       property View: TControl read GetView; //stored false
       property StoryItem: IStoryItem read GetStoryItem write SetStoryItem; //stored false
+
+      {$endregion}
     end;
 
     {$endregion}
@@ -385,6 +403,8 @@ interface
     IStory = interface
       ['{3A6CAD51-3787-4D18-9DA7-A07895BC4661}']
 
+      {$region '--- Methods ---'}
+
       {Refresh any structure view}
       procedure RefreshStructure;
 
@@ -429,6 +449,10 @@ interface
       function GetStoryMode: TStoryMode;
       procedure SetStoryMode(const Value: TStoryMode);
 
+      {$endregion}
+
+      {$region '--- Properties ---'}
+
       property StoryMode: TStoryMode read GetStoryMode write SetStoryMode;
       //
       property RootStoryItem: IStoryItem read GetRootStoryItem write SetRootStoryItem;
@@ -438,6 +462,8 @@ interface
       property FirstStoryPoint: IStoryItem read GetFirstStoryPoint;
       property PreviousStoryPoint: IStoryItem read GetPreviousStoryPoint;
       property NextStoryPoint: IStoryItem read GetNextStoryPoint;
+
+      {$endregion}
     end;
 
     {$endregion}

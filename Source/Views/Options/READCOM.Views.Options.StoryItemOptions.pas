@@ -35,6 +35,7 @@ type
     txtID: TEdit;
     btnToggleHome: TSpeedButton;
     btnToggleStoryPoint: TSpeedButton;
+    btnToggleCollectable: TSpeedButton;
     btnToggleAnchored: TSpeedButton;
     btnToggleTags: TSpeedButton;
     btnToggleUrlAction: TSpeedButton;
@@ -51,6 +52,7 @@ type
     procedure txtIDChange(Sender: TObject);
     procedure actionToggleHomeExecute(Sender: TObject);
     procedure actionToggleStoryPointExecute(Sender: TObject);
+    procedure actionToggleCollectableExecute(Sender: TObject);
     procedure actionToggleSnappingExecute(Sender: TObject);
     procedure actionToggleAnchoredExecute(Sender: TObject);
     procedure actionChangeTagsExecute(Sender: TObject);
@@ -135,6 +137,7 @@ begin
   begin
     btnToggleHome.IsPressed := Home;
     btnToggleStoryPoint.IsPressed := StoryPoint;
+    btnToggleCollectable.IsPressed := Collectable;
     btnToggleSnapping.IsPressed := Snapping;
     btnToggleAnchored.IsPressed := Anchored;
     btnToggleTags.IsPressed := (Tags <> '');
@@ -192,6 +195,13 @@ end;
 procedure TStoryItemOptions.actionToggleStoryPointExecute(Sender: TObject);
 begin
   StoryItem.StoryPoint := btnToggleStoryPoint.IsPressed;
+end;
+
+//--- Collectable ---
+
+procedure TStoryItemOptions.actionToggleCollectableExecute(Sender: TObject);
+begin
+  StoryItem.Collectable := btnToggleCollectable.IsPressed;
 end;
 
 //--- Anchored (non Moveable) ---
