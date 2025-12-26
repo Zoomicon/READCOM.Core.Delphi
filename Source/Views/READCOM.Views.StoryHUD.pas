@@ -11,7 +11,7 @@ interface
     System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
     System.Actions,
     //
-    FMX.Types, //for TLang
+    FMX.Types, //for TLang, RegisterFmxClasses
     FMX.Graphics, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.StdCtrls,
     FMX.Controls.Presentation, System.ImageList, FMX.ImgList,
     FMX.Layouts, FMX.ActnList,
@@ -320,5 +320,17 @@ implementation
   {$endregion}
 
   {$ENDREGION}
+
+  {$region 'Registration'}
+
+  procedure RegisterSerializationClasses;
+  begin
+    RegisterFmxClasses([TStoryHUD], [TFrame]);
+  end;
+
+  {$endregion}
+
+initialization
+  RegisterSerializationClasses; //might be needed by the IDE designer
 
 end.

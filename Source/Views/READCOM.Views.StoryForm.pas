@@ -4,7 +4,7 @@
 {-$DEFINE NOSTYLE}
 
 //WARNING: if Delphi corrupts the form (sometimes it fails to load the StoryHUD frame first), revert only the StoryForm.fmx file from version control
-//WARNING: if Icons are not shown in the designer, also open Resources\READCOM.Resources.Icons
+//WARNING: if Icons are not shown in the form designer, also open Resources\READCOM.Resources.Icons in design-mode
 
 unit READCOM.Views.StoryForm;
 
@@ -1746,11 +1746,6 @@ implementation
 
   {$region 'SavedState'}
 
-  function GetFileNameWithoutExt(const FullPath: string): string; //TODO: move to some utilities package
-  begin
-    result := ChangeFileExt(ExtractFileName(FullPath), '');
-  end;
-
   function TStoryForm.GetSavedStateName: String;
   begin
     result := 'SavedState.readcom';
@@ -1759,7 +1754,7 @@ implementation
   function TStoryForm.GetSavedStateStoragePath: String;
   begin
     var LHomePath := TPath.GetHomePath;
-    var LSavedStatePath := TPath.Combine(LHomePath, GetFileNameWithoutExt(Application.ExeName));
+    var LSavedStatePath := TPath.Combine(LHomePath, TPath.GetFileNameWithoutExtension(Application.ExeName));
 
     if ForceDirectories(LSavedStatePath) then //will try to create subpaths as needed
       result := LSavedStatePath
@@ -1884,5 +1879,17 @@ implementation
   {$endregion}
 
   {$ENDREGION .................................................................}
+
+  {$region 'Registration'}
+
+  procedure RegisterSerializationClasses;
+  begin
+    RegisterFmxClasses([TStoryForm], [TForm]);
+  end;
+
+  {$endregion}
+
+initialization
+  RegisterSerializationClasses; //might be needed by the IDE designer
 
 end.
