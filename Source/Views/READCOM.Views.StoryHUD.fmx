@@ -41,6 +41,25 @@ object StoryHUD: TStoryHUD
       ShowScrollBars = False
       Viewport.Width = 50.000000000000000000
       Viewport.Height = 672.000000000000000000
+      object btnToggleBackpack: TSpeedButton
+        StaysPressed = True
+        Align = Top
+        Hint = 'Toggle Backpack visibility'#13#13'Shows/Hides backpack contents'
+        Images = Icons.SVGIconImageList
+        ImageIndex = 46
+        Margins.Left = 3.000000000000000000
+        Margins.Top = 3.000000000000000000
+        Margins.Right = 3.000000000000000000
+        Margins.Bottom = 3.000000000000000000
+        Position.X = 3.000000000000000000
+        Position.Y = 3.000000000000000000
+        Size.Width = 44.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'escapetoolbutton'
+        Text = 'Backpack'
+        OnClick = btnToggleBackpackClick
+      end
       object btnNew: TSpeedButton
         Action = actionNew
         Align = Top
@@ -51,7 +70,7 @@ object StoryHUD: TStoryHUD
         Margins.Right = 3.000000000000000000
         Margins.Bottom = 3.000000000000000000
         Position.X = 3.000000000000000000
-        Position.Y = 3.000000000000000000
+        Position.Y = 49.000000000000000000
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
@@ -67,7 +86,7 @@ object StoryHUD: TStoryHUD
         Margins.Right = 3.000000000000000000
         Margins.Bottom = 3.000000000000000000
         Position.X = 3.000000000000000000
-        Position.Y = 49.000000000000000000
+        Position.Y = 95.000000000000000000
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
@@ -83,7 +102,7 @@ object StoryHUD: TStoryHUD
         Margins.Right = 3.000000000000000000
         Margins.Bottom = 6.000000000000000000
         Position.X = 3.000000000000000000
-        Position.Y = 95.000000000000000000
+        Position.Y = 141.000000000000000000
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
@@ -103,7 +122,7 @@ object StoryHUD: TStoryHUD
         Margins.Right = 3.000000000000000000
         Margins.Bottom = 3.000000000000000000
         Position.X = 3.000000000000000000
-        Position.Y = 144.000000000000000000
+        Position.Y = 190.000000000000000000
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
@@ -144,7 +163,7 @@ object StoryHUD: TStoryHUD
         Margins.Right = 3.000000000000000000
         Margins.Bottom = 3.000000000000000000
         Position.X = 3.000000000000000000
-        Position.Y = 190.000000000000000000
+        Position.Y = 236.000000000000000000
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
@@ -165,7 +184,7 @@ object StoryHUD: TStoryHUD
         Margins.Right = 3.000000000000000000
         Margins.Bottom = 6.000000000000000000
         Position.X = 3.000000000000000000
-        Position.Y = 236.000000000000000000
+        Position.Y = 282.000000000000000000
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
@@ -184,7 +203,7 @@ object StoryHUD: TStoryHUD
         Margins.Right = 3.000000000000000000
         Margins.Bottom = 6.000000000000000000
         Position.X = 3.000000000000000000
-        Position.Y = 285.000000000000000000
+        Position.Y = 331.000000000000000000
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
@@ -202,7 +221,7 @@ object StoryHUD: TStoryHUD
         Margins.Right = 3.000000000000000000
         Margins.Bottom = 3.000000000000000000
         Position.X = 3.000000000000000000
-        Position.Y = 334.000000000000000000
+        Position.Y = 380.000000000000000000
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
@@ -218,7 +237,7 @@ object StoryHUD: TStoryHUD
         Margins.Right = 3.000000000000000000
         Margins.Bottom = 3.000000000000000000
         Position.X = 3.000000000000000000
-        Position.Y = 380.000000000000000000
+        Position.Y = 426.000000000000000000
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False

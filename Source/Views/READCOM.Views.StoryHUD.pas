@@ -25,26 +25,20 @@ interface
   {$endregion}
 
   type
-    TEditModeChangedEvent = procedure (Sender: TObject; const Value: Boolean) of object;
-    TStructureVisibleChangedEvent = procedure (Sender: TObject; const Value: Boolean) of object;
-    TTargetsVisibleChangedEvent = procedure (Sender: TObject; const Value: Boolean) of object;
-    TUseStoryTimerChangedEvent = procedure (Sender: TObject; const Value: Boolean) of object;
+    TBooleanPropertyChangedEvent = procedure (Sender: TObject; const Value: Boolean) of object;
 
     TStoryHUD = class(TFrame)
-      btnPrevious: TSpeedButton;
-      btnToggleEditMode: TSpeedButton;
       BtnMenu: TSpeedButton;
-      btnNext: TSpeedButton;
-      layoutButtonsNavigation: TLayout;
-      ActionList: TActionList;
-      layoutButtons: TLayout;
       MultiView: TMultiView;
-      btnToggleStructureVisible: TSpeedButton;
+
       layoutContent: TLayout;
-      btnToggleTargetsVisible: TSpeedButton;
+      layoutButtons: TLayout;
+      layoutButtonsNavigation: TLayout;
 
       scrollButtonsMain: TVertScrollBoxWithArrows;
       scrollButtonsEdit: TVertScrollBoxWithArrows;
+
+      ActionList: TActionList;
 
       actionMenu: TAction;
 
@@ -69,14 +63,20 @@ interface
       actionDelete: TAction;
 
       btnHome: TSpeedButton;
+      btnPrevious: TSpeedButton;
+      btnNext: TSpeedButton;
 
       btnNew: TSpeedButton;
       btnLoad: TSpeedButton;
       btnSave: TSpeedButton;
+      btnToggleEditMode: TSpeedButton;
+      btnToggleBackpack: TSpeedButton;
+      btnToggleStructureVisible: TSpeedButton;
+      btnToggleTargetsVisible: TSpeedButton;
       btnToggleUseStoryTimer: TSpeedButton;
+      btnToggleFullscreen: TSpeedButton;
       btnNextTheme: TSpeedButton;
       btnAbout: TSpeedButton;
-      btnToggleFullscreen: TSpeedButton;
 
       btnAdd: TSpeedButton;
       btnAddImageStoryItem: TSpeedButton;
@@ -92,29 +92,34 @@ interface
       btnOptions: TSpeedButton;
 
       Localizations: TLang;
+
       procedure actionAboutExecute(Sender: TObject);
       procedure actionMenuExecute(Sender: TObject);
-      procedure btnToggleStructureVisibleClick(Sender: TObject);
       procedure btnToggleEditModeClick(Sender: TObject);
+      procedure btnToggleBackpackClick(Sender: TObject);
+      procedure btnToggleStructureVisibleClick(Sender: TObject);
       procedure btnToggleTargetsVisibleClick(Sender: TObject);
       procedure btnToggleUseStoryTimerClick(Sender: TObject);
       procedure btnToggleFullscreenClick(Sender: TObject);
 
     protected
       FMultiViewOpenedWidth: Single;
-
       FEditMode: Boolean;
+      FBackpackVisible: Boolean;
       FStructureVisible: Boolean;
       FTargetsVisible: Boolean;
       FUseStoryTimer: Boolean;
 
-      FEditModeChanged: TEditModeChangedEvent;
-      FStructureVisibleChanged: TStructureVisibleChangedEvent;
-      FTargetsVisibleChanged: TTargetsVisibleChangedEvent;
-      FUseStoryTimerChanged: TUseStoryTimerChangedEvent;
+      FEditModeChanged: TBooleanPropertyChangedEvent;
+      FBackpackVisibleChanged: TBooleanPropertyChangedEvent;
+      FStructureVisibleChanged: TBooleanPropertyChangedEvent;
+      FTargetsVisibleChanged: TBooleanPropertyChangedEvent;
+      FUseStoryTimerChanged: TBooleanPropertyChangedEvent;
 
       {EditMode}
       procedure SetEditMode(const Value: Boolean); virtual;
+      {BackpackVisible}
+      procedure SetBackpackVisible(const Value: Boolean); virtual;
       {StructureVisible}
       procedure SetStructureVisible(const Value: Boolean); virtual;
       {TargetsVisible}
@@ -133,15 +138,17 @@ interface
 
     published
       property EditMode: Boolean read FEditMode write SetEditMode default false;
+      property BackpackVisible: Boolean read FBackpackVisible write SetBackpackVisible default false;
       property StructureVisible: Boolean read FStructureVisible write SetStructureVisible default false;
       property TargetsVisible: Boolean read FTargetsVisible write SetTargetsVisible default false;
       property UseStoryTimer: Boolean read FUseStoryTimer write SetUseStoryTimer default false;
       property FullScreen: Boolean read GetFullScreen write SetFullScreen default false;
 
-      property OnEditModeChanged: TEditModeChangedEvent read FEditModeChanged write FEditModeChanged;
-      property OnStructureVisibleChanged: TStructureVisibleChangedEvent read FStructureVisibleChanged write FStructureVisibleChanged;
-      property OnTargetsVisibleChanged: TTargetsVisibleChangedEvent read FTargetsVisibleChanged write FTargetsVisibleChanged;
-      property OnUseStoryTimerChanged: TUseStoryTimerChangedEvent read FUseStoryTimerChanged write FUseStoryTimerChanged;
+      property OnEditModeChanged: TBooleanPropertyChangedEvent read FEditModeChanged write FEditModeChanged;
+      property OnBackpackVisibleChanged: TBooleanPropertyChangedEvent read FBackpackVisibleChanged write FBackpackVisibleChanged;
+      property OnStructureVisibleChanged: TBooleanPropertyChangedEvent read FStructureVisibleChanged write FStructureVisibleChanged;
+      property OnTargetsVisibleChanged: TBooleanPropertyChangedEvent read FTargetsVisibleChanged write FTargetsVisibleChanged;
+      property OnUseStoryTimerChanged: TBooleanPropertyChangedEvent read FUseStoryTimerChanged write FUseStoryTimerChanged;
     end;
 
 implementation
@@ -191,31 +198,53 @@ implementation
 
   procedure TStoryHUD.SetEditMode(const Value: Boolean);
   begin
-    FEditMode := Value;
-    btnToggleEditMode.IsPressed := Value; //don't use "Pressed", need to use "IsPressed"
+    if (Value <> FEditMode) then
+    begin
+      FEditMode := Value;
+      btnToggleEditMode.IsPressed := Value; //don't use "Pressed", need to use "IsPressed"
 
-    scrollButtonsEdit.Visible := Value;
+      scrollButtonsEdit.Visible := Value;
 
-    if Assigned(FEditModeChanged) then
-      FEditModeChanged(Self, Value);
+      if Assigned(FEditModeChanged) then
+        FEditModeChanged(Self, Value);
+    end;
   end;
 
-{$endregion}
+  {$endregion}
+
+  {$region 'BackpackVisible'}
+
+  procedure TStoryHUD.SetBackpackVisible(const Value: Boolean);
+  begin
+    if (Value <> FBackpackVisible) then
+    begin
+      FBackpackVisible := Value;
+      btnToggleBackpack.IsPressed := Value; //don't use "Pressed", need to use "IsPressed"
+
+      if Assigned(FBackpackVisibleChanged) then
+        FBackpackVisibleChanged(Self, Value);
+    end;
+  end;
+
+  {$endregion}
 
   {$region 'StrucureVisible'}
 
   procedure TStoryHUD.SetStructureVisible(const Value: Boolean);
   begin
-    FStructureVisible := Value;
-    btnToggleStructureVisible.IsPressed := Value; //don't use "Pressed", need to use "IsPressed"
+    if (Value <> FStructureVisible) then
+    begin
+      FStructureVisible := Value;
+      btnToggleStructureVisible.IsPressed := Value; //don't use "Pressed", need to use "IsPressed"
 
-    if Value then
-      MultiView.Width := FMultiViewOpenedWidth
-    else
-      MultiView.Width := 0;
+      if Value then
+        MultiView.Width := FMultiViewOpenedWidth
+      else
+        MultiView.Width := 0;
 
-    if Assigned(FStructureVisibleChanged) then
-      FStructureVisibleChanged(Self, Value);
+      if Assigned(FStructureVisibleChanged) then
+        FStructureVisibleChanged(Self, Value);
+    end;
   end;
 
   {$endregion}
@@ -224,11 +253,14 @@ implementation
 
   procedure TStoryHUD.SetTargetsVisible(const Value: Boolean);
   begin
-    FTargetsVisible := Value;
-    btnToggleTargetsVisible.IsPressed := Value; //don't use "Pressed", need to use "IsPressed"
+    if (Value <> FTargetsVisible) then
+    begin
+      FTargetsVisible := Value;
+      btnToggleTargetsVisible.IsPressed := Value; //don't use "Pressed", need to use "IsPressed"
 
-    if Assigned(FTargetsVisibleChanged) then
-      FTargetsVisibleChanged(Self, Value);
+      if Assigned(FTargetsVisibleChanged) then
+        FTargetsVisibleChanged(Self, Value);
+    end;
   end;
 
   {$endregion}
@@ -237,11 +269,14 @@ implementation
 
   procedure TStoryHUD.SetUseStoryTimer(const Value: Boolean);
   begin
-    FUseStoryTimer := Value;
-    btnToggleUseStoryTimer.IsPressed := Value; //don't use "Pressed", need to use "IsPressed"
+    if (Value <> FUseStoryTimer) then
+    begin
+      FUseStoryTimer := Value;
+      btnToggleUseStoryTimer.IsPressed := Value; //don't use "Pressed", need to use "IsPressed"
 
-    if Assigned(FUseStoryTimerChanged) then
-      FUseStoryTimerChanged(Self, Value);
+      if Assigned(FUseStoryTimerChanged) then
+        FUseStoryTimerChanged(Self, Value);
+    end;
   end;
 
   {$endregion}
@@ -281,10 +316,19 @@ implementation
 
   procedure TStoryHUD.btnToggleEditModeClick(Sender: TObject);
   begin
-    EditMode := not EditMode; //don't use "btnToggleEditMode.Pressed", returns inconsistent values
+    EditMode := not EditMode; //don't use "btnToggleEditMode.Pressed", returns inconsistent values (note: IsPressed is different from Pressed)
   end;
 
-{$endregion}
+  {$endregion}
+
+  {$region 'Backpack'}
+
+  procedure TStoryHUD.btnToggleBackpackClick(Sender: TObject);
+  begin
+    BackpackVisible := not BackpackVisible; //don't use "btnToggleBackpack.Pressed", returns inconsistent values (note: IsPressed is different from Pressed)
+  end;
+
+  {$endregion}
 
   {$region 'View actions'}
 

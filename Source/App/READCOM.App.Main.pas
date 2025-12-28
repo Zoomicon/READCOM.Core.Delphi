@@ -110,7 +110,7 @@ implementation
     Icons := TIcons.Create(Application); //must create before StoryForm, it's a DataModule it uses - don't use Application.CreateForm since Delphi 12.3 sets the 1st one (even if it's a DataModule!) as MainForm internally
     Themes := TThemes.Create(Application); //must create before StoryForm, it's a DataModule it uses - don't use Application.CreateForm since Delphi 12.3 sets the 1st one (even if it's a DataModule!) as MainForm internally
 
-    {var} MainForm{: TStoryForm} := nil; //WARNING: MUST NOT DEFINE THE VARIABLE INSIDE THE MAIN PROCEDURE, NEED TO DEFINE IT OUTSIDE, ELSE Delphi12.3 SHOWS BLANK SCREEN ON ANDROID AND MAY ALSO THROW EXCEPTION INTERNALLY AT SETVISIBLE(TRUE) WHEN IT CALLS CANSHOW
+    MainForm := nil; //WARNING: MUST NOT DEFINE THE VARIABLE INSIDE THE MAIN PROCEDURE, NEED TO DEFINE IT OUTSIDE, ELSE Delphi12.3 SHOWS BLANK SCREEN ON ANDROID AND MAY ALSO THROW EXCEPTION INTERNALLY AT SETVISIBLE(TRUE) WHEN IT CALLS CANSHOW
     //IMPORTANT: first call to Application.CreateForm defines the Application.MainForm, if DataModules above use it Delphi 12.3 internally sets 1st one as the Application.MainForm, causing various issues...
     Application.CreateForm(TStoryForm, MainForm); //note that CreateForm doesn't immediately create and assign the form object to the variable (depends on platform, may delay till Application.Run)
     //IMPORTANT: ...we couldn't just set Application.MainForm := MainForm here, since on some mobile platforms (e.g. Android) Application.CreateForm returns immediately and the instance of the form is created later on and assigned to the variable we passed a reference to

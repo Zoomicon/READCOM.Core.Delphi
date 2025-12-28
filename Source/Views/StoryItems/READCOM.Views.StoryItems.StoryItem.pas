@@ -59,6 +59,7 @@ interface
         FTargetsVisible: Boolean;
         FDragging: Boolean; //=False
         FDragStart: TPointF; //=TPointF.Zero
+        FMoved: Boolean; //=false
 
         FStoryItems: TIStoryItemList;
         FAudioStoryItems: TIAudioStoryItemList;
@@ -1762,6 +1763,8 @@ end;
     FDragStart := PointF(X, Y);
     FDragging := true;
 
+    FMoved := false; //this is set to true by MouseMove when FDragging=true and is cleared at MouseUp (it defaults to false, but it's safer to reinitialize it here)
+
     Capture; //Capture the mouse actions
   end;
 
@@ -1773,6 +1776,7 @@ end;
 
     FDragging := false;
     FDragStart := TPointF.Zero;
+    FMoved := false;
 
     DoSnapping;
 
@@ -1794,6 +1798,8 @@ end;
       if LParentView.AbsoluteRect.Contains(newAbsoluteBounds) then //only when the new bounds are contained in Parent to avoid user losing the moved StoryItem at the edges of its parent
         Position.Point := LParentView.AbsoluteToLocal(newAbsoluteBounds.TopLeft);
     end;
+
+    FMoved := true;
   end;
 
   procedure TStoryItem.MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
@@ -1858,24 +1864,22 @@ end;
         Active := true //...make us (the parent of the ActiveStoryItem) the Active one (so that we can go back to the parent level by right-clicking it without using the keyboard's ESC key)
       else
       begin
+        //Note: apart from pure clicks audio will also play at end of drag operations (e.g. when we drop some speech bubble text [that has an AudioStoryItem child] onto some speech bubble placeholder [empty ImageStoryItem with magnet/snap])
         PlayRandomAudioStoryItem; //TODO: maybe should play AudioStoryItems in the order they exist in their parent StoryItem (but would need to remember last one played in that case which may be problematic if they are reordered etc.)
         //PlayNextAudioStoryItem;
 
-        if IsCollectable then
-        begin
-          ShowMessage('Collected ' + ID + '@' + Tags);
-          //TODO: place in backpack
-          FreeAndNil(Self);
-        end
+        if (not FMoved) then //only for Click operations (not MouseDown + MouseMove + MouseUp) //Note: MouseClick is called before MouseUp in FMX, so FMoved (set by MouseMove when FDragging=true) hasn't be cleared yet
 
-        //var LParent := ParentStoryItem;
-        else if (HasUrlAction
-            and Assigned(FStory)
-            and (FStory.StoryMode <> TStoryMode.EditMode) //make sure we don't do UrlActions of child items when editing a story //should we use EditMode property instead? it doesn't seem to check StoryMode, but seems to store to local storable field (//TODO THAT EDITMODE PROPERTY IS FOR BEING ABLE TO DISABLE CHILDREN THAT ARE DEEPER INSIDE, SHOULD CHANGE THAT LOGIC ANYWAY AND DISABLE SUBTREES UNDER NESTED STORYPOINTS WHEN WE ARE AT SOME ANCESTOR STORYPOINT)
-            {and //TODO: should have URLs clickable only for children of ActiveStoryItem (and for itself if it's the RootStoryItem maybe) //in non-EditMode should disable HitTest though at everything that isn't the current StoryItem or direct child of the ActiveStoryItem apart from the TextStoryItems maybe (could maybe just disble HitTest at all siblings of ActiveStoryItem and have everything under ActiveStoryItem HitTest-enabled)
-            ((Assigned(LParent) and LParent.Active) or
-            ((not Assigned(LParent)) and Active))}) then //only when ParentStoryItem is the ActiveStoryItem //assuming short-circuit evaluation //if no LParent then it's the RootStoryItem, allowing it to have URLAction too
-          FStory.DoUrlAction(FUrlAction, Self); //TODO: if child item has a UrlAction it should consume the click event, currently it seems parent StoryItem will play its AudioStoryItem(s) even while navigating say to NextStoryPoint (when a child ImageStoryItem with '+' urlAction was clicked)
+          if IsCollectable and Assigned(FStory) then
+            FStory.Collect(Self)
+
+          else if (HasUrlAction
+              and Assigned(FStory)
+              and (FStory.StoryMode <> TStoryMode.EditMode) //make sure we don't do UrlActions of child items when editing a story //should we use EditMode property instead? it doesn't seem to check StoryMode, but seems to store to local storable field (//TODO THAT EDITMODE PROPERTY IS FOR BEING ABLE TO DISABLE CHILDREN THAT ARE DEEPER INSIDE, SHOULD CHANGE THAT LOGIC ANYWAY AND DISABLE SUBTREES UNDER NESTED STORYPOINTS WHEN WE ARE AT SOME ANCESTOR STORYPOINT)
+              {and //TODO: should have URLs clickable only for children of ActiveStoryItem (and for itself if it's the RootStoryItem maybe) //in non-EditMode should disable HitTest though at everything that isn't the current StoryItem or direct child of the ActiveStoryItem apart from the TextStoryItems maybe (could maybe just disble HitTest at all siblings of ActiveStoryItem and have everything under ActiveStoryItem HitTest-enabled)
+              ((Assigned(LParent) and LParent.Active) or
+              ((not Assigned(LParent)) and Active))}) then //only when ParentStoryItem is the ActiveStoryItem //assuming short-circuit evaluation //if no LParent then it's the RootStoryItem, allowing it to have URLAction too
+            FStory.DoUrlAction(FUrlAction, Self); //TODO: if child item has a UrlAction it should consume the click event, currently it seems parent StoryItem will play its AudioStoryItem(s) even while navigating say to NextStoryPoint (when a child ImageStoryItem with '+' urlAction was clicked)
       end;
     end;
 

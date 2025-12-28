@@ -29,8 +29,13 @@ interface
     READCOM.Views.StoryHUD; //for TStoryHUD
   {$endregion}
 
-  const
+  const //TODO: move to some READCOM.App.Settings as pre-initialized vars?
     OPENLOCK_DELAY = 800; //msec
+    BACKPACK_ALPHA = 0.85;
+
+  resourcestring
+    MSG_CONFIRM_CLEAR_STORY = 'Clearing Story: are you sure?';
+    MSG_CONFIRM_DELETION = 'Deleting ActiveStoryItem: are you sure?';
 
   type
     TStoryForm = class; //forward declaration needed, since TStory keeps a reference to TStoryForm
@@ -77,6 +82,9 @@ interface
 
       {Tags}
       function CheckTagsMatched(const TagsMatching: TTagsMatching = TagsMatching_Default): Boolean;
+
+      {Collectables}
+      procedure Collect(const StoryItem: IStoryItem);
 
       {URLs}
       procedure DoUrlAction(const UrlAction: String; const BaseStoryItem: IStoryItem = nil);
@@ -195,6 +203,9 @@ interface
 
     protected
       FStory: TEditableStory;
+      FBackpack: IStoryItem;
+      FBackpackPreviousActiveStoryItem: IStoryItem;
+
       FStructureView: TStructureView;
       FShiftDown: Boolean; //set by event handlers for OnFormKeyDown, OnFormKeyUp to monitor SHIFT key standalone presses
       FShortcutCut, FShortcutCopy, FShortcutPaste: TShortCut;
@@ -207,7 +218,7 @@ interface
       {Idle}
       procedure Idle(Sender: TObject; var Done: Boolean);
 
-      {Loading / SavedState}
+      {Loading}
       procedure LoadAtStartup;
       function LoadFromStream(const Stream: TStream; const ActivateHome: Boolean = True): Boolean;
       function LoadFromFile(const Filepath: String): Boolean;
@@ -216,8 +227,11 @@ interface
       function LoadCommandLineParameter: Boolean;
       function LoadDefaultDocument: Boolean;
 
-      function GetSavedStateName: String;
-      function GetSavedStateStoragePath: String;
+      function LoadBackpack: Boolean;
+      procedure SaveBackpack;
+
+      {SavedState}
+      function GetStateStoragePath: String;
       function LoadSavedState: Boolean;
       procedure SaveCurrentState;
 
@@ -242,6 +256,9 @@ interface
       {Options}
       procedure ShowActiveStoryItemOptions;
 
+      {Backpack}
+      procedure ClearBackpack;
+
       {StructureView}
       function GetStructureView: TStructureView;
       procedure SetStructureView(const Value: TStructureView);
@@ -252,6 +269,7 @@ interface
 
       {HUD}
       procedure HUDEditModeChanged(Sender: TObject; const Value: Boolean);
+      procedure HUDBackpackVisibleChanged(Sender: TObject; const Value: Boolean);
       procedure HUDStructureVisibleChanged(Sender: TObject; const Value: Boolean);
       procedure HUDTargetsVisibleChanged(Sender: TObject; const Value: Boolean);
       procedure HUDUseStoryTimerChanged(Sender: TObject; const Value: Boolean);
@@ -271,10 +289,6 @@ interface
 
     {$endregion}
 
-  resourcestring
-    MSG_CONFIRM_CLEAR_STORY = 'Clearing Story: are you sure?';
-    MSG_CONFIRM_DELETION = 'Deleting ActiveStoryItem: are you sure?';
-
 implementation
   {$region 'Used units'}
   uses
@@ -284,8 +298,9 @@ implementation
     System.Math, //for Max
     System.Net.HttpClient, //for HTTP/HTTPS url scheme support in TURLStream (Delphi 11.1+)
     System.Net.URLClient, //for TURLStream (Delphi 11.1+)
+    System.UIConsts, //for MakeColor
     //
-    Fmx.Memo, //for TMemo
+    FMX.Memo, //for TMemo
     //
     Zoomicon.Helpers.RTL.ClassListHelpers, //for TClassList.Create(TClassArray)
     Zoomicon.Helpers.FMX.ActnList, //for SafeTextToShortcut
@@ -437,6 +452,29 @@ implementation
 
   {$endregion}
 
+  {$region 'Collectables'}
+
+  procedure TStory.Collect(const StoryItem: IStoryItem);
+  begin
+    if not Assigned(UI.FBackpack) then exit;
+
+    var LNewParent: IStoryItem;
+    if (StoryItem.ParentStoryItem.View <> UI.FBackpack.View) then //if not in backpack //WARNING: do not compare interface references, they can differ)
+    begin
+      LNewParent := UI.FBackpack; //move to backpack
+      StoryItem.Anchored := false; //make moveable (will remain so after we place object back into a scene - collectables that weren't moveable before adding to the backpack could be for example items stuck somewhere that we unstack and collected and can place back freely where we wish)
+    end
+    else
+    begin
+      LNewParent := UI.FBackpackPreviousActiveStoryItem; //move to previously ActiveStoryItem (before backpack was shown)
+      UI.HUD.BackpackVisible := false; //hide backpack
+    end;
+
+    StoryItem.ParentStoryItem := LNewParent;
+  end;
+
+  {$endregion}
+
   {$region 'URLs'}
 
   procedure TStory.DoUrlAction(const UrlAction: String; const BaseStoryItem: IStoryItem = nil);
@@ -494,9 +532,9 @@ implementation
       exit;
     end;
 
-     if LUrl = '0' then
+    if LUrl = '0' then
     begin
-      ActivateHomeStoryItem(TagsMatching); //?0, ??0, ???0 will do tags matching
+      UI.HUD.BackpackVisible := not UI.HUD.BackpackVisible; //?0, ??0, ???0 will do tags matching //Note: in the past this doing ActivateHomeStoryItem, but now ~ does it (from ID path resolution logic at ActivateUrl), so using 0 to toggle Backpack visibility
       exit;
     end;
 
@@ -672,6 +710,7 @@ implementation
     with UI do
     begin
       RootStoryItemView := nil; //must do first to free the previous one (to avoid naming clashes)
+
       var newRootStoryItemView := TImageStoryItem.Create(Self); //Note: very old versions may expect a TBitmapImageStoryItem instead, ignoring them to keep design clean
       with newRootStoryItemView do
         begin
@@ -679,13 +718,17 @@ implementation
         Size.Size := TSizeF.Create(ZoomFrame.Width, ZoomFrame.Height);
         EditMode := HUD.EditMode; //TODO: add EditMode property to IStory or use its originally intended mode one
         end;
+
       RootStoryItemView := newRootStoryItemView;
     end;
   end;
 
   procedure TEditableStory.AddChildStoryItem(const TheStoryItemClass: TClass; const TheName: String); //assuming TStoryItemClass is passed
   begin
-    if not ((StoryMode = EditMode) and Assigned(ActiveStoryItem)) then exit; //only in Edit mode and when an ActiveStoryItem is assigned
+    if (StoryMode <> EditMode) or //only in Edit mode
+       (not Assigned(ActiveStoryItem)) //and when an ActiveStoryItem is assigned
+    then
+      exit;
 
     var OwnerAndParent := ActiveStoryItem.View;
 
@@ -812,6 +855,7 @@ implementation
         TargetsVisible := false;
 
         OnEditModeChanged := HUDEditModeChanged;
+        OnBackpackVisibleChanged := HUDBackpackVisibleChanged;
         OnStructureVisibleChanged := HUDStructureVisibleChanged;
         OnTargetsVisibleChanged := HUDTargetsVisibleChanged;
         OnUseStoryTimerChanged := HUDUseStoryTimerChanged;
@@ -862,7 +906,7 @@ implementation
 
   procedure TStoryForm.FormDestroy(Sender: TObject);
   begin
-    //NOP
+    ClearBackpack;
   end;
 
   procedure TStoryForm.FormShow(Sender: TObject);
@@ -883,9 +927,12 @@ implementation
 
   procedure TStoryForm.SetRootStoryItemView(const Value: TStoryItem);
   begin
+    HUD.BackpackVisible := false; //MUST HIDE BACKPACK FIRST (since it's injected in the Story when it appears)
+
     //Remove old story
     var TheRootStoryItemView := RootStoryItemView;
-    if Assigned(TheRootStoryItemView) and (Value <> TheRootStoryItemView) then //must check that the same one isn't set again to avoid destroying it
+    if Assigned(TheRootStoryItemView) and
+       (Value <> TheRootStoryItemView) then //must check that the same one isn't set again to avoid destroying it
     begin
       //TheRootStoryItemView.Parent := nil; //shouldn't be needed
       Story.ActiveStoryItem := nil; //must clear reference to old ActiveStoryItem since all StoryItems will be destroyed
@@ -904,7 +951,7 @@ implementation
         AutoSize := true; //TODO: the Root StoryItem should be expandable
         OnResized := RootStoryItemViewResized; //listen for resizing to adapt ZoomFrame.ScaledLayout's size //TODO: this doesn't seem to get called
 
-        var newSize := Size.Size;
+        var newSize := Size.Size; //Note: this is the TStoryItem's (a TFrame descendent) Size
 
         (*
         var currentZoomerSize := ZoomFrame.Zoomer.Size.Size; //don't get size of zoomFrame itself
@@ -1070,7 +1117,11 @@ implementation
       procedure(Confirmed: Boolean)
       begin
         if Confirmed and (not LoadDefaultDocument) then
+        begin
           Story.NewRootStoryItem;
+
+          ClearBackpack; //Note: only ClearBackpack at New action (and FormDestroy), not at Edit/Cut or Edit/Delete of RootStoryItem
+        end;
       end
     );
   end;
@@ -1290,47 +1341,47 @@ implementation
 
   {$endregion}
 
-  {$region 'View actions'}
+  {$region 'Backpack'}
 
-  procedure TStoryForm.UpdateStructureView;
+  procedure TStoryForm.ClearBackpack;
   begin
-    Log('UpdateStructureView');
-    StartTiming; //doing nothing in non-DEBUG builds
-
-    if not HUD.StructureVisible then
-      Log('Ignoring UpdateStructureView, currently hidden')
-    else
-    with StructureView do
-      begin
-        if (Story.StoryMode <> EditMode) then
-          FilterMode := tfFlatten
-        else
-          FilterMode := tfPrune;
-
-        GUIRoot := RootStoryItemView;
-
-        var LActiveStoryItem := Story.ActiveStoryItem;
-        if Assigned(LActiveStoryItem) then
-          SelectedObject := LActiveStoryItem.View;
-      end;
-
-    StopTiming_msec; //this will Log elapsed msec at DEBUG builds
-  end;
-
-  //
-
-  procedure TStoryForm.HUDStructureVisibleChanged(Sender: TObject; const Value: Boolean);
-  begin
-    if Value then
-      UpdateStructureView;
-
-    with FStructureView do //TODO: see why we need those for the hidden StructureView to not grab mouse events from the area it was before collapse on the form (Probably a MultiView bug with or without the combination of TFrameStand to put a frame at the side tray)
+    if Assigned(FBackpack) then
     begin
-      Visible := Value;
-      Enabled := Value;
-      HitTest := Value;
+      FreeAndNil(FBackpack.View);
+      FBackpack := nil;
     end;
   end;
+
+  procedure TStoryForm.HUDBackpackVisibleChanged(Sender: TObject; const Value: Boolean);
+  begin
+    if Value then
+    begin
+      var LBackpackParentStoryItem := Story.ActiveStoryItem;
+      if Assigned(LBackpackParentStoryItem) then
+      begin
+        var LBackpackParentStoryItemView := LBackpackParentStoryItem.View;
+        with FBackpack.View do
+        begin
+          Position.Point := TPointF.Zero;
+          Size.Size := LBackpackParentStoryItemView.Size.Size;
+          Align := TAlignLayout.Scale;
+          Parent := LBackpackParentStoryItemView;
+        end;
+        FBackpackPreviousActiveStoryItem := Story.ActiveStoryItem;
+        FBackpack.Active := true;
+      end
+    end
+    else
+    begin
+      Story.ActiveStoryItem := FBackpackPreviousActiveStoryItem;
+      FBackpack.View.Parent := nil; //Hide backpack
+      FBackpackPreviousActiveStoryItem := nil;
+    end;
+  end;
+
+  {$endregion}
+
+  {$region 'Targets'}
 
   procedure TStoryForm.HUDTargetsVisibleChanged(Sender: TObject; const Value: Boolean);
   begin
@@ -1426,6 +1477,44 @@ implementation
       Story.ActiveStoryItem := TStoryItem(Selection); //Make active (may also zoom to it) - assuming this is a TStoryItem since StructureView was filtering for such class //also accepts "nil" (for no selection)
       //TODO: check that ContextMenu event is indeed called before Selection, in which case it is indeed best to make the item active first
       ShowActiveStoryItemOptions;
+    end;
+  end;
+
+  procedure TStoryForm.UpdateStructureView;
+  begin
+    Log('UpdateStructureView');
+    StartTiming; //doing nothing in non-DEBUG builds
+
+    if not HUD.StructureVisible then
+      Log('Ignoring UpdateStructureView, currently hidden')
+    else
+    with StructureView do
+      begin
+        if (Story.StoryMode <> EditMode) then
+          FilterMode := tfFlatten
+        else
+          FilterMode := tfPrune;
+
+        GUIRoot := RootStoryItemView;
+
+        var LActiveStoryItem := Story.ActiveStoryItem;
+        if Assigned(LActiveStoryItem) then
+          SelectedObject := LActiveStoryItem.View;
+      end;
+
+    StopTiming_msec; //this will Log elapsed msec at DEBUG builds
+  end;
+
+  procedure TStoryForm.HUDStructureVisibleChanged(Sender: TObject; const Value: Boolean);
+  begin
+    if Value then
+      UpdateStructureView;
+
+    with FStructureView do //TODO: see why we need those for the hidden StructureView to not grab mouse events from the area it was before collapse on the form (Probably a MultiView bug with or without the combination of TFrameStand to put a frame at the side tray)
+    begin
+      Visible := Value;
+      Enabled := Value;
+      HitTest := Value;
     end;
   end;
 
@@ -1746,20 +1835,51 @@ implementation
 
   {$region 'SavedState'}
 
-  function TStoryForm.GetSavedStateName: String;
-  begin
-    result := 'SavedState.readcom';
-  end;
-
-  function TStoryForm.GetSavedStateStoragePath: String;
+  function TStoryForm.GetStateStoragePath: String;
   begin
     var LHomePath := TPath.GetHomePath;
-    var LSavedStatePath := TPath.Combine(LHomePath, TPath.GetFileNameWithoutExtension(Application.ExeName));
+    var LStateStoragePath := TPath.Combine(LHomePath, TPath.GetFileNameWithoutExtension(Application.ExeName));
 
-    if ForceDirectories(LSavedStatePath) then //will try to create subpaths as needed
-      result := LSavedStatePath
+    if ForceDirectories(LStateStoragePath) then //will try to create subpaths as needed
+      result := LStateStoragePath
     else
       result := LHomePath; //if we fail to create subdirectory under home path for the app, use the home path instead
+  end;
+
+  function TStoryForm.LoadBackpack: Boolean;
+  begin
+    var LBackpackPath := TPath.Combine(GetStateStoragePath, BACKPACK_FILENAME);
+    try
+      FBackpack := TStoryItem.LoadNew(LBackpackPath, EXT_READCOM); //a new instance of the TStoryItem descendent serialized in the Stream will be created
+      result := true;
+    except
+      on E: Exception do
+      begin
+        Log(E);
+        //ShowException(E, @TStoryForm.LoadBackpack); //Backpack can be missing (esp. at first launch), don't show exception to user
+        FBackpack := TImageStoryItem.Create(Self); //Create an empty backpack
+        FBackpack.BackgroundColor := MakeColor(TAlphaColorRec.Lime, BACKPACK_ALPHA); //make it a bit translucent since it is shown over the ActiveStoryItem //set this only here, not when loading from saved backpack (so that author can customize it in Edit mode)
+        result := false;
+      end;
+    end;
+    FBackpack.UrlAction := '0'; //always setting this (to close backup when clicking its empty area)
+    FBackpack.StoryPoint := true; //always setting this (could set it only when we create a new one, but doesn't hurt to set it too after loading a saved one)
+  end;
+
+  procedure TStoryForm.SaveBackpack;
+  begin
+    var LBackpackPath := TPath.Combine(GetStateStoragePath, BACKPACK_FILENAME);
+
+    if Assigned(FBackpack) then
+      try
+        FBackpack.Save(LBackpackPath); //default file format is EXT_READCOM //Note: saves .readcom in binary (instead of text) format unless SHIFT key is being pressed
+      except
+        on E: Exception do
+          begin
+          Log(E);
+          ShowException(E, @TStoryForm.SaveBackpack);
+          end;
+      end
   end;
 
   function TStoryForm.LoadSavedState: Boolean;
@@ -1768,28 +1888,32 @@ implementation
 
     With SaveState do
     begin
-      Name := GetSavedStateName;
-      StoragePath := GetSavedStateStoragePath;
-      result := LoadFromStream(Stream, false); //don't ActivateHome, keep last Active one (needed in case the OS brought down the app and need to continue from where we were from saved state)
-      StorySource := StoragePath;
+      Name := SAVED_STATE_FILENAME;
+      StoragePath := GetStateStoragePath;
+      result := LoadFromStream(Stream, {ActivateHome:=}false); //don't ActivateHome, keep last Active one (needed in case the OS brought down the app and need to continue from where we were from saved state)
+      StorySource := TPath.Combine(StoragePath, Name);
     end;
+
+    LoadBackpack;
   end;
 
   procedure TStoryForm.SaveCurrentState;
   begin
     Log('SaveCurrentState');
 
+    HUD.BackpackVisible := false; //Hide backpack so that its StoryItem (added to ActiveStoryItem) doesn't get saved with the Story
+
     with SaveState do
     begin
-      Name := GetSavedStateName;
-      StoragePath := GetSavedStateStoragePath;
+      Name := SAVED_STATE_FILENAME;
+      StoragePath := GetStateStoragePath;
 
       Stream.Clear;
 
-      var TheRootStoryItemView := RootStoryItemView;
-      if Assigned(TheRootStoryItemView) then
+      var LRootStoryItem := Story.RootStoryItem;
+      if Assigned(LRootStoryItem) then
         try
-          TheRootStoryItemView.Save(Stream); //default file format is EXT_READCOM //Note: saves .readcom in binary (instead of text) format unless SHIFT key is being pressed
+          LRootStoryItem.Save(Stream); //default file format is EXT_READCOM //Note: saves .readcom in binary (instead of text) format unless SHIFT key is being pressed
         except
           on E: Exception do
             begin
@@ -1799,6 +1923,8 @@ implementation
             end;
         end
     end;
+
+    SaveBackpack;
   end;
 
   procedure TStoryForm.FormSaveState(Sender: TObject);

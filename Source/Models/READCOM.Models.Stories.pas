@@ -425,6 +425,9 @@ interface
       function GetPreviousStoryPoint: IStoryItem;
       function GetNextStoryPoint: IStoryItem;
 
+      {Collectables}
+      procedure Collect(const StoryItem: IStoryItem);
+
       {Tags}
       function CheckTagsMatched(const TagsMatching: TTagsMatching = TagsMatching_Default): Boolean;
 
