@@ -74,8 +74,6 @@ interface
         FIgnoreActiveStoryItemChanges: Boolean; //=False
         FActiveStoryItem: IStoryItem; //=nil
         FOnActiveStoryItemChanged: TNotifyEvent;
-
-        //TODO: maybe move to IStory so that we don't have many class variables
         FHomeStoryItem: IStoryItem;
 
     {$endregion}
