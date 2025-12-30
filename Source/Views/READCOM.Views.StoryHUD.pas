@@ -70,7 +70,6 @@ interface
       btnLoad: TSpeedButton;
       btnSave: TSpeedButton;
       btnToggleEditMode: TSpeedButton;
-      btnToggleBackpack: TSpeedButton;
       btnToggleStructureVisible: TSpeedButton;
       btnToggleTargetsVisible: TSpeedButton;
       btnToggleUseStoryTimer: TSpeedButton;
@@ -96,7 +95,6 @@ interface
       procedure actionAboutExecute(Sender: TObject);
       procedure actionMenuExecute(Sender: TObject);
       procedure btnToggleEditModeClick(Sender: TObject);
-      procedure btnToggleBackpackClick(Sender: TObject);
       procedure btnToggleStructureVisibleClick(Sender: TObject);
       procedure btnToggleTargetsVisibleClick(Sender: TObject);
       procedure btnToggleUseStoryTimerClick(Sender: TObject);
@@ -105,21 +103,17 @@ interface
     protected
       FMultiViewOpenedWidth: Single;
       FEditMode: Boolean;
-      FBackpackVisible: Boolean;
       FStructureVisible: Boolean;
       FTargetsVisible: Boolean;
       FUseStoryTimer: Boolean;
 
       FEditModeChanged: TBooleanPropertyChangedEvent;
-      FBackpackVisibleChanged: TBooleanPropertyChangedEvent;
       FStructureVisibleChanged: TBooleanPropertyChangedEvent;
       FTargetsVisibleChanged: TBooleanPropertyChangedEvent;
       FUseStoryTimerChanged: TBooleanPropertyChangedEvent;
 
       {EditMode}
       procedure SetEditMode(const Value: Boolean); virtual;
-      {BackpackVisible}
-      procedure SetBackpackVisible(const Value: Boolean); virtual;
       {StructureVisible}
       procedure SetStructureVisible(const Value: Boolean); virtual;
       {TargetsVisible}
@@ -138,14 +132,12 @@ interface
 
     published
       property EditMode: Boolean read FEditMode write SetEditMode default false;
-      property BackpackVisible: Boolean read FBackpackVisible write SetBackpackVisible default false;
       property StructureVisible: Boolean read FStructureVisible write SetStructureVisible default false;
       property TargetsVisible: Boolean read FTargetsVisible write SetTargetsVisible default false;
       property UseStoryTimer: Boolean read FUseStoryTimer write SetUseStoryTimer default false;
       property FullScreen: Boolean read GetFullScreen write SetFullScreen default false;
 
       property OnEditModeChanged: TBooleanPropertyChangedEvent read FEditModeChanged write FEditModeChanged;
-      property OnBackpackVisibleChanged: TBooleanPropertyChangedEvent read FBackpackVisibleChanged write FBackpackVisibleChanged;
       property OnStructureVisibleChanged: TBooleanPropertyChangedEvent read FStructureVisibleChanged write FStructureVisibleChanged;
       property OnTargetsVisibleChanged: TBooleanPropertyChangedEvent read FTargetsVisibleChanged write FTargetsVisibleChanged;
       property OnUseStoryTimerChanged: TBooleanPropertyChangedEvent read FUseStoryTimerChanged write FUseStoryTimerChanged;
@@ -207,22 +199,6 @@ implementation
 
       if Assigned(FEditModeChanged) then
         FEditModeChanged(Self, Value);
-    end;
-  end;
-
-  {$endregion}
-
-  {$region 'BackpackVisible'}
-
-  procedure TStoryHUD.SetBackpackVisible(const Value: Boolean);
-  begin
-    if (Value <> FBackpackVisible) then
-    begin
-      FBackpackVisible := Value;
-      btnToggleBackpack.IsPressed := Value; //don't use "Pressed", need to use "IsPressed"
-
-      if Assigned(FBackpackVisibleChanged) then
-        FBackpackVisibleChanged(Self, Value);
     end;
   end;
 
@@ -320,13 +296,6 @@ implementation
   end;
 
   {$endregion}
-
-  {$region 'Backpack'}
-
-  procedure TStoryHUD.btnToggleBackpackClick(Sender: TObject);
-  begin
-    BackpackVisible := not BackpackVisible; //don't use "btnToggleBackpack.Pressed", returns inconsistent values (note: IsPressed is different from Pressed)
-  end;
 
   {$endregion}
 

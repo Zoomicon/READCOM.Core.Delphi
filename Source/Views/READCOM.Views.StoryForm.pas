@@ -11,8 +11,13 @@ unit READCOM.Views.StoryForm;
 interface
   {$region 'Used units'}
   uses
-    System.Actions, System.SysUtils, System.Types, System.UITypes,
-    System.Classes, System.Variants,
+    System.Actions,
+    System.SysUtils,
+    System.Types,
+    System.UITypes,
+    System.Classes,
+    System.Variants,
+    System.Generics.Collections, //for TStack
     //
     FMX.Objects, FMX.Controls, FMX.Controls.Presentation, FMX.StdCtrls,
     FMX.Types, //for TLang
@@ -46,11 +51,12 @@ interface
 
     TStoryLoadedEvent = procedure(const Story: TStory) of object;
 
-    TStory = class(TComponent, IStory)
+    TStory = class(TComponent, IStory) //using TComponent so that it can appear in Object Debugger (and lifetime can be managed by TStoryForm)
     protected
       var
         UI: TStoryForm;
         //
+        FNavigationHistory: TStack<IStoryItem>;
         FStoryMode: TStoryMode;
 
       class var
@@ -58,7 +64,11 @@ interface
 
     public
       {Initialization}
-      constructor Create(AUI: TStoryForm); reintroduce; //hiding ancestor constructor
+      constructor Create(AUI: TStoryForm); reintroduce;
+      destructor Destroy; override;
+
+      {Navigation History}
+      procedure ClearNavigationHistory;
 
       {Refresh any structure view}
       procedure RefreshStructure;
@@ -203,8 +213,6 @@ interface
 
     protected
       FStory: TEditableStory;
-      FBackpack: IStoryItem;
-      FBackpackPreviousActiveStoryItem: IStoryItem;
 
       FStructureView: TStructureView;
       FShiftDown: Boolean; //set by event handlers for OnFormKeyDown, OnFormKeyUp to monitor SHIFT key standalone presses
@@ -226,9 +234,6 @@ interface
       function LoadFromFileOrUrl(const PathOrUrl: String): Boolean;
       function LoadCommandLineParameter: Boolean;
       function LoadDefaultDocument: Boolean;
-
-      function LoadBackpack: Boolean;
-      procedure SaveBackpack;
 
       {SavedState}
       function GetStateStoragePath: String;
@@ -256,9 +261,6 @@ interface
       {Options}
       procedure ShowActiveStoryItemOptions;
 
-      {Backpack}
-      procedure ClearBackpack;
-
       {StructureView}
       function GetStructureView: TStructureView;
       procedure SetStructureView(const Value: TStructureView);
@@ -269,7 +271,6 @@ interface
 
       {HUD}
       procedure HUDEditModeChanged(Sender: TObject; const Value: Boolean);
-      procedure HUDBackpackVisibleChanged(Sender: TObject; const Value: Boolean);
       procedure HUDStructureVisibleChanged(Sender: TObject; const Value: Boolean);
       procedure HUDTargetsVisibleChanged(Sender: TObject; const Value: Boolean);
       procedure HUDUseStoryTimerChanged(Sender: TObject; const Value: Boolean);
@@ -332,8 +333,33 @@ implementation
   begin
     inherited Create(AUI); //the form is the owner for life-time management of the Story object
     Name := 'Story'; //displayed in Object Debugger
+
+    FNavigationHistory := TStack<IStoryItem>.Create;
+
     UI := AUI;
   end;
+
+  destructor TStory.Destroy;
+  begin
+    FreeAndNil(FNavigationHistory);
+
+    inherited; //must do last
+  end;
+
+  {$region 'Navigation History'}
+  
+  procedure TStory.ClearNavigationHistory;
+  begin
+    with FNavigationHistory do
+    begin
+      for var i := 0 to Count - 1 do
+        List[i] := nil;  // List is the protected dynamic array
+
+      Clear; //if interface refs are stale (objects have already been deleted, this will fails, so need to nil them first)
+    end;
+  end;
+  
+  {$endregion}
 
   {$region 'Refresh any structure view'}
 
@@ -456,18 +482,20 @@ implementation
 
   procedure TStory.Collect(const StoryItem: IStoryItem);
   begin
-    if not Assigned(UI.FBackpack) then exit;
+    var LBackpack := RootStoryItem.GetStoryPoint('BACKPACK'); //TODO: change so that Collectables specify ID path for where they get collected at
+    if not Assigned(LBackpack) then exit;
 
     var LNewParent: IStoryItem;
-    if (StoryItem.ParentStoryItem.View <> UI.FBackpack.View) then //if not in backpack //WARNING: do not compare interface references, they can differ)
+    if (StoryItem.ParentStoryItem.View <> LBackpack.View) then //if item not in backpack //WARNING: do not compare interface references, they can differ)
     begin
-      LNewParent := UI.FBackpack; //move to backpack
+      LNewParent := LBackpack; //move to backpack
       StoryItem.Anchored := false; //make moveable (will remain so after we place object back into a scene - collectables that weren't moveable before adding to the backpack could be for example items stuck somewhere that we unstack and collected and can place back freely where we wish)
     end
     else
     begin
-      LNewParent := UI.FBackpackPreviousActiveStoryItem; //move to previously ActiveStoryItem (before backpack was shown)
-      UI.HUD.BackpackVisible := false; //hide backpack
+      var LPreviousActiveStoryPoint := FNavigationHistory.Pop;
+      LNewParent := LPreviousActiveStoryPoint; //move item to previously ActiveStoryItem (before backpack was shown)
+      ActiveStoryItem := LPreviousActiveStoryPoint;
     end;
 
     StoryItem.ParentStoryItem := LNewParent;
@@ -534,7 +562,7 @@ implementation
 
     if LUrl = '0' then
     begin
-      UI.HUD.BackpackVisible := not UI.HUD.BackpackVisible; //?0, ??0, ???0 will do tags matching //Note: in the past this doing ActivateHomeStoryItem, but now ~ does it (from ID path resolution logic at ActivateUrl), so using 0 to toggle Backpack visibility
+      ActivateHomeStoryItem(TagsMatching); //?0, ??0, ???0 will do tags matching //Note: can also use ~ now to Activate HomeStoryItem (from ID path resolution logic at ActivateUrl)
       exit;
     end;
 
@@ -557,7 +585,12 @@ implementation
 
   procedure TStory.SetActiveStoryItem(const Value: IStoryItem);
   begin
-    TStoryItem.ActiveStoryItem := Value;
+    if (ActiveStoryItem <> Value) then
+    begin
+      if (StoryMode <> EditMode) then
+        FNavigationHistory.Push(ActiveStoryItem); //TODO: should make sure if StoryPoints can be self-deleted they get removed from navigation history
+      TStoryItem.ActiveStoryItem := Value;
+    end;
   end;
 
   procedure TStory.ActivateRootStoryItem;
@@ -855,7 +888,6 @@ implementation
         TargetsVisible := false;
 
         OnEditModeChanged := HUDEditModeChanged;
-        OnBackpackVisibleChanged := HUDBackpackVisibleChanged;
         OnStructureVisibleChanged := HUDStructureVisibleChanged;
         OnTargetsVisibleChanged := HUDTargetsVisibleChanged;
         OnUseStoryTimerChanged := HUDUseStoryTimerChanged;
@@ -906,7 +938,7 @@ implementation
 
   procedure TStoryForm.FormDestroy(Sender: TObject);
   begin
-    ClearBackpack;
+    //NOP //Note: FStory's lifetime is managed by its owner TStoryForm
   end;
 
   procedure TStoryForm.FormShow(Sender: TObject);
@@ -927,7 +959,7 @@ implementation
 
   procedure TStoryForm.SetRootStoryItemView(const Value: TStoryItem);
   begin
-    HUD.BackpackVisible := false; //MUST HIDE BACKPACK FIRST (since it's injected in the Story when it appears)
+    Story.ClearNavigationHistory;
 
     //Remove old story
     var TheRootStoryItemView := RootStoryItemView;
@@ -1117,11 +1149,7 @@ implementation
       procedure(Confirmed: Boolean)
       begin
         if Confirmed and (not LoadDefaultDocument) then
-        begin
           Story.NewRootStoryItem;
-
-          ClearBackpack; //Note: only ClearBackpack at New action (and FormDestroy), not at Edit/Cut or Edit/Delete of RootStoryItem
-        end;
       end
     );
   end;
@@ -1338,46 +1366,6 @@ implementation
   end;
 
   {$endregion}
-
-  {$endregion}
-
-  {$region 'Backpack'}
-
-  procedure TStoryForm.ClearBackpack;
-  begin
-    if Assigned(FBackpack) then
-    begin
-      FreeAndNil(FBackpack.View);
-      FBackpack := nil;
-    end;
-  end;
-
-  procedure TStoryForm.HUDBackpackVisibleChanged(Sender: TObject; const Value: Boolean);
-  begin
-    if Value then
-    begin
-      var LBackpackParentStoryItem := Story.ActiveStoryItem;
-      if Assigned(LBackpackParentStoryItem) then
-      begin
-        var LBackpackParentStoryItemView := LBackpackParentStoryItem.View;
-        with FBackpack.View do
-        begin
-          Position.Point := TPointF.Zero;
-          Size.Size := LBackpackParentStoryItemView.Size.Size;
-          Align := TAlignLayout.Scale;
-          Parent := LBackpackParentStoryItemView;
-        end;
-        FBackpackPreviousActiveStoryItem := Story.ActiveStoryItem;
-        FBackpack.Active := true;
-      end
-    end
-    else
-    begin
-      Story.ActiveStoryItem := FBackpackPreviousActiveStoryItem;
-      FBackpack.View.Parent := nil; //Hide backpack
-      FBackpackPreviousActiveStoryItem := nil;
-    end;
-  end;
 
   {$endregion}
 
@@ -1846,42 +1834,6 @@ implementation
       result := LHomePath; //if we fail to create subdirectory under home path for the app, use the home path instead
   end;
 
-  function TStoryForm.LoadBackpack: Boolean;
-  begin
-    var LBackpackPath := TPath.Combine(GetStateStoragePath, BACKPACK_FILENAME);
-    try
-      FBackpack := TStoryItem.LoadNew(LBackpackPath, EXT_READCOM); //a new instance of the TStoryItem descendent serialized in the Stream will be created
-      result := true;
-    except
-      on E: Exception do
-      begin
-        Log(E);
-        //ShowException(E, @TStoryForm.LoadBackpack); //Backpack can be missing (esp. at first launch), don't show exception to user
-        FBackpack := TImageStoryItem.Create(Self); //Create an empty backpack
-        FBackpack.BackgroundColor := MakeColor(TAlphaColorRec.Lime, BACKPACK_ALPHA); //make it a bit translucent since it is shown over the ActiveStoryItem //set this only here, not when loading from saved backpack (so that author can customize it in Edit mode)
-        result := false;
-      end;
-    end;
-    FBackpack.UrlAction := '0'; //always setting this (to close backup when clicking its empty area)
-    FBackpack.StoryPoint := true; //always setting this (could set it only when we create a new one, but doesn't hurt to set it too after loading a saved one)
-  end;
-
-  procedure TStoryForm.SaveBackpack;
-  begin
-    var LBackpackPath := TPath.Combine(GetStateStoragePath, BACKPACK_FILENAME);
-
-    if Assigned(FBackpack) then
-      try
-        FBackpack.Save(LBackpackPath); //default file format is EXT_READCOM //Note: saves .readcom in binary (instead of text) format unless SHIFT key is being pressed
-      except
-        on E: Exception do
-          begin
-          Log(E);
-          ShowException(E, @TStoryForm.SaveBackpack);
-          end;
-      end
-  end;
-
   function TStoryForm.LoadSavedState: Boolean;
   begin
     Log('LoadSavedState');
@@ -1893,15 +1845,11 @@ implementation
       result := LoadFromStream(Stream, {ActivateHome:=}false); //don't ActivateHome, keep last Active one (needed in case the OS brought down the app and need to continue from where we were from saved state)
       StorySource := TPath.Combine(StoragePath, Name);
     end;
-
-    LoadBackpack;
   end;
 
   procedure TStoryForm.SaveCurrentState;
   begin
     Log('SaveCurrentState');
-
-    HUD.BackpackVisible := false; //Hide backpack so that its StoryItem (added to ActiveStoryItem) doesn't get saved with the Story
 
     with SaveState do
     begin
@@ -1923,8 +1871,6 @@ implementation
             end;
         end
     end;
-
-    SaveBackpack;
   end;
 
   procedure TStoryForm.FormSaveState(Sender: TObject);
