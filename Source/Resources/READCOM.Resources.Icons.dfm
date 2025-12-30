@@ -162,7 +162,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 24
+            Size = 136
           end>
         IconName = 'Anchor'
         SVGText = 
@@ -188,7 +188,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 24
+            Size = 136
           end>
         IconName = 'OpenFileFolder'
         SVGText = 
@@ -224,7 +224,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 24
+            Size = 136
           end>
         IconName = 'Save'
         SVGText = 
@@ -292,7 +292,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 24
+            Size = 136
           end>
         IconName = 'GlobeWithMeridians'
         SVGText = 
@@ -442,7 +442,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 24
+            Size = 136
           end>
         IconName = 'Home'
         SVGText = 
@@ -470,7 +470,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 24
+            Size = 136
           end>
         IconName = 'Signpost'
         SVGText = 
@@ -1016,7 +1016,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 24
+            Size = 136
           end>
         IconName = 'Tag'
         SVGText = 
@@ -1158,7 +1158,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 24
+            Size = 136
           end>
         IconName = 'Magnet'
         SVGText = 
@@ -1411,7 +1411,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 24
+            Size = 136
           end>
         IconName = 'Close'
         SVGText = 
@@ -1705,7 +1705,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 24
+            Size = 136
           end>
         IconName = 'Factory_SVGrepo_168883'
         SVGText = 
@@ -1811,7 +1811,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 24
+            Size = 136
           end>
         IconName = 'Eye_OpenMoji_1F441'
         SVGText = 
@@ -1880,24 +1880,24 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'Anchor'
-            SourceRect.Right = 24.000000000000000000
-            SourceRect.Bottom = 24.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'OpenFileFolder'
-            SourceRect.Right = 24.000000000000000000
-            SourceRect.Bottom = 24.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Save'
-            SourceRect.Right = 24.000000000000000000
-            SourceRect.Bottom = 24.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
@@ -1912,8 +1912,8 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'GlobeWithMeridians'
-            SourceRect.Right = 24.000000000000000000
-            SourceRect.Bottom = 24.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
@@ -1944,16 +1944,16 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'Home'
-            SourceRect.Right = 24.000000000000000000
-            SourceRect.Bottom = 24.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Signpost'
-            SourceRect.Right = 24.000000000000000000
-            SourceRect.Bottom = 24.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
@@ -2056,8 +2056,8 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'Tag'
-            SourceRect.Right = 24.000000000000000000
-            SourceRect.Bottom = 24.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
@@ -2080,8 +2080,8 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'Magnet'
-            SourceRect.Right = 24.000000000000000000
-            SourceRect.Bottom = 24.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
@@ -2128,8 +2128,8 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'Close'
-            SourceRect.Right = 24.000000000000000000
-            SourceRect.Bottom = 24.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
@@ -2200,8 +2200,8 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'Factory_SVGrepo_168883'
-            SourceRect.Right = 24.000000000000000000
-            SourceRect.Bottom = 24.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end
       item
@@ -2216,8 +2216,8 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'Eye_OpenMoji_1F441'
-            SourceRect.Right = 24.000000000000000000
-            SourceRect.Bottom = 24.000000000000000000
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
           end>
       end>
     Size = 136

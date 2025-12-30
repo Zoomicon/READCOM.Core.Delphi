@@ -341,13 +341,20 @@ implementation
 
   destructor TStory.Destroy;
   begin
-    FreeAndNil(FNavigationHistory);
+    try
+      ClearNavigationHistory; //MUST do before FreeAndNil(FNavigationHistory) else it does Clear which try to release IStoryItem references that point to already freed StoryItems
+
+      FreeAndNil(FNavigationHistory);
+    except //TODO: even though we do ClearNavigationHistory it still seems to have issue
+      On E: Exception do
+        Log(E);
+    end;
 
     inherited; //must do last
   end;
 
   {$region 'Navigation History'}
-  
+
   procedure TStory.ClearNavigationHistory;
   begin
     with FNavigationHistory do
@@ -358,7 +365,7 @@ implementation
       Clear; //if interface refs are stale (objects have already been deleted, this will fails, so need to nil them first)
     end;
   end;
-  
+
   {$endregion}
 
   {$region 'Refresh any structure view'}
@@ -482,23 +489,30 @@ implementation
 
   procedure TStory.Collect(const StoryItem: IStoryItem);
   begin
-    var LBackpack := RootStoryItem.GetStoryPoint('BACKPACK'); //TODO: change so that Collectables specify ID path for where they get collected at
-    if not Assigned(LBackpack) then exit;
+    if not Assigned(StoryItem) then exit;
+
+    var LCollectableTargetStoryItem := StoryItem.CollectableTargetStoryItem; //TODO: change so that Collectables specify ID path for where they get collected at
+    if not Assigned(LCollectableTargetStoryItem) then exit;
 
     var LNewParent: IStoryItem;
-    if (StoryItem.ParentStoryItem.View <> LBackpack.View) then //if item not in backpack //WARNING: do not compare interface references, they can differ)
+    if (StoryItem.ParentStoryItem.View <> LCollectableTargetStoryItem.View) then //if item not in backpack //WARNING: do not compare interface references, they can differ)
     begin
-      LNewParent := LBackpack; //move to backpack
+      LNewParent := LCollectableTargetStoryItem; //move to collectable's target
       StoryItem.Anchored := false; //make moveable (will remain so after we place object back into a scene - collectables that weren't moveable before adding to the backpack could be for example items stuck somewhere that we unstack and collected and can place back freely where we wish)
     end
     else
-    begin
-      var LPreviousActiveStoryPoint := FNavigationHistory.Pop;
-      LNewParent := LPreviousActiveStoryPoint; //move item to previously ActiveStoryItem (before backpack was shown)
-      ActiveStoryItem := LPreviousActiveStoryPoint;
-    end;
+      if (not FNavigationHistory.IsEmpty) then
+      begin
+        var LPreviousActiveStoryPoint := FNavigationHistory.Pop;
+        if not Assigned(LPreviousActiveStoryPoint) then exit; //if we had started with the CollectableTarget as ActiveStoryItem this will end up nil
+
+        LNewParent := LPreviousActiveStoryPoint; //move item to previously ActiveStoryItem (before backpack was shown)
+        ActiveStoryItem := LPreviousActiveStoryPoint; //this should push to navigation history
+      end;
 
     StoryItem.ParentStoryItem := LNewParent;
+
+    UI.UpdateStructureView; //TODO: if we fully handle reparenting events that will not be needed (will update automatically)
   end;
 
   {$endregion}
@@ -1529,7 +1543,6 @@ implementation
 
       with Story do
       begin
-        ZoomTo; //TODO: temp fix, else showing some undrawn text when loading from temp state and till one [un]zooms or resizes (seems 0.3.1 didn't have the issue this fixes, but 0.3.0 and 0.3.2+ had it)
         ZoomToActiveStoryPointOrHome; //needed upon app first loading to ZoomTo Active StoryPoint or Home from loaded saved state
         //ActivateHomeStoryItem; //apply the home //TODO: text doesn't render yet at this point
       end;

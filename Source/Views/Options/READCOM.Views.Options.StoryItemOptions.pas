@@ -20,6 +20,7 @@ resourcestring
   STR_URL = 'URL';
   STR_FACTORY_CAPACITY = 'Factory Capacity';
   STR_TAGS = 'Tags';
+  STR_COLLECTABLE_TARGET = 'Collectable Target';
 
 type
   TStoryItemOptions = class(TFrame, IStoryItemOptions)
@@ -82,6 +83,7 @@ type
     procedure ShowPopup; //TODO: use PopupVisible boolean property instead
     procedure HidePopup;
 
+    procedure ActChangeCollectableTarget;
     procedure ActChangeTags;
     procedure ActChangeUrlAction;
     procedure ActChangeFactoryCapacity;
@@ -135,15 +137,16 @@ begin
 
   with FStoryItem do
   begin
+    btnToggleVisible.IsPressed := not Hidden;
+    txtID.Text := ID;
     btnToggleHome.IsPressed := Home;
     btnToggleStoryPoint.IsPressed := StoryPoint;
-    btnToggleCollectable.IsPressed := Collectable;
+    btnToggleCollectable.IsPressed := (CollectableTarget <> '');
     btnToggleSnapping.IsPressed := Snapping;
     btnToggleAnchored.IsPressed := Anchored;
     btnToggleTags.IsPressed := (Tags <> '');
     btnToggleUrlAction.IsPressed := (UrlAction <> '');
     btnToggleFactory.IsPressed := (FactoryCapacity <> 0);
-    btnToggleVisible.IsPressed := not Hidden;
 
     {$IF DEFINED(ANDROID) OR DEFINED(IOS)}
     btnLoad.Visible := false; //TODO: implement some simple Load file dialog for mobile devices (flat list of documents). Should have some button to delete files too
@@ -197,11 +200,26 @@ begin
   StoryItem.StoryPoint := btnToggleStoryPoint.IsPressed;
 end;
 
-//--- Collectable ---
+//--- CollectableTarget ---
+
+procedure TStoryItemOptions.ActChangeCollectableTarget;
+begin
+  TDialogServiceAsync.InputQuery(STR_COLLECTABLE_TARGET, [STR_COLLECTABLE_TARGET], [StoryItem.GetCollectableTarget],
+    procedure(const AResult: TModalResult; const AValues: array of string)
+    begin
+      if (AResult = mrOk) then
+      begin
+        var LCollectableTarget := Trim(AValues[0]);
+        StoryItem.CollectableTarget := LCollectableTarget;
+        btnToggleCollectable.IsPressed := (LCollectableTarget <> '');
+      end;
+    end
+  );
+end;
 
 procedure TStoryItemOptions.actionToggleCollectableExecute(Sender: TObject);
 begin
-  StoryItem.Collectable := btnToggleCollectable.IsPressed;
+  ActChangeCollectableTarget;
 end;
 
 //--- Anchored (non Moveable) ---

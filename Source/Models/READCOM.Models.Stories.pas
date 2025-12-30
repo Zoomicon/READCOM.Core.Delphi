@@ -113,9 +113,10 @@ interface
       function IsStoryPoint: boolean;
       procedure SetStoryPoint(const Value: boolean);
 
-      {Collectable}
-      function IsCollectable: boolean;
-      procedure SetCollectable(const Value: boolean);
+      {CollectableTarget}
+      function GetCollectableTarget: String;
+      procedure SetCollectableTarget(const Value: String);
+      function GetCollectableTargetStoryItem: IStoryItem;
 
       {StoryPoints}
       function GetStoryPoint(const ID: String): IStoryItem; //ID can be a path of IDs, / meaning Story.HomeStoryItem, ~ meaning Story.HomeStoryItem, empty or . meaning current StoryItem if it is a StoryPoint or Home (else AncestorStoryPoint) and .. meaning AncestorStoryPoint
@@ -206,7 +207,7 @@ interface
       property Active: Boolean read IsActive write SetActive; //default false
       property Home: Boolean read IsHome write SetHome; //default false
       property StoryPoint: Boolean read IsStoryPoint write SetStoryPoint; //default false
-      property Collectable: Boolean read IsCollectable write SetCollectable; //default false
+      property CollectableTarget: String read GetCollectableTarget write SetCollectableTarget; //default ''
       property Snapping: Boolean read IsSnapping write SetSnapping; //default false
       property Anchored: Boolean read IsAnchored write SetAnchored; //default true
       property Tags: String read GetTags write SetTags; //default ''
@@ -235,6 +236,8 @@ interface
       property PreviousStoryPoint: IStoryItem read GetPreviousStoryPoint; //stored false
       property NextStoryPoint: IStoryItem read GetNextStoryPoint; //stored false
       property AncestorStoryPoint: IStoryItem read GetAncestorStoryPoint; //stored false
+      //
+      property CollectableTargetStoryItem: IStoryItem read GetCollectableTargetStoryItem; //stored false
       //
       property TagsMatched: Boolean read AreTagsMatched;
       property AllText: TStrings read GetAllText write SetAllText; //stored false //Note: used to replace Text at applicable items in StoryItem's whole subtree (to be used recursively)

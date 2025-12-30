@@ -50,7 +50,7 @@ interface
         FContent: TBytes; //opaque content storage (dynamic array of bytes)
         FContentExt: String;
         FStoryPoint: Boolean;
-        FCollectable: Boolean;
+        FCollectableTarget: String;
         FHidden: Boolean;
         FSnapping: Boolean;
         FUrlAction: String;
@@ -169,9 +169,10 @@ interface
       function IsStoryPoint: Boolean; virtual;
       procedure SetStoryPoint(const Value: Boolean); virtual;
 
-      {Collectable}
-      function isCollectable: Boolean; virtual;
-      procedure SetCollectable(const Value: Boolean); virtual;
+      {CollectableTarget}
+      function GetCollectableTarget: String; virtual;
+      procedure SetCollectableTarget(const Value: String); virtual;
+      function GetCollectableTargetStoryItem: IStoryItem; //helper
 
       {StoryPoints}
       function GetStoryPoint(const ID: String): IStoryItem; //ID can be a path of IDs, / meaning Story.HomeStoryItem, ~ meaning Story.HomeStoryItem, empty or . meaning current StoryItem if it is a StoryPoint or Home (else AncestorStoryPoint) and .. meaning AncestorStoryPoint
@@ -347,7 +348,6 @@ interface
         DEFAULT_ACTIVE = false;
         DEFAULT_HOME = false;
         DEFAULT_STORYPOINT = false;
-        DEFAULT_COLLECTABLE = false;
         DEFAULT_FOREGROUND_COLOR = TAlphaColorRec.Null; //claNull
         DEFAULT_BACKGROUND_COLOR = TAlphaColorRec.Null; //claNull
         DEFAULT_SNAPPING = false;
@@ -368,10 +368,11 @@ interface
       property Active: Boolean read IsActive write SetActive default DEFAULT_ACTIVE;
       property Home: Boolean read IsHome write SetHome default DEFAULT_HOME;
       property StoryPoint: Boolean read IsStoryPoint write SetStoryPoint default DEFAULT_STORYPOINT;
-      property Collectable: Boolean read IsCollectable write SetCollectable default DEFAULT_COLLECTABLE;
+      property CollectableTarget: String read GetCollectableTarget write SetCollectableTarget; //default '' (implied, not allows to use '')
       property PreviousStoryPoint: IStoryItem read GetPreviousStoryPoint stored false;
       property NextStoryPoint: IStoryItem read GetNextStoryPoint stored false;
       property AncestorStoryPoint: IStoryItem read GetAncestorStoryPoint stored false;
+      property CollectableTargetStoryItem: IStoryItem read GetCollectableTargetStoryItem stored false;
       property Content: TBytes read GetContent write SetContent stored false; //seems Delphi (at least till v12.2) doesn't stream TBytes, so serializing it via DefineProperties as "ContentBin" //TODO: defining as published instead of public in case a Property Editor is implemented in the future
       property ContentExt: String read GetContentExt write SetContentExt; //default nil
       property AllText: TStrings read GetAllText write SetAllText stored false; //Note: used to replace Text at applicable items in StoryItem's whole subtree (to be used recursively) //Note: need to free returned object when done, isn't cached by the StoryItem
@@ -804,7 +805,8 @@ implementation
 
   procedure TStoryItem.SetParentStoryItem(const Value: IStoryItem);
   begin
-    inherited SetParent(Value.View); //don't use "InsertComponent" here, won't work //must use "inherited" to avoid infinite loop and stack overflow //"inherited Parent :=" also fails in Delphi11 when using with just "Value"
+    if Assigned(Value) then
+      inherited SetParent(Value.View); //don't use "InsertComponent" here, won't work //must use "inherited" to avoid infinite loop and stack overflow //"inherited Parent :=" also fails in Delphi11 when using with just "Value"
   end;
 
   {$endregion}
@@ -1133,16 +1135,25 @@ end;
 
   {$region 'StoryPoint'}
 
-  function TStoryItem.IsCollectable: Boolean;
+  function TStoryItem.GetCollectableTarget: String;
   begin
-    Result := FCollectable;
+    Result := FCollectableTarget;
   end;
 
-  procedure TStoryItem.SetCollectable(const Value: Boolean);
+  procedure TStoryItem.SetCollectableTarget(const Value: String);
   begin
-    FCollectable := Value;
+    FCollectableTarget := Value;
 
     UpdateHint;
+  end;
+
+  function TStoryItem.GetCollectableTargetStoryItem: IStoryItem;
+  begin
+    var LCollectableTarget := GetCollectableTarget;
+    if (LCollectableTarget <> '') then
+      result := GetStoryItem(LCollectableTarget)
+    else
+      result := nil;
   end;
 
   {$endregion}
@@ -1683,21 +1694,34 @@ end;
   {$region 'Hints'}
 
   procedure TStoryItem.UpdateHint; //TODO: should also have StructureView show hints of items on hover (though as code is below won't work since it would work only for the ActiveStoryItem - unless we only show for the selected one there)
+  var LHint: String;
+
+  procedure AddToLHint(const Value: String);
+  begin
+    LHint := LHint + ' ' + Value;
+  end;
+
+  procedure AddToLHintNewLine(const Value: String);
+  begin
+    LHint := LHint + #13#10 + Value;
+  end;
+
   begin //TODO: this could update any overlay icons for StructureView items (to show that they're StoryPoint, are anchored etc.)
     if not EditMode then //don't check FStory.StoryMode here, when copying in Edit mode of Story it would add hint too to serialized data
       Hint := '' //don't show Hint in other cases //TODO: consider having a Hint set at StoryItemOptions (if mechanism is added to show such with long tap on touch screens for example). In that case could show it in non-Edit mode (and maybe in Edit mode show a composite hint augmenting it with any extra state like showing URL etc. [could also show if item has anchor etc. on such hint)
     else
     begin
       //Hint := Options.GetDescription; //TODO: move below code to method
-      var LHint: string := ID;
-      if Home then LHint := LHint + ' Home';
-      if StoryPoint then LHint := LHint + ' StoryPoint';
-      if Collectable then LHint := LHint + ' Collectable';
-      if Snapping then LHint := LHint + ' Snapping';
-      if Anchored then LHint := LHint + ' Anchored';
-      if (Tags <> '') then LHint := LHint + ' Tags=[' + Tags + ']';
-      if (UrlAction <> '') then LHint := LHint + ' UrlAction=[' + UrlAction + ']';
-      if (FactoryCapacity > 0) then LHint := LHint + ' FactoryCapacity=[' + IntToStr(FactoryCapacity) + ']';
+      LHint := ID;
+      //TODO: make these resourcestrings or get from the buttons text (assuming it is set and they're just styled to not display it)
+      if Home then AddToLHintNewLine('Home');
+      if StoryPoint then AddToLHintNewLine('StoryPoint');
+      if (CollectableTarget <> '') then AddToLHintNewLine('CollectableTarget=[' + CollectableTarget + ']'); //TODO: use String Formatting
+      if Snapping then AddToLHintNewLine('Snapping');
+      if Anchored then AddToLHintNewLine('Anchored');
+      if (Tags <> '') then AddToLHintNewLine('Tags=[' + Tags + ']'); //TODO: use String Formatting
+      if (UrlAction <> '') then AddToLHintNewLine('UrlAction=[' + UrlAction + ']'); //TODO: use String Formatting
+      if (FactoryCapacity > 0) then AddToLHintNewLine('FactoryCapacity=[' + IntToStr(FactoryCapacity) + ']'); //TODO: use String Formatting
       Hint := LHint;
     end;
   end;
@@ -1868,7 +1892,7 @@ end;
 
         if (not FMoved) then //only for Click operations (not MouseDown + MouseMove + MouseUp) //Note: MouseClick is called before MouseUp in FMX, so FMoved (set by MouseMove when FDragging=true) hasn't be cleared yet
 
-          if IsCollectable and Assigned(FStory) then
+          if (CollectableTarget <> '') and Assigned(FStory) then //TODO: maybe use not IsEmpty instead of <> '' everywhere
             FStory.Collect(Self)
 
           else if (HasUrlAction
