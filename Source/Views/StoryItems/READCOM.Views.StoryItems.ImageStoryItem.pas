@@ -91,11 +91,11 @@ interface
 
       {$region 'IStoreable'}
       function GetLoadFilesFilter: String; override;
-      function Load(const Stream: TStream; const ContentFormat: String = EXT_READCOM; const CreateNew: Boolean = false): TObject; overload; override;
+      function LoadFromStream(const Stream: TStream; const ContentFormat: String = EXT_READCOM; const CreateNew: Boolean = false): TObject; overload; override;
       function LoadSVG(const Stream: TStream; Const ContentFormat: String): TObject; virtual;
       function LoadBitmap(const Stream: TStream; Const ContentFormat: String): TObject; virtual;
       function LoadAnimation(const Stream: TStream; Const ContentFormat: String): TObject; virtual;
-      function Load(const Clipboard: IFMXExtendedClipboardService; const CreateNew: Boolean = false): TObject; overload; override;
+      function LoadFromClipboard(const Clipboard: IFMXExtendedClipboardService; const CreateNew: Boolean = false): TObject; overload; override;
       {$endregion}
 
     //--- Properties ---
@@ -172,7 +172,7 @@ implementation
               inherited; //filters defined by ancestor (e.g. for readcom files)
   end;
 
-  function TImageStoryItem.Load(const Stream: TStream; const ContentFormat: String = EXT_READCOM; const CreateNew: Boolean = false): TObject;
+  function TImageStoryItem.LoadFromStream(const Stream: TStream; const ContentFormat: String = EXT_READCOM; const CreateNew: Boolean = false): TObject;
   begin //TODO: maybe honor CreateNew by making and returning a new instance if true
     //TODO: to make this simpler, could call TMediaDisplay.Load (which has almost identical logic) and catch exception to do result := inherited, but then descendents wouldn't be able to override behaviour by overriding LoadSVG/LoadBitmap/LoadAnimation methods (though they could override this one instead)
     if TMediaDisplay.IsContentFormatSVG(ContentFormat) then //load EXT_SVG //TODO: support SVGZ
@@ -209,7 +209,7 @@ implementation
     result := Self;
   end;
 
-  function TImageStoryItem.Load(const Clipboard: IFMXExtendedClipboardService; const CreateNew: Boolean = false): TObject;
+  function TImageStoryItem.LoadFromClipboard(const Clipboard: IFMXExtendedClipboardService; const CreateNew: Boolean = false): TObject;
   begin
     //check for Bitmap image
     if Clipboard.HasImage then //TODO: does SKIA4Delphi extend this too to support animated images?

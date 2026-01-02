@@ -82,7 +82,7 @@ interface
 
       {$region 'IStoreable'}
       function GetLoadFilesFilter: String; override;
-      function Load(const Stream: TStream; const ContentFormat: String = EXT_READCOM; const CreateNew: Boolean = false): TObject; overload; override;
+      function LoadFromStream(const Stream: TStream; const ContentFormat: String = EXT_READCOM; const CreateNew: Boolean = false): TObject; overload; override;
       function LoadMP3(const Stream: TStream): TObject; virtual;
       {$endregion}
 
@@ -169,7 +169,7 @@ implementation
     result := FILTER_AUDIO + '|' + inherited;
   end;
 
-  function TAudioStoryItem.Load(const Stream: TStream; const ContentFormat: String = EXT_READCOM; const CreateNew: Boolean = false): TObject;
+  function TAudioStoryItem.LoadFromStream(const Stream: TStream; const ContentFormat: String = EXT_READCOM; const CreateNew: Boolean = false): TObject;
   begin
     if (ContentFormat = EXT_MP3) then //load EXT_MP3
       result := LoadMP3(Stream)

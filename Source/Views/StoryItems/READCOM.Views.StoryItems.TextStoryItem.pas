@@ -117,9 +117,9 @@ interface
 
       {$region 'IStoreable'}
       function GetLoadFilesFilter: String; override;
-      function Load(const Stream: TStream; const ContentFormat: String = EXT_READCOM; const CreateNew: Boolean = false): TObject; overload; override;
+      function LoadFromStream(const Stream: TStream; const ContentFormat: String = EXT_READCOM; const CreateNew: Boolean = false): TObject; overload; override;
       function LoadTXT(const Stream: TStream): TObject; virtual;
-      function Load(const Clipboard: IFMXExtendedClipboardService; const CreateNew: Boolean = false): TObject; overload; override;
+      function LoadFromClipboard(const Clipboard: IFMXExtendedClipboardService; const CreateNew: Boolean = false): TObject; overload; override;
       //TODO: add SaveTXT and Save override
       {$endregion}
 
@@ -594,7 +594,7 @@ end;
 
   {$region 'Clipboard'}
 
-  function TTextStoryItem.Load(const Clipboard: IFMXExtendedClipboardService; const CreateNew: Boolean = false): TObject;
+  function TTextStoryItem.LoadFromClipboard(const Clipboard: IFMXExtendedClipboardService; const CreateNew: Boolean = false): TObject;
   begin
     if Clipboard.HasText then
     begin
@@ -780,7 +780,7 @@ end;
     result := FILTER_TEXT + '|' + inherited;
   end;
 
-  function TTextStoryItem.Load(const Stream: TStream; const ContentFormat: String = EXT_READCOM; const CreateNew: Boolean = false): TObject;
+  function TTextStoryItem.LoadFromStream(const Stream: TStream; const ContentFormat: String = EXT_READCOM; const CreateNew: Boolean = false): TObject;
   begin
     if (ContentFormat = EXT_TXT) then //load EXT_TXT
       result := LoadTXT(Stream)

@@ -274,6 +274,7 @@ interface
       {File}
       function ActAdd: Boolean;
       function ActLoad_GetFilename: String;
+      function ActLoadUrl: Boolean;
       function ActLoad: Boolean;
       function ActSave: Boolean;
 
@@ -445,7 +446,7 @@ interface
       function CheckTagsMatched(const TagsMatching: TTagsMatching = TagsMatching_Default): Boolean;
 
       {URLs}
-      procedure DoUrlAction(const UrlAction: String; const BaseStoryItem: IStoryItem = nil);
+      procedure DoUrlAction(const UrlAction: String; const UrlTarget: String; const BaseStoryItem: IStoryItem = nil);
 
       {ActiveStoryItem}
       function GetActiveStoryItem: IStoryItem;
@@ -459,7 +460,7 @@ interface
       procedure ActivatePreviousStoryPoint(const TagsMatching: TTagsMatching = TagsMatching_Default);
       procedure ActivateNextStoryPoint(const TagsMatching: TTagsMatching = TagsMatching_Default);
       //
-      procedure ActivateUrl(const Url:string; const BaseStoryItem: IStoryItem = nil; const TagsMatching: TTagsMatching = TagsMatching_Default); //open new story when ending in .readcom, else open url in browser
+      procedure ActivateUrl(const Url: String; const UrlTarget: String; const BaseStoryItem: IStoryItem = nil; const TagsMatching: TTagsMatching = TagsMatching_Default); //open new story when ending in .readcom, else open url in browser
 
       {StoryMode}
       function GetStoryMode: TStoryMode;

@@ -59,17 +59,19 @@ interface
 
       {Load}
       function GetLoadFilesFilter: String;
-      function Load(const Stream: TStream; const ContentFormat: String = EXT_READCOM; const CreateNew: Boolean = false): TObject; overload;
-      function Load(const Filepath: String; const CreateNew: Boolean = false): TObject; overload;
-      function Load(const Clipboard: IFMXExtendedClipboardService; const CreateNew: Boolean = false): TObject; overload;
+      function LoadFromStream(const Stream: TStream; const ContentFormat: String = EXT_READCOM; const CreateNew: Boolean = false): TObject; overload;
+      function LoadFromFile(const Filepath: String; const CreateNew: Boolean = false): TObject; overload;
+      function LoadFromUrl(const Url: String; const CreateNew: Boolean = false): TObject; overload;
+      function LoadFromFileOrUrl(const PathOrUrl: String; const CreateNew: Boolean = false): TObject; overload;
+      function LoadFromClipboard(const Clipboard: IFMXExtendedClipboardService; const CreateNew: Boolean = false): TObject; overload;
       function LoadFromString(const Data: String; const CreateNew: Boolean = false): TObject;
 
       {Save}
       function GetSaveFilesFilter: String;
       function SaveToString: String;
-      procedure Save(const Stream: TStream; const ContentFormat: String = EXT_READCOM); overload;
-      procedure Save(const Filepath: String); overload;
-      procedure Save(const Clipboard: IFMXExtendedClipboardService); overload;
+      procedure SaveToStream(const Stream: TStream; const ContentFormat: String = EXT_READCOM); overload;
+      procedure SaveToFile(const Filepath: String); overload;
+      procedure SaveToClipboard(const Clipboard: IFMXExtendedClipboardService); overload;
       procedure SaveThumbnail(const Filepath: String; const MaxWidth: Integer = DEFAULT_THUMB_WIDTH; const MaxHeight: Integer = DEFAULT_THUMB_HEIGHT); //TODO: should make constants
       procedure SaveHTML(const Stream: TStream; const ImagesPath: String; const MaxImageWidth: Integer = DEFAULT_HTML_IMAGE_WIDTH; const MaxImageHeight: Integer = DEFAULT_HTML_IMAGE_HEIGHT); overload;
       procedure SaveHTML(const Filepath: String; const MaxImageWidth: Integer = DEFAULT_HTML_IMAGE_WIDTH; const MaxImageHeight: Integer = DEFAULT_HTML_IMAGE_HEIGHT); overload;

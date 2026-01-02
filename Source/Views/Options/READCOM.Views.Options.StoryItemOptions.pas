@@ -17,6 +17,7 @@ uses
 
 resourcestring
   STR_ID = 'ID';
+  STR_URL = 'URL';
   STR_URL_ACTION = 'URL Action';
   STR_URL_ACTION_TARGET = 'URL Action Target';
   STR_FACTORY_CAPACITY = 'Factory Capacity';
@@ -50,6 +51,8 @@ type
     LayoutStoryItemBreak: TFlowLayoutBreak;
     LayoutStoryItemMain: TFlowLayout;
     btnClose: TSpeedButton;
+    btnLoadUrl: TSpeedButton;
+    actionLoadUrl: TAction;
     procedure actionToggleVisibleExecute(Sender: TObject);
     procedure txtIDChange(Sender: TObject);
     procedure actionToggleHomeExecute(Sender: TObject);
@@ -63,6 +66,7 @@ type
     procedure actionLoadExecute(Sender: TObject);
     procedure actionSaveExecute(Sender: TObject);
     procedure txtIDKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
+    procedure actionLoadUrlExecute(Sender: TObject);
 
     //Note: not using a btnCloseClick handler, but using btnClose.ModalResult := mrClose so that it can also handle the ESC key to close the popup (before the app catches it)
 
@@ -90,6 +94,7 @@ type
     procedure ActChangeFactoryCapacity;
     function ActAdd: Boolean;
     function ActLoad_GetFilename: String;
+    function ActLoadUrl: Boolean;
     function ActLoad: Boolean;
     function ActSave: Boolean;
 
@@ -103,6 +108,8 @@ type
 implementation
   uses
     FMX.DialogService.Async, //for TDialogServiceAsync
+    //
+    READCOM.App.Messages, //for URL_GALLERY
     READCOM.Models; //for EXT_READCOM
 
 {$R *.fmx}
@@ -348,17 +355,41 @@ begin
   end;
 end;
 
+function TStoryItemOptions.ActLoadUrl: Boolean;
+begin
+  TDialogServiceAsync.InputQuery(STR_URL, [STR_URL], [URL_GALLERY],
+    procedure(const AResult: TModalResult; const AValues: array of string)
+    begin
+      if (AResult = mrOk) then
+      begin
+        var LUrl := Trim(AValues[0]);
+
+        var result := (LUrl <> ''); //Note: dummy, this is not the result of the outer function
+        if result then
+          {result := Assigned}(StoryItem.LoadFromUrl(LUrl));
+      end;
+    end
+  );
+
+  result := true; //assuming it will work //TODO: wait without blocking main thread
+end; //TODO: see comments at ActLoad
+
 function TStoryItemOptions.ActLoad: Boolean;
 begin
   var Filename := ActLoad_GetFilename;
   result := (Filename <> '');
   if result then
-    result := Assigned(StoryItem.Load(Filename)); //TODO: seems to cause error (on MouseUp at Form) due to MouseCapture (probably from the popup) not having been released for some (child?) item that gets freed. Should try to get the Root (the form) and do SetCapture(nil) on it or similar, or try to get Capture to us here and release immediately (OR MAYBE THERE IS SOME OTHER ERROR AND WE SHOULD TRY TO REPLACE THE WHOLE ITEM VIA ITS PARENT INSTEAD OF LOADING CONTENT IN IT REMOVING ITS CHILDREN FIRST - THAT WAY WE'LL BE ABLE TO REPLACE AN ITEM WITH ANY OTHER ITEM)
+    result := Assigned(StoryItem.LoadFromFile(Filename)); //TODO: seems to cause error (on MouseUp at Form) due to MouseCapture (probably from the popup) not having been released for some (child?) item that gets freed. Should try to get the Root (the form) and do SetCapture(nil) on it or similar, or try to get Capture to us here and release immediately (OR MAYBE THERE IS SOME OTHER ERROR AND WE SHOULD TRY TO REPLACE THE WHOLE ITEM VIA ITS PARENT INSTEAD OF LOADING CONTENT IN IT REMOVING ITS CHILDREN FIRST - THAT WAY WE'LL BE ABLE TO REPLACE AN ITEM WITH ANY OTHER ITEM)
 end; //TODO: need to change ActLoad to load any file and replace the current one (if not the RootStoryItem should maybe resize to take current bounds), then return the StoryItem instance that was created from that file info (not assume it's same class of StoryItem, TPanelStoryItem in the case of the story [want to load any StoryItem as root - also make sure when RootStoryItem changes the old one is released to not leak]). Can pass true to 2nd optional parameter of load, but need to return the storyitem instead of boolean (can return nil on fail/cancel - also add try/catch maybe?)
 
 procedure TStoryItemOptions.actionLoadExecute(Sender: TObject);
 begin
   actLoad;
+end;
+
+procedure TStoryItemOptions.actionLoadUrlExecute(Sender: TObject);
+begin
+  actLoadUrl;
 end;
 
 //--- Save FileDialog ---
@@ -371,7 +402,7 @@ begin
     Filter := StoryItem.GetSaveFilesFilter;
     result := Execute; //TODO: need a file dialog for mobile (https://stackoverflow.com/questions/69138504/why-does-fmx-topendialog-not-work-in-android)
     if result then
-      StoryItem.Save(Filename);
+      StoryItem.SaveToFile(Filename);
   end;
 end;
 

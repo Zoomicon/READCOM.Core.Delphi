@@ -97,7 +97,7 @@ interface
       procedure Collect(const StoryItem: IStoryItem);
 
       {URLs}
-      procedure DoUrlAction(const UrlAction: String; const BaseStoryItem: IStoryItem = nil);
+      procedure DoUrlAction(const UrlAction: String; const UrlActionTarget: string; const BaseStoryItem: IStoryItem = nil);
 
       {ActiveStoryItem}
       function GetActiveStoryItem: IStoryItem;
@@ -111,7 +111,7 @@ interface
       procedure ActivatePreviousStoryPoint(const TagsMatching: TTagsMatching = TagsMatching_Default);
       procedure ActivateNextStoryPoint(const TagsMatching: TTagsMatching = TagsMatching_Default);
       //
-      procedure ActivateUrl(const Url:string; const BaseStoryItem: IStoryItem = nil; const TagsMatching: TTagsMatching = TagsMatching_Default); //open new story when ending in .readcom, else open url in browser
+      procedure ActivateUrl(const Url:String; const UrlTarget: String; const BaseStoryItem: IStoryItem = nil; const TagsMatching: TTagsMatching = TagsMatching_Default); //open new story when ending in .readcom, else open url in browser
 
       {StoryMode}
       function GetStoryMode: TStoryMode;
@@ -304,9 +304,10 @@ implementation
     FMX.Memo, //for TMemo
     //
     Zoomicon.Helpers.RTL.ClassListHelpers, //for TClassList.Create(TClassArray)
+    Zoomicon.Helpers.RTL.URIHelpers, //for IsURI
     Zoomicon.Helpers.FMX.ActnList, //for SafeTextToShortcut
     Zoomicon.Helpers.FMX.Controls.ControlHelper, //for TControl.Orientation, TControl.FlipHorizontally, TControl.FlipVertically
-    Zoomicon.Helpers.FMX.Forms.ApplicationHelper, //for TApplication.Confirm, TApplication.OpenURL, IsURI
+    Zoomicon.Helpers.FMX.Forms.ApplicationHelper, //for TApplication.Confirm, TApplication.OpenURL
     Zoomicon.Helpers.FMX.Forms.FormHelper, //for TForm.Orientation
     Zoomicon.Helpers.FMX.Memo.MemoHelpers, //for TMemo.DisableFontSizeToFit
     Zoomicon.Introspection.FMX.Debugging, //for ToggleObjectDebuggerVisibility
@@ -519,7 +520,7 @@ implementation
 
   {$region 'URLs'}
 
-  procedure TStory.DoUrlAction(const UrlAction: String; const BaseStoryItem: IStoryItem = nil);
+  procedure TStory.DoUrlAction(const UrlAction: String; const UrlActionTarget: string; const BaseStoryItem: IStoryItem = nil);
   begin
     if UrlAction = '' then exit;
 
@@ -576,7 +577,7 @@ implementation
 
     if LUrl = '0' then
     begin
-      ActivateHomeStoryItem(TagsMatching); //?0, ??0, ???0 will do tags matching //Note: can also use ~ now to Activate HomeStoryItem (from ID path resolution logic at ActivateUrl)
+      //TODO// EmptyTargetStoryItem(TagsMatching); //?0, ??0, ???0 will do tags matching //Note: used to do ActivateHomeStoryItem, but now using '~' for that (at ActivateUrl below)
       exit;
     end;
 
@@ -585,7 +586,7 @@ implementation
 
     //--- Resource URLs - including navigation to other .readcom story (with Tags Matching checking if not bypassed with "!" prefix and only if explicitly asked for with "+" prefix) ---
 
-    ActivateUrl(LUrl, BaseStoryItem, TagsMatching);
+    ActivateUrl(LUrl, UrlActionTarget, BaseStoryItem, TagsMatching);
   end;
 
   {$endregion}
@@ -665,39 +666,59 @@ implementation
     end;
   end;
 
-  procedure TStory.ActivateUrl(const Url:string; const BaseStoryItem: IStoryItem = nil; const TagsMatching: TTagsMatching = TagsMatching_Default); //open new story when ending in .readcom, else open url in browser
+  procedure TStory.ActivateUrl(const Url:String; const UrlTarget: String; const BaseStoryItem: IStoryItem = nil; const TagsMatching: TTagsMatching = TagsMatching_Default); //open new story when ending in .readcom, else open url in browser
+
+    function GetUrlActionTargetStoryItem(const BaseStoryItem: IStoryItem = nil): IStoryItem;
+    begin
+      if (UrlTarget = '') then //do not call GetStoryPoint/GetStoryItem with empty UrlTarget, it will return the StoryItem upon which the method was called. In our case we want UrlActionTarget='' to mean using loading of the RootStoryItem via UI.LoadFromURL (that shows wait modal prompt etc.)
+        exit(nil);
+
+      var Base := BaseStoryItem;
+      if not Assigned(Base) then //if BaseStoryItem not provided...
+        Base := ActiveStoryItem; //...use the ActiveStoryItem as Base for resolving ID paths
+
+      result := Base.GetStoryPoint(UrlTarget); //first try to resolve ID path among StoryPoings only
+
+      if not Assigned(result) then //ID path not resolved among StoryPoints...
+        result := Base.GetStoryItem(UrlTarget); ///...then try to resolve ID path among all StoryItems
+    end;
+
   begin
     if (TagsMatching = TagsMatching_Default) or //skip tags matching by default for URLs
        CheckTagsMatched(TagsMatching) //pass it to CheckTagsMatched to do close-only or open/close lock prompting and return matching state
     then
     begin
 
-      if Url.StartsWith('http:', True) or Url.StartsWith('https:', True) then
-      begin
-        if Url.EndsWith(EXT_READCOM, True) then //if it's a LUrl to a .readcom file (case-insensitive comparison)
-          UI.LoadFromUrl(Url) //either bypassing Tags Matcing, or Tags are Matched, advance to LUrl
-        else
-          Application.OpenUrl(Url); //else open in system browser
-      end
-      else
-      begin
-        var Base := BaseStoryItem;
-        if not Assigned(Base) then
-          Base := ActiveStoryItem;
-        var LTargetStoryItem := Base.GetStoryPoint(Url); //try to resolve ID path among StoryPoings only
-        if Assigned(LTargetStoryItem) then
-        begin
-          LTargetStoryItem.Hidden := false; //unhide StoryPoint
-          UI.Story.SetActiveStoryItem(LTargetStoryItem); //make StoryPoint active (zoom to it)
-        end
-        else //ID path not resolved for StoryPoint
-        begin
-          LTargetStoryItem := Base.GetStoryItem(Url); //try to resolve ID path among all StoryItems
-          if Assigned(LTargetStoryItem) then
-            LTargetStoryItem.Hidden := not LTargetStoryItem.Hidden; //since this isn't a StoryPoint, just toggle its Hidden state (can be used to Show/Hide info cards)
-        end;
+      var LTargetStoryItem := GetUrlActionTargetStoryItem(BaseStoryItem);
 
-      end;
+      if IsURI(Url) then
+      begin
+        if not Url.EndsWith(EXT_READCOM, True) then //if it's not a Url to a .readcom file (case-insensitive comparison)
+          Application.OpenUrl(Url) //open in system browser
+       else
+          //either bypassing Tags Matcing, or Tags are Matched, navigate to Url
+          if not Assigned(LTargetStoryItem) then //no target found, use RootStoryItem
+            UI.LoadFromUrl(Url) //when using RootStoryItem, use the StoryForm's loading method (shows wait prompt etc.)
+          else
+          begin
+            LTargetStoryItem.LoadFromUrl(Url, {CreateNew:=}true); //TODO: should update to fire notifications for showing/hiding wait prompt etc. (even better should show loading prompt as item's image - can use that with ContentSource property too to fetch remote content - but see what other side-effects the form's LoadFromURL does)
+            if LTargetStoryItem.StoryPoint then
+            begin
+              LTargetStoryItem.Active := true;
+              //ActivateHomeStoryItem; //assuming the loaded content had a HomeStoryItem
+            end;
+          end
+      end
+
+      else if (Url ='') then
+        if Assigned(LTargetStoryItem) then
+          if LTargetStoryItem.StoryPoint then
+            begin
+              LTargetStoryItem.Hidden := false; //unhide StoryPoint
+              UI.Story.SetActiveStoryItem(LTargetStoryItem); //make StoryPoint active (zoom to it)
+            end
+          else
+            LTargetStoryItem.Hidden := not LTargetStoryItem.Hidden; //since this isn't a StoryPoint, just toggle its Hidden state (can be used to Show/Hide info cards)
 
       //if (TagsMatching = TagsMatching_OkFail_Prompt) then //REMOVED: LoadFromUrl is asynchronous
         //TLockFrame.HideModal(OPENLOCK_DELAY);
@@ -1728,7 +1749,7 @@ implementation
   function TStoryForm.LoadFromStream(const Stream: TStream; const ActivateHome: Boolean = True): Boolean;
   begin
     result := false;
-    if Stream.Size > 0 then
+    if (Stream.Size > 0) then
     begin
       try
         RootStoryItemView := TStoryItem.LoadNew(Stream, EXT_READCOM); //a new instance of the TStoryItem descendent serialized in the Stream will be created //only set RootStoryItemView (this affects RootStoryItem too)
@@ -1750,7 +1771,7 @@ implementation
     end;
   end;
 
-  function TStoryForm.LoadFromFile(const Filepath: string): Boolean;
+  function TStoryForm.LoadFromFile(const Filepath: String): Boolean;
   begin
     var InputFileStream := TFileStream.Create(Filepath,  fmOpenRead {or fmShareDenyNone}); //TODO: fmShareDenyNote probably needed for Android
     try
@@ -1876,7 +1897,7 @@ implementation
       var LRootStoryItem := Story.RootStoryItem;
       if Assigned(LRootStoryItem) then
         try
-          LRootStoryItem.Save(Stream); //default file format is EXT_READCOM //Note: saves .readcom in binary (instead of text) format unless SHIFT key is being pressed
+          LRootStoryItem.SaveToStream(Stream); //default file format is EXT_READCOM //Note: saves .readcom in binary (instead of text) format unless SHIFT key is being pressed
         except
           on E: Exception do
             begin

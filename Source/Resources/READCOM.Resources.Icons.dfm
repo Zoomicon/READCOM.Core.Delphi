@@ -1835,6 +1835,64 @@ object Icons: TIcons
           'p="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-' +
           'width="2"/>'#10'  </g>'#10'</svg>'#10
         Opacity = 1.000000000000000000
+      end
+      item
+        MultiResBitmap = <
+          item
+            Size = 136
+          end>
+        IconName = 'OpenWebFolder'
+        SVGText = 
+          '<svg width="72" height="72" xmlns="http://www.w3.org/2000/svg">'#10 +
+          #10' <g>'#10'  <title>Layer 1</title>'#10'  <g id="color">'#10'   <path id="svg' +
+          '_1" d="m15.464,59.6264c0.1391,-0.1691 2.3559,-7.8264 2.8998,-9.6' +
+          '27c0.457,-1.5137 3.9618,-15.2702 6.1601,-25.071c0.0084,-0.1315 3' +
+          '3.4839,-0.6133 33.4839,-0.6133l0,-4.0109c0,0.5522 -1,-3.356 -1,-' +
+          '3.356l-27.4931,-0.5712c-0.0801,-1.2364 -1.004,-4.1216 -2.1368,-4' +
+          '.1216l-12.5869,-0.1983c-1.1026,0 -2.8321,1.3407 -2.8321,2.4437c0' +
+          ',0 0.5527,39.7248 0,39.7248c-0.5527,0 -0.9999,2.3271 -0.9999,1.7' +
+          '744c0,0 0.3537,3.5947 1.3755,4.566c0.0143,0.0137 0.0302,0.0212 0' +
+          '.0451,0.0335c-0.1325,-0.1559 2.9254,-0.7806 3.0844,-0.9731z" fil' +
+          'l="#9B9B9A"/>'#10'   <path id="svg_2" d="m23.9444,24.3151c0,0.0782 -' +
+          '0.0083,0.1557 -0.0259,0.2318c-0.2749,1.226 -6.7345,30.0417 -7.36' +
+          '3,32.1243c-0.3359,1.1164 -0.9593,2.3082 -1.7645,3.291l43.1115,0.' +
+          '0104c1.1381,0 1.5216,0 2.1521,-2.3899c0.6676,-2.5305 6.6984,-30.' +
+          '2693 7.342,-33.2323c0.0017,-0.009 0.0066,-0.0353 0.0066,-0.0353l' +
+          '-43.4588,0z" fill="#D0CFCE"/>'#10'  </g>'#10'  <g id="hair"/>'#10'  <g id="s' +
+          'kin"/>'#10'  <g id="skin-shadow"/>'#10'  <g id="line">'#10'   <path id="svg_' +
+          '3" d="m57.0078,20.3044l0,-3.3562l-27.3383,-0.0025c-0.198,0 -0.35' +
+          '86,-0.165 -0.3586,-0.3684l-0.0687,-1.5169c-0.116,-1.7878 -1.3398' +
+          ',-3.0033 -2.9967,-3.0033l-11.2866,0c-1.6569,0 -3,1.3432 -3,3l0,4' +
+          '0.9429" stroke-width="2" stroke-miterlimit="10" stroke-linejoin=' +
+          '"round" stroke-linecap="round" stroke="#000000" fill="none"/>'#10'  ' +
+          ' <path id="svg_4" d="m17.0271,55.5678c-0.5897,1.954 -2.2223,4.13' +
+          '89 -3.8959,4.394l43.9148,0.0108c1.6569,0 2.3233,-0.4388 3,-3c0.6' +
+          '767,-2.5612 7,-31.6575 7,-31.6575c0,-0.5523 -0.4477,-1 -1,-1l-41' +
+          '.0811,0c-0.5523,0 -1,0.4477 -1,1c0,0 -6.3481,28.2986 -6.9378,30.' +
+          '2527z" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="' +
+          'round" stroke-linecap="round" stroke="#000000" fill="none"/>'#10'  <' +
+          '/g>'#10'  <g stroke="null" id="svg_12">'#10'   <circle stroke="#000000" ' +
+          'id="svg_5" stroke-width="2" stroke-miterlimit="10" stroke-linejo' +
+          'in="round" stroke-linecap="round" fill="none" r="14" cy="43" cx=' +
+          '"43"/>'#10'   <path stroke="#000000" id="svg_6" d="m43,29l0,28c-4.28' +
+          '02,0 -7.75,-6.268 -7.75,-14s3.4698,-14 7.75,-14c4.2802,0 7.75,6.' +
+          '268 7.75,14s-3.4698,14 -7.75,14" stroke-width="2" stroke-miterli' +
+          'mit="10" stroke-linejoin="round" stroke-linecap="round" fill="no' +
+          'ne"/>'#10'   <path stroke="#000000" id="svg_7" d="m29,43" stroke-wid' +
+          'th="2" stroke-miterlimit="10" stroke-linejoin="round" stroke-lin' +
+          'ecap="round" fill="none"/>'#10'   <path stroke="#000000" id="svg_8" ' +
+          'd="m57,43" stroke-width="2" stroke-miterlimit="10" stroke-linejo' +
+          'in="round" stroke-linecap="round" fill="none"/>'#10'   <line stroke=' +
+          '"#000000" id="svg_9" stroke-width="2" stroke-miterlimit="10" str' +
+          'oke-linejoin="round" stroke-linecap="round" fill="none" y2="43" ' +
+          'y1="43" x2="29" x1="57"/>'#10'   <line stroke="#000000" id="svg_10" ' +
+          'stroke-width="2" stroke-miterlimit="10" stroke-linejoin="round" ' +
+          'stroke-linecap="round" fill="none" y2="36" y1="36" x2="31" x1="5' +
+          '5"/>'#10'   <line stroke="#000000" id="svg_11" stroke-width="2" stro' +
+          'ke-miterlimit="10" stroke-linejoin="round" stroke-linecap="round' +
+          '" fill="none" y2="50" y1="50" x2="31" x1="55"/>'#10'  </g>'#10' </g>'#10'</s' +
+          'vg>'
+        Opacity = 1.000000000000000000
       end>
     Destination = <
       item
@@ -2217,6 +2275,14 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'Eye_OpenMoji_1F441'
+            SourceRect.Right = 136.000000000000000000
+            SourceRect.Bottom = 136.000000000000000000
+          end>
+      end
+      item
+        Layers = <
+          item
+            Name = 'OpenWebFolder'
             SourceRect.Right = 136.000000000000000000
             SourceRect.Bottom = 136.000000000000000000
           end>

@@ -10,7 +10,9 @@ interface
   uses
     System.UITypes,
     System.SysUtils, //for TBytes, Supports
-    System.Types, System.Classes, System.Variants,
+    System.Types,
+    System.Classes,
+    System.Variants,
     //
     FMX.Types, FMX.Graphics, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.StdCtrls,
     FMX.Objects,
@@ -32,7 +34,8 @@ interface
   {$endregion}
 
   resourcestring
-    MSG_CONTENT_FORMAT_NOT_SUPPORTED = 'Content format not supported: %s';
+    ERR_CONTENT_FORMAT_NOT_SUPPORTED = 'Content format not supported: %s';
+    ERR_DOWNLOAD = 'Download failed (%s)';
 
   //TODO: override EnabledStored maybe to never store Enabled property (which is used in Edit mode - in that case should disable a child after pasting in edit mode)
 
@@ -265,6 +268,7 @@ interface
       constructor Create(AOwner: TComponent); overload; override;
       constructor Create(AOwner: TComponent; const AName: String); reintroduce; overload; virtual; //TODO: see why if we don't define "reintroduce" we're getting message "[dcc32 Warning] READCOM.Views.StoryItems.StoryItem.pas(148): W1010 Method 'Create' hides virtual method of base type 'TCustomManipulator'" even though "virtual" was added here (ancestor has no such constructor to use "override" instead)
       destructor Destroy; override;
+      procedure SetPropertyDefaults; virtual;
       procedure Reset; virtual;
 
       //procedure Paint; override; //TODO: not doing any custom drawing like target lines
@@ -297,9 +301,11 @@ interface
       function GetLoadFilesFilter: String; virtual;
       class function LoadNew(const Stream: TStream; const ContentFormat: String = EXT_READCOM): TStoryItem; overload; virtual;
       class function LoadNew(const Filepath: String; const ContentFormat: String = EXT_READCOM): TStoryItem; overload; virtual;
-      function Load(const Stream: TStream; const ContentFormat: String = EXT_READCOM; const CreateNew: Boolean = false): TObject; overload; virtual;
-      function Load(const Filepath: String; const CreateNew: Boolean = false): TObject; overload; virtual;
-      function Load(const Clipboard: IFMXExtendedClipboardService; const CreateNew: Boolean = false): TObject; overload; virtual;
+      function LoadFromStream(const Stream: TStream; const ContentFormat: String = EXT_READCOM; const CreateNew: Boolean = false): TObject; overload; virtual;
+      function LoadFromFile(const Filepath: String; const CreateNew: Boolean = false): TObject; overload; virtual;
+      function LoadFromUrl(const Url: String; const CreateNew: Boolean = false): TObject; overload;
+      function LoadFromFileOrUrl(const PathOrUrl: String; const CreateNew: Boolean = false): TObject; overload;
+      function LoadFromClipboard(const Clipboard: IFMXExtendedClipboardService; const CreateNew: Boolean = false): TObject; overload; virtual;
       function LoadFromString(const Data: String; const CreateNew: Boolean = false): TObject; virtual;
       //
       function LoadReadCom(const Stream: TStream; const CreateNew: Boolean = false): IStoryItem; virtual;
@@ -307,9 +313,9 @@ interface
 
       function GetSaveFilesFilter: String; virtual;
       function SaveToString: String; virtual;
-      procedure Save(const Stream: TStream; const ContentFormat: String = EXT_READCOM); overload; virtual;
-      procedure Save(const Filepath: String); overload; virtual;
-      procedure Save(const Clipboard: IFMXExtendedClipboardService); overload;
+      procedure SaveToStream(const Stream: TStream; const ContentFormat: String = EXT_READCOM); overload; virtual;
+      procedure SaveToFile(const Filepath: String); overload; virtual;
+      procedure SaveToClipboard(const Clipboard: IFMXExtendedClipboardService); overload;
       procedure SaveThumbnail(const Filepath: String; const MaxWidth: Integer = DEFAULT_THUMB_WIDTH; const MaxHeight: Integer = DEFAULT_THUMB_HEIGHT); virtual;
       procedure SaveHTML(const Stream: TStream; const ImagesPath: String; const MaxImageWidth: Integer = DEFAULT_HTML_IMAGE_WIDTH; const MaxImageHeight: Integer = DEFAULT_HTML_IMAGE_HEIGHT); overload;
       procedure SaveHTML(const Filepath: String; const MaxImageWidth: Integer = DEFAULT_HTML_IMAGE_WIDTH; const MaxImageHeight: Integer = DEFAULT_HTML_IMAGE_HEIGHT); overload;
@@ -409,7 +415,11 @@ interface
 implementation
   {$region 'Used units'}
   uses
+    System.Diagnostics, //for TStopWatch
     System.IOUtils, //for TPath
+    System.Math, //for Max
+    System.Net.HttpClient, //for HTTP/HTTPS url scheme support in TURLStream (Delphi 11.1+)
+    System.Net.URLClient, //for TURLStream (Delphi 11.1+)
     //
     FMX.Platform, //for TPlatformServices
     //
@@ -417,7 +427,8 @@ implementation
     Zoomicon.Helpers.RTL.ComponentHelpers, //for TComponent.FindSafeName
     Zoomicon.Helpers.RTL.StreamHelpers, //for TStream.ReadComponent, TStream.SkipBOM_UTF8, TStream.PeekString
     Zoomicon.Helpers.RTL.StringsHelpers, //for TStrings.GetLines
-    //Zoomicon.Helpers.FMX.Forms.ApplicationHelper, //for IsURI
+    Zoomicon.Helpers.RTL.URIHelpers, //for ExtractUrlExt
+    Zoomicon.Helpers.FMX.Forms.ApplicationHelper, //for IsURI
     Zoomicon.Introspection.FMX.Debugging, //for Log, IsShiftKeyPressed
     //
     READCOM.Factories.StoryItemFactory, //for StoryItemFactories, AddStoryItemFileFilter, StoryItemFileFilters
@@ -438,7 +449,7 @@ implementation
 
   constructor TStoryItem.Create(AOwner: TComponent);
 
-    procedure InitBackground;
+    procedure InitBackground; //used for background color
     begin
       with Background do
       begin
@@ -451,7 +462,7 @@ implementation
       end;
     end;
 
-    procedure InitGlyph;
+    procedure InitGlyph; //used for background image
     begin
       with Glyph do
       begin
@@ -464,7 +475,7 @@ implementation
       end;
     end;
 
-    procedure InitBorder;
+    procedure InitBorder; //used for borderline (shown in Story's Edit mode when Active or ParentStoryItem is Active)
     begin
       with Border do
       begin
@@ -508,9 +519,8 @@ implementation
     InitBackground; //will end up at the bottom
 
     //DragMode := TDragMode.dmManual; //no automatic drag (it's the default)
-    Anchored := true;
-    ForegroundColor := TAlphaColorRec.Null;
-    BackgroundColor := TAlphaColorRec.Null;
+
+    SetPropertyDefaults; //don't call Reset here, too heavy
 
     //Size.Size := DefaultSize; //set the default size (overriden at descendents) //DO NOT DO, CAUSES NON-LOADING OF VECTOR GRAPHICS OF DEFAULT STORY - SEEMS TO BE DONE INTERNALLY BY FMX ANYWAY SINCE WE OVERRIDE GetDefaultSize
   end;
@@ -533,6 +543,22 @@ implementation
     HomeStoryItem := nil;
   end;
 
+  procedure TStoryItem.SetPropertyDefaults;
+  begin
+    Active := DEFAULT_ACTIVE;
+    Home := DEFAULT_HOME;
+    StoryPoint := DEFAULT_STORYPOINT;
+    ForegroundColor := DEFAULT_FOREGROUND_COLOR;
+    BackgroundColor := DEFAULT_BACKGROUND_COLOR;
+    Snapping := DEFAULT_SNAPPING;
+    Anchored := DEFAULT_ANCHORED;
+    FlippedHorizontally := DEFAULT_FLIPPED_HORIZONTALLY;
+    FlippedVertically := DEFAULT_FLIPPED_VERTICALLY;
+    Hidden := DEFAULT_HIDDEN;
+    FactoryCapacity := DEFAULT_FACTORY_CAPACITY;
+    TargetsVisible := DEFAULT_TARGETS_VISIBLE;
+  end;
+
   procedure TStoryItem.Reset;
 
     procedure RemoveStoryItemViews; //TODO: add to IStoryItem and implement at TStoryItem level?
@@ -548,6 +574,7 @@ implementation
 
   begin
     RemoveStoryItemViews;
+    SetPropertyDefaults;
   end;
 
   destructor TStoryItem.Destroy;
@@ -576,9 +603,9 @@ implementation
       var LContentStream := TBytesStream.Create(LContent);
       try
         if (ContentExt <> '') then
-          Load(LContentStream, ContentExt); //will call overriden method (if any) when at descendant class
+          LoadFromStream(LContentStream, ContentExt); //will call overriden method (if any) when at descendant class
           //Note: this should result in Content property being set again by descendent (if they want to store via the Content property)...
-          //...we shouldn't store the Content at TStoryItem.Load(Stream) base implementation, since descendents may opt to use other property for more efficient storage instead of keeping the whole assigned file with its headers, metadata etc.
+          //...we shouldn't store the Content at TStoryItem.LoadFromStream(Stream) base implementation, since descendents may opt to use other property for more efficient storage instead of keeping the whole assigned file with its headers, metadata etc.
       finally
         FreeAndNil(LContentStream);
       end;
@@ -1942,7 +1969,7 @@ end;
           Options.ShowPopup; //if no child at this position show options popup
       end
       else if (ssAlt in Shift) and HasUrlAction then //load new story from UrlAction of ActiveStoryItem with ALT+CLICK
-        FStory.DoUrlAction(FUrlAction, Self) //this includes special URLs too (like -/0/+) used for navigation in the story
+        FStory.DoUrlAction(FUrlAction, FUrlActionTarget, Self) //this includes special URLs too (like -/0/+) used for navigation in the story
       else
         PlayRandomAudioStoryItem; //TODO: maybe should play AudioStoryItems in the order they exist in their parent StoryItem (but would need to remember last one played in that case which may be problematic if they are reordered etc.)
         //PlayNextAudioStoryItem;
@@ -1973,7 +2000,7 @@ end;
               {and //TODO: should have URLs clickable only for children of ActiveStoryItem (and for itself if it's the RootStoryItem maybe) //in non-EditMode should disable HitTest though at everything that isn't the current StoryItem or direct child of the ActiveStoryItem apart from the TextStoryItems maybe (could maybe just disble HitTest at all siblings of ActiveStoryItem and have everything under ActiveStoryItem HitTest-enabled)
               ((Assigned(LParent) and LParent.Active) or
               ((not Assigned(LParent)) and Active))}) then //only when ParentStoryItem is the ActiveStoryItem //assuming short-circuit evaluation //if no LParent then it's the RootStoryItem, allowing it to have URLAction too
-            FStory.DoUrlAction(FUrlAction, Self); //TODO: if child item has a UrlAction it should consume the click event, currently it seems parent StoryItem will play its AudioStoryItem(s) even while navigating say to NextStoryPoint (when a child ImageStoryItem with '+' urlAction was clicked)
+            FStory.DoUrlAction(FUrlAction, FUrlActionTarget, Self); //TODO: if child item has a UrlAction it should consume the click event, currently it seems parent StoryItem will play its AudioStoryItem(s) even while navigating say to NextStoryPoint (when a child ImageStoryItem with '+' urlAction was clicked)
       end;
     end;
 
@@ -2039,7 +2066,7 @@ end;
   var Clipboard: IFMXExtendedClipboardService;
   begin
     if TPlatformServices.Current.SupportsPlatformService(IFMXExtendedClipboardService, Clipboard) then
-      Save(Clipboard);
+      SaveToClipboard(Clipboard);
   end;
 
   procedure TStoryItem.Paste;
@@ -2081,15 +2108,15 @@ end;
         begin
           StoryItem := StoryItemFactory.New(Self).View as TStoryItem;
           StoryItem.Name := 'Clipboard_' + GetUniqueID;
-          StoryItem.Load(Clipboard); //this should also set the Size of the control
+          StoryItem.LoadFromClipboard(Clipboard); //this should also set the Size of the control
         end
         else //we are adding a ".readcom" file, don't know beforehand what class of TStoryItem descendent it contains serialized
-          StoryItem := Load(Clipboard, true) as TStoryItem;
+          StoryItem := LoadFromClipboard(Clipboard, true) as TStoryItem;
 
         Add(StoryItem); //note: Add does (StoryItem=nil) check and returns, logging it
       except
         on EListError do
-          raise EInvalidOperation.CreateFmt(MSG_CONTENT_FORMAT_NOT_SUPPORTED, [FileExt]);
+          raise EInvalidOperation.CreateFmt(ERR_CONTENT_FORMAT_NOT_SUPPORTED, [FileExt]);
       end;
 
     finally
@@ -2271,15 +2298,15 @@ end;
         begin
           StoryItem := StoryItemFactory.New(Self).View as TStoryItem;
           StoryItem.Name := RemoveNonAllowedIdentifierChars(TPath.GetFileNameWithoutExtension(Filepath)) + '_' + GetUniqueID;
-          StoryItem.Load(Filepath); //this should also set the Size of the control
+          StoryItem.LoadFromFile(Filepath); //this should also set the Size of the control
         end
         else //we are adding a ".readcom" file, don't know beforehand what class of TStoryItem descendent it contains serialized
-          StoryItem := Load(Filepath, true) as TStoryItem;
+          StoryItem := LoadFromFile(Filepath, true) as TStoryItem;
 
         Add(StoryItem);
       except
         on EListError do
-          raise EInvalidOperation.CreateFmt(MSG_CONTENT_FORMAT_NOT_SUPPORTED, [FileExt]);
+          raise EInvalidOperation.CreateFmt(ERR_CONTENT_FORMAT_NOT_SUPPORTED, [FileExt]);
       end;
 
     finally
@@ -2307,7 +2334,7 @@ end;
     var tempStoryItem: TStoryItem := nil; //local vars not auto-initialized, safeguarding FreeAndNil
     try
       tempStoryItem := TStoryItem.Create(nil); //creating since we need an instance to call Load //TODO: add a class
-      Result := TStoryItem(tempStoryItem.Load(Stream, ContentFormat, True)); //passing True to load new TStoryItem descendent instance based on serialization information in the stream
+      Result := TStoryItem(tempStoryItem.LoadFromStream(Stream, ContentFormat, True)); //passing True to load new TStoryItem descendent instance based on serialization information in the stream
     finally
       FreeAndNil(tempStoryItem); //releasing the tempStoryItem
     end;
@@ -2318,7 +2345,7 @@ end;
     var tempStoryItem: TStoryItem := nil; //local vars not auto-initialized, safeguarding FreeAndNil
     try
       tempStoryItem := TStoryItem.Create(nil); //creating since we need an instance to call Load //TODO: add a class
-      Result := TStoryItem(tempStoryItem.Load(Filepath, true)); //passing True to load new TStoryItem descendent instance based on serialization information in the stream
+      Result := TStoryItem(tempStoryItem.LoadFromFile(Filepath, true)); //passing True to load new TStoryItem descendent instance based on serialization information in the stream
     finally
       FreeAndNil(tempStoryItem); //releasing the tempStoryItem
     end;
@@ -2404,7 +2431,7 @@ end;
   end;
 
   /// Load from Stream
-  function TStoryItem.Load(const Stream: TStream; const ContentFormat: String = EXT_READCOM; const CreateNew: Boolean = false): TObject;
+  function TStoryItem.LoadFromStream(const Stream: TStream; const ContentFormat: String = EXT_READCOM; const CreateNew: Boolean = false): TObject;
     const
       READCOM_TEXT_PREAMBLE = 'object ';
       //READCOM_BIN_PREAMBLE = 'TPF0'#21; //TPF0 may mean Turbo Pascal Form, version 0, while #21=NAK
@@ -2430,23 +2457,79 @@ end;
     end
 
     else
-      raise EInvalidOperation.CreateFmt(MSG_CONTENT_FORMAT_NOT_SUPPORTED, [ContentFormat]);
+      raise EInvalidOperation.CreateFmt(ERR_CONTENT_FORMAT_NOT_SUPPORTED, [ContentFormat]);
   end;
 
   /// Load from Filepath
-  function TStoryItem.Load(const Filepath: String; const CreateNew: Boolean = false): TObject;
+  function TStoryItem.LoadFromFile(const Filepath: String; const CreateNew: Boolean = false): TObject;
   begin
     var InputFileStream: TFileStream := nil; //local vars not auto-initialized, safeguarding FreeAndNil
     try
       InputFileStream := TFileStream.Create(Filepath, fmOpenRead {or fmShareDenyNone}); //TODO: fmShareDenyNote probably needed for Android
-      Result := Load(InputFileStream, ExtractFileExt(Filepath).ToLowerInvariant, CreateNew);
+      Result := LoadFromStream(InputFileStream, ExtractFileExt(Filepath).ToLowerInvariant, CreateNew);
     finally
       FreeAndNil(InputFileStream);
     end;
   end;
 
+  /// Load from URL
+  function TStoryItem.LoadFromUrl(const Url: String; const CreateNew: Boolean = false): TObject;
+
+  var FStopWatch: TStopWatch;
+  begin
+    try
+      FStopwatch := TStopwatch.StartNew; // Start timing
+      Log('Started download [%s]', [Url]);
+
+      //TODO// GlyphIcon.Image := ...wait... (set ImageSource and index)
+
+      TURLStream.Create(Url,
+        procedure(AStream: TStream)
+        begin
+          try
+            LoadFromStream(AStream, ExtractUrlExt(Url).ToLowerInvariant); //probably it can start loading while the content is coming
+            Log('Finished download [%s]', [Url]);
+          finally
+            FStopwatch.Stop; //stop timing
+
+            var FElapsedTime := FStopwatch.ElapsedMilliseconds;
+            Log('Elapsed time (ms) [%d]', [FElapsedTime]);
+
+            //TODO// GlyphIcon.Image := nil; //??? (or just clear ImageSource)
+          end;
+        end,
+        true, //ASynchronizeProvide: call the anonymous proc (AProvider parameter) in the context of the main thread //IMPORTANT (if not done various AV errors occur later: we shouldn't touch the UI from other than the main thread)
+        true //free on completion
+      );
+
+      //TODO// block and wait for download to finish
+      result := nil; //TODO
+    except
+      on e: Exception do
+      begin
+        FStopWatch.Stop; //stop timing
+
+        //TODO// GlyphIcon.Image := nil; //??? (or just clear ImageSource)
+
+        ShowMessageFmt(ERR_DOWNLOAD, [e.Message]);
+        Log(e);
+
+        result := nil; //probably no network connection etc.
+      end;
+    end;
+  end;
+
+  /// Load from Filepath or URL
+  function TStoryItem.LoadFromFileOrUrl(const PathOrUrl: String; const CreateNew: Boolean = false): TObject;
+  begin
+   if IsURI(PathOrUrl) then
+      result := LoadFromUrl(PathOrUrl)
+    else
+      result := LoadFromFile(PathOrUrl);
+  end;
+
   /// Load from Clipboard
-  function TStoryItem.Load(const Clipboard: IFMXExtendedClipboardService; const CreateNew: Boolean = false): TObject;
+  function TStoryItem.LoadFromClipboard(const Clipboard: IFMXExtendedClipboardService; const CreateNew: Boolean = false): TObject;
   begin
     //TODO: how do we check for other opaque file formats (filepath?) on clipboard?
     //TODO: add support for pasting a URL from clipboard if there's custom format for it
@@ -2527,7 +2610,7 @@ end;
   end;
 
   /// Save to Stream
-  procedure TStoryItem.Save(const Stream: TStream; const ContentFormat: String = EXT_READCOM);
+  procedure TStoryItem.SaveToStream(const Stream: TStream; const ContentFormat: String = EXT_READCOM);
   begin
     if ContentFormat = EXT_READCOM then
       if isShiftKeyPressed then
@@ -2541,11 +2624,11 @@ end;
     *)
 
     else
-      raise EInvalidOperation.CreateFmt(MSG_CONTENT_FORMAT_NOT_SUPPORTED, [ContentFormat]);
+      raise EInvalidOperation.CreateFmt(ERR_CONTENT_FORMAT_NOT_SUPPORTED, [ContentFormat]);
   end;
 
   /// Save to Filepath
-  procedure TStoryItem.Save(const Filepath: String);
+  procedure TStoryItem.SaveToFile(const Filepath: String);
   begin
     var OutputFileStream: TFileStream := nil; //local vars not auto-initialized, safeguarding FreeAndNil
     try
@@ -2555,14 +2638,14 @@ end;
      if ContentFormat = EXT_HTML then //must check here instead of at Save(Stream, ContentFormat), since saving to HTML requires a filepath (we don't save images encoded inside the HTML for size reasons)
       SaveHTML(OutputFileStream, Filepath + '_Images')
      else
-      Save(OutputFileStream, ContentFormat);
+      SaveToStream(OutputFileStream, ContentFormat);
 
     finally
       FreeAndNil(OutputFileStream);
     end;
   end;
 
-  procedure TStoryItem.Save(const Clipboard: IFMXExtendedClipboardService);
+  procedure TStoryItem.SaveToClipboard(const Clipboard: IFMXExtendedClipboardService);
   begin
     Clipboard.SetText(SaveToString);
   end;

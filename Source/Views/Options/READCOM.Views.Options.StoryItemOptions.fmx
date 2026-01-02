@@ -266,6 +266,20 @@ object StoryItemOptions: TStoryItemOptions
         Text = 'Change URL Action'
         OnClick = actionChangeFactoryCapacityExecute
       end
+      object btnLoadUrl: TSpeedButton
+        Action = actionLoadUrl
+        Align = Client
+        Images = Icons.SVGIconImageList
+        ImageIndex = 48
+        Margins.Left = 4.000000000000000000
+        Margins.Top = 4.000000000000000000
+        Margins.Right = 4.000000000000000000
+        Margins.Bottom = 4.000000000000000000
+        Size.Width = 50.000000000000000000
+        Size.Height = 50.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'actiontoolbutton'
+      end
       object btnLoad: TSpeedButton
         Action = actionLoad
         Align = Client
@@ -326,6 +340,13 @@ object StoryItemOptions: TStoryItemOptions
       Text = 'Add'
       ImageIndex = 10
       ImageIndex = 10
+    end
+    object actionLoadUrl: TAction
+      Category = 'File'
+      Text = 'Load'
+      ImageIndex = 6
+      OnExecute = actionLoadUrlExecute
+      ImageIndex = 6
     end
   end
 end
