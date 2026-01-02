@@ -992,7 +992,8 @@ end;
 
   procedure TStoryItem.SetActive(const Value: Boolean);
   begin
-    if FIgnoreActiveStoryItemChanges or (Value = IsActive) then exit; //Important
+    if FIgnoreActiveStoryItemChanges or (Value = IsActive) then exit; //Important (used while loading content subtree into existing StoryItem)
+    //TODO: maybe also check csLoading to not fire change events and have story find the active storyitem after loading and zoom to it?
 
     if (Value) then //make active
     begin
@@ -1058,6 +1059,11 @@ end;
         ApplyParentEditMode(StoryItem);
 
       UpdateHint;
+
+       // Override base class border styling for ActiveStoryItem //TODO: Doesn't work, check TCustomManipulator implementation
+      //if Assigned(Border) then
+        //Border.Stroke.Color := (if Value then TAlphaColors.Blue else TAlphaColors.Black);
+
     finally
       //EndUpdate;
     end;
@@ -1072,6 +1078,12 @@ end;
       BorderVisible := ParentEditMode;
       Hidden := Hidden; //reapply logic for child StoryItems' Hidden since it's related to StoryItemParent's EditMode
       UpdateHint;
+
+      // Override base class border styling for direct children of ActiveStoryItem //TODO: Doesn't work, check TCustomManipulator implementation
+      //with View do
+        //if Assigned(Border) then
+          //Border.Stroke.Color := (if ParentEditMode then TAlphaColors.Yellow else TAlphaColors.Black);
+
     finally
       //View.EndUpdate;
     end;

@@ -1069,31 +1069,31 @@ implementation
 
     RecursiveClearEditMode(RootStoryItemView); //Clear EditMode from all items recursively
 
-    var Value := Story.ActiveStoryItem;
+    var LActiveStoryItem := Story.ActiveStoryItem;
+    var LActiveStoryItemView := TStoryItem(LActiveStoryItem.View);
 
     //Set any current editmode to the newly active item
-    if Assigned(Value) then
+    if Assigned(LActiveStoryItem) then
     begin
-      var StoryItem := TStoryItem(Value.View);
-      with StoryItem do
+      with LActiveStoryItem do
       begin
-        EditMode := HUD.EditMode; //TODO: see StoryMode of IStoryItem instead (or move that to the IStory)
-        //AreaSelector := RootStoryItemView.AreaSelector; //re-use RootStoryItem's AreaSelector (so that we don't get drawing artifacts when resizing area selector and is always on top of everything when extending outside of ActiveStoryItem's bounds - since that can have children that are not inside its area, like a speech bubble for a character) //TODO: not working correctly
+        EditMode := HUD.EditMode;
+        //LActiveStoryItemView.AreaSelector := RootStoryItemView.AreaSelector; //re-use RootStoryItem's AreaSelector (so that we don't get drawing artifacts when resizing area selector and is always on top of everything when extending outside of ActiveStoryItem's bounds - since that can have children that are not inside its area, like a speech bubble for a character) //TODO: not working correctly
+
+        //Update color pickers
+        HUD.comboForeColor.Color := ForegroundColor;
+        HUD.comboBackColor.Color := BackgroundColor;
       end;
 
-      //Update color pickers
-      HUD.comboForeColor.Color := StoryItem.ForegroundColor;
-      HUD.comboBackColor.Color := StoryItem.BackgroundColor;
-
       //Cut-Copy-Paste shortcut keys variation for TextStoryItem //TODO: should maybe disable respective actions in non-Edit mode, even though they do check it to do nothing when not in edit mode
-      if (StoryItem is TTextStoryItem) then
+      if (LActiveStoryItemView is TTextStoryItem) then
       begin
         //Note: don't use plain TextToShortcut, returns -1 on Android at Delphi 11.1, which gives Range Check Error since TCustomAction.Shortcut doesn't accept values <0. Delphi 12.2 seems to have this fixed, returning 0 in that case
         HUD.actionCut.ShortCut := SafeTextToShortCut('Ctrl+Shift+X'); //set alternate shortcut while TTextStoryItem is being edited
         HUD.actionCopy.ShortCut := SafeTextToShortCut('Ctrl+Shift+C'); //set alternate shortcut while TTextStoryItem is being edited
         HUD.actionPaste.ShortCut := SafeTextToShortCut('Ctrl+Shift+V'); //set alternate shortcut while TTextStoryItem is being edited
       end
-      else if TAllTextFrame.Shown then //disable editing shortcuts of app when AllTextFrame is shown
+      else if TAllTextFrame.Shown then //disable editing shortcuts of app when AllTextFrame is shown //TODO: should this be here?
       begin
         HUD.actionCut.ShortCut := 0;
         HUD.actionCopy.ShortCut := 0;
@@ -1107,8 +1107,9 @@ implementation
       end;
 
       if HUD.StructureVisible then
-        StructureView.SelectedObject := StoryItem; //Change StructureView selection (ONLY WHEN StructureView is visible)
+        StructureView.SelectedObject := LActiveStoryItemView; //Change StructureView selection (ONLY WHEN StructureView is visible)
     end
+
     else
       if HUD.StructureVisible //Clear StructureView selection (ONLY WHEN StructureView is visible)
          and Assigned(StructureView) //when app is getting destroyed this will return nil
