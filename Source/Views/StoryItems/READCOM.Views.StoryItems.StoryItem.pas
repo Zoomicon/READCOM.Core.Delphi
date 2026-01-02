@@ -54,6 +54,7 @@ interface
         FHidden: Boolean;
         FSnapping: Boolean;
         FUrlAction: String;
+        FUrlActionTarget: String;
         FFactoryCapacity: Integer;
         FOptions: IStoryItemOptions;
         FTargetsVisible: Boolean;
@@ -117,6 +118,9 @@ interface
 
       {EditMode}
       procedure SetEditMode(const Value: Boolean); override;
+
+      {ParentEditMode}
+      function IsParentEditMode: Boolean; virtual;
       procedure ApplyParentEditMode(const StoryItem: IStoryItem); virtual;
 
       {BorderVisible}
@@ -236,6 +240,10 @@ interface
       function GetUrlAction: String; virtual;
       procedure SetUrlAction(const Value: String); virtual;
 
+      {UrlActionTarget}
+      function GetUrlActionTarget: String;
+      procedure SetUrlActionTarget(const Value: String);
+
       {FactoryCapacity}
       function GetFactoryCapacity: Integer; virtual;
       procedure SetFactoryCapacity(const Value: Integer); virtual;
@@ -266,6 +274,7 @@ interface
       procedure SetID(const Value: String); inline;
 
       {Audio}
+      function HasAudioStoryItems: boolean;
       procedure PlayRandomAudioStoryItem;
 
       {IClipboardEnabled}
@@ -333,6 +342,7 @@ interface
     {$region '--- Properties ---'}
 
     public
+      property ParentEditMode: Boolean read IsParentEditMode stored false;
       property Options: IStoryItemOptions read GetOptions stored false; //TODO: should we make published? (think it was causing side-effects by getting somehow stored)
       property BorderVisible: Boolean read IsBorderVisible write SetBorderVisible stored false default false;
 
@@ -386,6 +396,7 @@ interface
       property Tags: String read GetTags write SetTags; //default '' (implied, not allows to use '')
       property TagsMatched: Boolean read AreTagsMatched;
       property UrlAction: String read GetUrlAction write SetUrlAction; //default '' (implied, not allows to use '')
+      property UrlActionTarget: String read GetUrlActionTarget write SetUrlActionTarget; //default '' (implied, not allows to use '')
       property FactoryCapacity: Integer read GetFactoryCapacity write SetFactoryCapacity default DEFAULT_FACTORY_CAPACITY;
       property TargetsVisible: Boolean read GetTargetsVisible write SetTargetsVisible stored false default DEFAULT_TARGETS_VISIBLE; //TODO: not using concept of explicit targets now, but since anchored items with Tags serve as targets could use that property to highlight them (as hint for user). Maybe in that case add the Targets visible toggle button again
 
@@ -601,6 +612,8 @@ implementation
     inherited;
     CheckAddToStoryItems;
     CheckAddToAudioStoryItems;
+
+    UpdateCursor; //e.g. Cursor depends on whether StoryItem has any AudioStoryItem children
   end;
 
   procedure TStoryItem.RefreshStoryItemsList;
@@ -627,6 +640,8 @@ implementation
     var LStoryItem: IStoryItem;
     if Supports(AObject, IStoryItem, LStoryItem) then
       ApplyParentEditMode(LStoryItem);
+
+    UpdateCursor; //e.g. Cursor depends on whether StoryItem has any AudioStoryItem children
   end;
 
   procedure TStoryItem.DoRemoveObject(const AObject: TFmxObject);
@@ -649,6 +664,8 @@ implementation
     inherited;
     CheckRemoveFromStoryItems;
     CheckRemoveFromAudioStoryItems; //not checking if item was removed from StoryItems, since it may just implement IAudioStoryItem without implementing IStoryItem in Delphi (which follows COM practice), even though IAudioStoryItem extends IStoryItem
+
+    UpdateCursor; //e.g. Cursor depends on whether StoryItem has any AudioStoryItem children
   end;
 
   procedure TStoryItem.SetParent(const Value: TFmxObject);
@@ -681,9 +698,14 @@ implementation
 
   {$region 'Audio'}
 
+  function TStoryItem.HasAudioStoryItems;
+  begin
+    result := Assigned(FAudioStoryItems) and (not FAudioStoryItems.IsEmpty);
+  end;
+
   procedure TStoryItem.PlayRandomAudioStoryItem;
   begin
-    if not Assigned(FAudioStoryItems) then
+    if (not HasAudioStoryItems) then
       exit;
 
     var LRandomAudioStoryItem := FAudioStoryItems.GetRandom;
@@ -1069,24 +1091,33 @@ end;
     end;
   end;
 
-  procedure TStoryItem.ApplyParentEditMode(const StoryItem: IStoryItem);
+  procedure TStoryItem.ApplyParentEditMode(const StoryItem: IStoryItem); //Act on child StoryItem when its ParentEditMode has changed
   begin
-    var ParentEditMode := EditMode;
+    var LApplyEditMode := EditMode;
     with StoryItem do
     try
       //View.BeginUpdate; //TODO: see if it helps or causes text drawing issues
-      BorderVisible := ParentEditMode;
+      BorderVisible := LApplyEditMode;
       Hidden := Hidden; //reapply logic for child StoryItems' Hidden since it's related to StoryItemParent's EditMode
       UpdateHint;
 
       // Override base class border styling for direct children of ActiveStoryItem //TODO: Doesn't work, check TCustomManipulator implementation
       //with View do
         //if Assigned(Border) then
-          //Border.Stroke.Color := (if ParentEditMode then TAlphaColors.Yellow else TAlphaColors.Black);
+          //Border.Stroke.Color := (if LApplyEditMode then TAlphaColors.Yellow else TAlphaColors.Black);
 
     finally
       //View.EndUpdate;
     end;
+  end;
+
+  function TStoryItem.IsParentEditMode: Boolean;
+  begin
+    var LParent := ParentStoryItem;
+    if Assigned(LParent) then
+      result := LParent.EditMode
+    else
+      result := false;
   end;
 
   {$endregion}
@@ -1625,6 +1656,23 @@ end;
 
   {$endregion}
 
+  {$region 'UrlActionTarget'}
+
+  function TStoryItem.GetUrlActionTarget: String;
+  begin
+    Result := FUrlActionTarget;
+  end;
+
+  procedure TStoryItem.SetUrlActionTarget(const Value: String);
+  begin
+    FUrlActionTarget := Trim(Value);
+
+    UpdateHint;
+    UpdateCursor;
+  end;
+
+  {$endregion}
+
   {$region 'FactoryCapacity'}
 
   function TStoryItem.GetFactoryCapacity: Integer;
@@ -1733,6 +1781,7 @@ end;
       if Anchored then AddToLHintNewLine('Anchored');
       if (Tags <> '') then AddToLHintNewLine('Tags=[' + Tags + ']'); //TODO: use String Formatting
       if (UrlAction <> '') then AddToLHintNewLine('UrlAction=[' + UrlAction + ']'); //TODO: use String Formatting
+      if (UrlActionTarget <> '') then AddToLHintNewLine('UrlActionTarget=[' + UrlActionTarget + ']'); //TODO: use String Formatting
       if (FactoryCapacity > 0) then AddToLHintNewLine('FactoryCapacity=[' + IntToStr(FactoryCapacity) + ']'); //TODO: use String Formatting
       Hint := LHint;
     end;
@@ -1744,14 +1793,25 @@ end;
 
   procedure TStoryItem.UpdateCursor;
   begin
-    if (UrlAction <> '') then //a story navigation action item
+    //TODO: should check if we have our closest StoryPoint ancestor is active
+
+    //this has top priority
+    if (UrlAction <> '') or (UrlActionTarget <> '') then //a story navigation action item
       Cursor := crHandPoint
+
+    //navigation hand cursor has higher priority than drag cursor
     else if (not Anchored) or (FactoryCapacity > 0) then //a moveable item (note that if tagged also takes part in puzzle solving) or a (cloning) factory
       Cursor := crDrag
     (* NOT USED: would always tell the user where they can drop (puzzle author may not want it) or show the correct answer since only that target (others may just have a snap/magnet) has tag. Could show just where magnets are, but anyway cursor wouldn't change with this during drag of another item over the target. Even showing where snapping occurs might not be desired by puzzle author, plus might confuse users since not all targets use snap (esp. those that are to accept multiple moveable Tagged items in whatever arrangement user wants)
     else if ((Tags <> '') and Anchored) then //a Target for puzzles
       Cursor := crSizeAll //don't use crSize (obsolete)
     *)
+
+    //this has lower priority than drag cursor
+    else if HasAudioStoryItems then //a StoryItem can be clicked to (re)play audio (StoryPoints also play audio automatically when activated)
+      Cursor := crHandPoint
+
+    //fallback to default cursor
     else
       Cursor := crDefault;
   end;

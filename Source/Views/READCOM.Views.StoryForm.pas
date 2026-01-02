@@ -1070,11 +1070,12 @@ implementation
     RecursiveClearEditMode(RootStoryItemView); //Clear EditMode from all items recursively
 
     var LActiveStoryItem := Story.ActiveStoryItem;
-    var LActiveStoryItemView := TStoryItem(LActiveStoryItem.View);
 
     //Set any current editmode to the newly active item
     if Assigned(LActiveStoryItem) then
     begin
+      var LActiveStoryItemView := TStoryItem(LActiveStoryItem.View);
+
       with LActiveStoryItem do
       begin
         EditMode := HUD.EditMode;

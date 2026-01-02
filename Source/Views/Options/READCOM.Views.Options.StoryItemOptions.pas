@@ -17,7 +17,8 @@ uses
 
 resourcestring
   STR_ID = 'ID';
-  STR_URL = 'URL';
+  STR_URL_ACTION = 'URL Action';
+  STR_URL_ACTION_TARGET = 'URL Action Target';
   STR_FACTORY_CAPACITY = 'Factory Capacity';
   STR_TAGS = 'Tags';
   STR_COLLECTABLE_TARGET = 'Collectable Target';
@@ -145,7 +146,7 @@ begin
     btnToggleSnapping.IsPressed := Snapping;
     btnToggleAnchored.IsPressed := Anchored;
     btnToggleTags.IsPressed := (Tags <> '');
-    btnToggleUrlAction.IsPressed := (UrlAction <> '');
+    btnToggleUrlAction.IsPressed := (UrlAction <> '') or (UrlActionTarget <> '');
     btnToggleFactory.IsPressed := (FactoryCapacity <> 0);
 
     {$IF DEFINED(ANDROID) OR DEFINED(IOS)}
@@ -262,14 +263,26 @@ end;
 
 procedure TStoryItemOptions.ActChangeUrlAction;
 begin
-  TDialogServiceAsync.InputQuery(STR_URL, [STR_URL], [StoryItem.GetUrlAction],
+  TDialogServiceAsync.InputQuery(STR_URL_ACTION, [STR_URL_ACTION], [StoryItem.GetUrlAction],
     procedure(const AResult: TModalResult; const AValues: array of string)
     begin
       if (AResult = mrOk) then
       begin
-        var LUrl := Trim(AValues[0]);
-        StoryItem.SetUrlAction(LUrl);
-        btnToggleUrlAction.IsPressed := (LUrl <> '');
+        var LUrlAction := Trim(AValues[0]);
+        StoryItem.SetUrlAction(LUrlAction);
+
+        TDialogServiceAsync.InputQuery(STR_URL_ACTION_TARGET, [STR_URL_ACTION_TARGET], [StoryItem.GetUrlActionTarget],
+          procedure(const AResult: TModalResult; const AValues: array of string)
+          begin
+            if (AResult = mrOk) then
+            begin
+              var LUrlActionTarget := Trim(AValues[0]);
+              StoryItem.SetUrlActionTarget(LUrlActionTarget);
+              btnToggleUrlAction.IsPressed := (LUrlAction <> '') or (LUrlActionTarget <> ''); //a target with an empty action should mean to remove the target item
+            end;
+          end
+        );
+
       end;
     end
   );

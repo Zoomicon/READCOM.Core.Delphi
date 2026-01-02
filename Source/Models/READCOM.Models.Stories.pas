@@ -64,6 +64,7 @@ interface
       procedure SetID(const Value: String);
 
       {Audio}
+      function HasAudioStoryItems: boolean;
       procedure PlayRandomAudioStoryItem;
 
       {View}
@@ -97,6 +98,9 @@ interface
       {EditMode}
       function IsEditMode: Boolean;
       procedure SetEditMode(const Value: Boolean);
+
+      {ParentEditMode}
+      function IsParentEditMode: Boolean;
 
       {BorderVisible}
       function IsBorderVisible: Boolean;
@@ -180,6 +184,10 @@ interface
       function GetUrlAction: String;
       procedure SetUrlAction(const Value: String);
 
+      {UrlActionTarget}
+      function GetUrlActionTarget: String;
+      procedure SetUrlActionTarget(const Value: String);
+
       {FactoryCapacity}
       function GetFactoryCapacity: Integer;
       procedure SetFactoryCapacity(const Value: Integer);
@@ -212,6 +220,7 @@ interface
       property Anchored: Boolean read IsAnchored write SetAnchored; //default true
       property Tags: String read GetTags write SetTags; //default ''
       property UrlAction: String read GetUrlAction write SetUrlAction; //default ''
+      property UrlActionTarget: String read GetUrlActionTarget write SetUrlActionTarget; //default ''
       property FactoryCapacity: Integer read GetFactoryCapacity write SetFactoryCapacity; //default 0
       property Content: TBytes read GetContent write SetContent; //default nil
       property ContentExt: String read GetContentExt write SetContentExt; //default ''
@@ -224,6 +233,7 @@ interface
       //
       property View: TControl read GetView;
       property EditMode: Boolean read IsEditMode write SetEditMode; //stored false //default false
+      property ParentEditMode: Boolean read IsParentEditMode; //stored false
       property TargetsVisible: Boolean read GetTargetsVisible write SetTargetsVisible; //default false //TODO: Hint on Tags Matching?
       property BorderVisible: Boolean read IsBorderVisible write SetBorderVisible; //stored false default false
       //
