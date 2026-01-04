@@ -118,9 +118,10 @@ interface
       procedure SetStoryPoint(const Value: boolean);
 
       {CollectableTarget}
+      function IsCollectable: Boolean;
       function GetCollectableTarget: String;
       procedure SetCollectableTarget(const Value: String);
-      function GetCollectableTargetStoryItem: IStoryItem;
+      function GetCollectableTargetStoryItem: IStoryItem; //helper
 
       {StoryPoints}
       function GetStoryPoint(const ID: String): IStoryItem; //ID can be a path of IDs, / meaning Story.HomeStoryItem, ~ meaning Story.HomeStoryItem, empty or . meaning current StoryItem if it is a StoryPoint or Home (else AncestorStoryPoint) and .. meaning AncestorStoryPoint
@@ -215,6 +216,7 @@ interface
       property Active: Boolean read IsActive write SetActive; //default false
       property Home: Boolean read IsHome write SetHome; //default false
       property StoryPoint: Boolean read IsStoryPoint write SetStoryPoint; //default false
+      property Collectable: Boolean read IsCollectable; //stored false
       property CollectableTarget: String read GetCollectableTarget write SetCollectableTarget; //default ''
       property Snapping: Boolean read IsSnapping write SetSnapping; //default false
       property Anchored: Boolean read IsAnchored write SetAnchored; //default true

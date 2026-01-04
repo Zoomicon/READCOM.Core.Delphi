@@ -177,6 +177,7 @@ interface
       procedure SetStoryPoint(const Value: Boolean); virtual;
 
       {CollectableTarget}
+      function IsCollectable: Boolean; inline;
       function GetCollectableTarget: String; virtual;
       procedure SetCollectableTarget(const Value: String); virtual;
       function GetCollectableTargetStoryItem: IStoryItem; //helper
@@ -351,6 +352,7 @@ interface
       property ParentEditMode: Boolean read IsParentEditMode stored false;
       property Options: IStoryItemOptions read GetOptions stored false; //TODO: should we make published? (think it was causing side-effects by getting somehow stored)
       property BorderVisible: Boolean read IsBorderVisible write SetBorderVisible stored false default false;
+      property Collectable: Boolean read IsCollectable stored false;
 
       class property Story: IStory read FStory write FStory; //Note: class properties can't be published and are not stored
 
@@ -1025,7 +1027,9 @@ end;
 
   class procedure TStoryItem.SetActiveStoryItem(const Value: IStoryItem);
   begin
-    if FIgnoreActiveStoryItemChanges or (Value = FActiveStoryItem) then exit;
+    if FIgnoreActiveStoryItemChanges or
+       (Value = FActiveStoryItem) //this also covers the case where (FActiveStoryItem=nil) and (Value=nil)
+    then exit;
 
     if Assigned(Value) then //not checking if StoryPoint, since a non-StoryPoint may be activated directly via a target if it belongs to other StoryPoint parent
       Value.Active := true //this will also deactivate the ActiveStoryItem if any
@@ -1040,24 +1044,57 @@ end;
   end;
 
   procedure TStoryItem.SetActive(const Value: Boolean);
+
+    procedure RemoveFoundCollectables;
+    begin
+      var FoundCollectableViews: TObjectListEx<TStoryItem> := nil; //local vars not auto-initialized, safeguarding FreeAndNil
+      try
+        FoundCollectableViews := TObjectListEx<TControl>.GetAllClass<TStoryItem>(Controls, nil, function(StoryItemView: TStoryItem): Boolean
+          begin
+            with StoryItemView do
+            begin
+              if not Collectable then exit(false);
+
+              var LCollectableTarget := CollectableTargetStoryItem;
+              if (LCollectableTarget.Active) then exit(false);
+
+              result := Assigned(GetStoryItem(CollectableTarget + '/' + ID)); //pick if item with same ID found in CollectableTarget
+            end;
+          end
+        );
+        FoundCollectableViews.FreeAll; //this will end up having RemoveObject called for each found StoryItem (which will also remove from StoryItems and AudioStoryItems [if it is such] lists)
+      finally
+        FreeAndNil(FoundCollectableViews);
+      end;
+    end;
+
   begin
     if FIgnoreActiveStoryItemChanges or (Value = IsActive) then exit; //Important (used while loading content subtree into existing StoryItem)
     //TODO: maybe also check csLoading to not fire change events and have story find the active storyitem after loading and zoom to it?
 
     if (Value) then //make active
     begin
+      //deactivate the previously active StoryItem
       if Assigned(FActiveStoryItem) then
-        FActiveStoryItem.Active := false; //deactivate the previously active StoryItem
+        FActiveStoryItem.Active := false;
 
+      //make this the ActiveStoryItem
       FActiveStoryItem := Self;
 
+      //Play any audio
       PlayRandomAudioStoryItem; //TODO: maybe should play AudioStoryItems in the order they exist in their parent StoryItem (but would need to remember last one played in that case which may be problematic if they are reordered etc.)
       //PlayNextAudioStoryItem;
-    end
-    else //make inactive //Note: since we would have exited if Value hadn't changed, if we've reached here this means we were the ActiveStoryItem
-      FActiveStoryItem := nil;
 
-    ActiveChanged;
+      if Assigned(FStory) and (FStory.StoryMode <> TStoryMode.EditMode) then //when not editing
+      begin
+        //Remove any collectables that are already at their collection target
+        RemoveFoundCollectables;
+      end;
+    end
+    else //make inactive
+      FActiveStoryItem := nil; //Note: since we would have exited if Value hadn't changed, if we've reached here this means we were the ActiveStoryItem
+
+    ActiveChanged; //fire change events
   end;
 
   function TStoryItem.IsRoot: Boolean;
@@ -1203,7 +1240,12 @@ end;
 
   {$endregion}
 
-  {$region 'StoryPoint'}
+  {$region 'CollectableTarget'}
+
+  function TStoryItem.IsCollectable: Boolean;
+  begin
+    result := (FCollectableTarget <> '');
+  end;
 
   function TStoryItem.GetCollectableTarget: String;
   begin
