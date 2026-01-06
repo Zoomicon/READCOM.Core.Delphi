@@ -191,25 +191,23 @@ implementation
   {$region 'EditMode'}
 
   /// Effectively sets EditMode
-  /// Always does side-effects (irrespective of current FEditMode value and without firing events)
+  /// Always does side-effects (irrespective of current FEditMode value)
   procedure TStoryHUD.DoSetEditMode(const Value: Boolean);
   begin
     FEditMode := Value;
     btnToggleEditMode.IsPressed := Value; //don't use "Pressed", need to use "IsPressed"
 
     scrollButtonsEdit.Visible := Value;
+
+    if Assigned(FEditModeChanged) then
+      FEditModeChanged(Self, Value);
   end;
 
   /// Sets EditMode (effective only if Value has changed)
   procedure TStoryHUD.SetEditMode(const Value: Boolean);
   begin
     if (Value <> FEditMode) then
-    begin
       DoSetEditMode(Value);
-
-      if Assigned(FEditModeChanged) then
-        FEditModeChanged(Self, Value);
-    end;
   end;
 
   {$endregion}
