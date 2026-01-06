@@ -563,21 +563,27 @@ implementation
 
     //--- In-Story Navigation URLs (with Tags Matching is set to do so, or for + [NextStoryPoint] by default [unless + tag matching is bypassed with ! prefix]) ---
 
-    if LUrl = '-' then //TODO: could use StartsWith and pass an optional number (default 1) on how many previous steps
+    if (LUrl = '-') and (UrlActionTarget = '') then //TODO: could use StartsWith and pass an optional number (default 1) on how many previous steps
     begin
       ActivatePreviousStoryPoint(TagsMatching); //?-, ??-, ???- will do tags matching
       exit;
     end;
 
-    if LUrl = '+' then //TODO: could use StartsWith and pass an optional number (default 1) on how many next steps
+    if (LUrl = '+') and (UrlActionTarget = '') then //TODO: could use StartsWith and pass an optional number (default 1) on how many next steps
     begin
       ActivateNextStoryPoint(TagsMatching); //!+ will skip tags matching
       exit;
     end;
 
-    if LUrl = '0' then
+    if (LUrl = '0') then //TODO: move to ActivateUrl
     begin
       //TODO// EmptyTargetStoryItem(TagsMatching); //?0, ??0, ???0 will do tags matching //Note: used to do ActivateHomeStoryItem, but now using '~' for that (at ActivateUrl below)
+      exit;
+    end;
+
+    if (LUrl = '') then //TODO: move to ActivateUrl
+    begin
+      //TODO// RemoveTargetStoryItem(TagsMatching);
       exit;
     end;
 
@@ -677,10 +683,7 @@ implementation
       if not Assigned(Base) then //if BaseStoryItem not provided...
         Base := ActiveStoryItem; //...use the ActiveStoryItem as Base for resolving ID paths
 
-      result := Base.GetStoryPoint(UrlTarget); //first try to resolve ID path among StoryPoings only
-
-      if not Assigned(result) then //ID path not resolved among StoryPoints...
-        result := Base.GetStoryItem(UrlTarget); ///...then try to resolve ID path among all StoryItems
+      result := Base.GetStoryItem(UrlTarget); //can use '@' prefix in ID path to force GetStoryPoint (or for subpath since it is recursive)
     end;
 
   begin
@@ -710,15 +713,20 @@ implementation
           end
       end
 
-      else if (Url ='') then
-        if Assigned(LTargetStoryItem) then
-          if LTargetStoryItem.StoryPoint then
-            begin
-              LTargetStoryItem.Hidden := false; //unhide StoryPoint
-              UI.Story.SetActiveStoryItem(LTargetStoryItem); //make StoryPoint active (zoom to it)
-            end
-          else
-            LTargetStoryItem.Hidden := not LTargetStoryItem.Hidden; //since this isn't a StoryPoint, just toggle its Hidden state (can be used to Show/Hide info cards)
+      //toggle visibility
+      else if Assigned(LTargetStoryItem) then
+        with LTargetStoryItem do
+        begin
+          if (Url = UrlTarget) then
+              Hidden := not Hidden //toggle visibility
+          else if (Url = '-' + UrlTarget) then
+              Hidden := true //hide
+          else if (Url = '+' + UrlTarget) then
+              Hidden := false; //show
+
+          if (not Hidden) and StoryPoint then
+            UI.Story.SetActiveStoryItem(LTargetStoryItem); //if target is StoryPoint set it as the active one (zoom to it)
+        end;
 
       //if (TagsMatching = TagsMatching_OkFail_Prompt) then //REMOVED: LoadFromUrl is asynchronous
         //TLockFrame.HideModal(OPENLOCK_DELAY);
@@ -1460,7 +1468,7 @@ implementation
         var isEditMode := (Story.StoryMode = EditMode);
 
         ShowOnlyClasses := TClassList.Create([TStoryItem]); //TStructureView's destructor will FreeAndNil that TClassList instance
-        ShowOnlyVisible := not isEditMode; //show Hidden StoryItems too in EditMode
+        ShowOnlyVisible := not isEditMode; //show Hidden StoryItems too in EditMode //TODO: see why an invisible Root doesn't get shown
         ShowNames := false;
         ShowTypes := false;
 

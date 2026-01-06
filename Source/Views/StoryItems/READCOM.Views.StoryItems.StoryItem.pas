@@ -142,7 +142,7 @@ interface
       procedure SetStoryItems(const Value: TIStoryItemList);
       //
       function GetStoryItem(const Index: Integer): IStoryItem; overload;
-      function GetStoryItem(const ID: String; const HomeOrStoryPoint: Boolean = false): IStoryItem; overload; //ID can be a path of IDs, / meaning Story.RootStoryItem, ~ meaning Story.HomeStoryItem, empty or . meaning current StoryItem and .. ParentStoryItem //if HomeOrStoryPoint=true behavior is that of GetStoryPoint(ID)
+      function GetStoryItem(const ID: String; const HomeOrStoryPoint: Boolean = false): IStoryItem; overload; //ID can be a path of IDs, / meaning Story.RootStoryItem, ~ meaning Story.HomeStoryItem, empty or . meaning current StoryItem and .. ParentStoryItem //if HomeOrStoryPoint=true (or path [subpaths too since it is recursive] is prefixed with @) behavior is that of GetStoryPoint(ID)
       //
       procedure RefreshStoryItemsList;
 
@@ -885,8 +885,16 @@ begin
   var Path := ID;
   var StartItem: IStoryItem;
 
+  // --- Force HomeOrStoryPoint ---
+  var LHomeOrStoryPoint := HomeOrStoryPoint;
+  if Path.StartsWith('@') then
+  begin
+    LHomeOrStoryPoint := true;
+    Path := Path.Substring(1);
+  end;
+
   // --- Determine starting point ---
-  if Path.StartsWith('/') then
+  if Path.StartsWith('/') then //Note: do not use "else if" here
   begin
     StartItem := Story.RootStoryItem;
     Path := Path.Substring(1);
@@ -906,7 +914,7 @@ begin
 
   else
   begin
-    if (not HomeOrStoryPoint) or Self.IsStoryPoint or Self.IsHome then
+    if (not LHomeOrStoryPoint) or Self.IsStoryPoint or Self.IsHome then
       StartItem := Self
     else
       StartItem := Self.AncestorStoryPoint; //may return nil
@@ -937,14 +945,14 @@ begin
 
   // Empty segment or "." gives Self
   if Head.IsEmpty or SameText(Head, '.') then
-    Exit(StartItem.GetStoryItem(Tail, HomeOrStoryPoint));
+    Exit(StartItem.GetStoryItem(Tail, LHomeOrStoryPoint));
 
   // Parent segment ("..")
   if SameText(Head, '..') then
   begin
     var Parent: IStoryItem;
 
-    if HomeOrStoryPoint then
+    if LHomeOrStoryPoint then
       Parent := StartItem.AncestorStoryPoint
     else
       Parent := StartItem.ParentStoryItem;
@@ -952,7 +960,7 @@ begin
     if not Assigned(Parent) then
       Parent := Story.RootStoryItem; //never go above the RootStoryItem
 
-    Exit(Parent.GetStoryItem(Tail, HomeOrStoryPoint));
+    Exit(Parent.GetStoryItem(Tail, LHomeOrStoryPoint));
   end;
 
   // --- Parse #n suffix (only for real IDs) ---
@@ -981,7 +989,7 @@ begin
     function(Child: IStoryItem): Boolean
     begin
       Result :=
-        ((not HomeOrStoryPoint) or Child.IsStoryPoint or Child.IsHome) and
+        ((not LHomeOrStoryPoint) or Child.IsStoryPoint or Child.IsHome) and
         (BaseID.IsEmpty or SameText(Child.ID, BaseID));
     end,
     Skip
@@ -991,7 +999,7 @@ begin
     Exit(nil);
 
   // --- Recurse downward ---
-  Result := Next.GetStoryItem(Tail, HomeOrStoryPoint);
+  Result := Next.GetStoryItem(Tail, LHomeOrStoryPoint);
 end;
 
   {$region 'ImageStoryItems'}

@@ -7,7 +7,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 36
           end>
         IconName = 'Edit'
         SVGText = 
@@ -52,7 +52,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 36
           end>
         IconName = 'reverse'
         SVGText = 
@@ -72,7 +72,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 36
           end>
         IconName = 'play'
         SVGText = 
@@ -92,8 +92,8 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Width = 87
-            Height = 109
+            Width = 29
+            Height = 36
           end>
         IconName = 'Diagram'
         SVGText = 
@@ -189,7 +189,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 36
           end>
         IconName = 'OpenFileFolder'
         SVGText = 
@@ -225,7 +225,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 36
           end>
         IconName = 'Save'
         SVGText = 
@@ -293,7 +293,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 36
           end>
         IconName = 'GlobeWithMeridians'
         SVGText = 
@@ -322,7 +322,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 36
           end>
         IconName = 'Plus'
         SVGText = 
@@ -443,7 +443,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 36
           end>
         IconName = 'Home'
         SVGText = 
@@ -501,7 +501,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 36
           end>
         IconName = 'Info'
         SVGText = 
@@ -566,7 +566,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 36
           end>
         IconName = 'CopyAction'
         SVGText = 
@@ -601,7 +601,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 36
           end>
         IconName = 'PasteAction'
         SVGText = 
@@ -651,7 +651,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 36
           end>
         IconName = 'FlipHorizontally'
         SVGText = 
@@ -687,7 +687,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 36
           end>
         IconName = 'FlipVertically'
         SVGText = 
@@ -723,7 +723,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 36
           end>
         IconName = 'ThoughtEllipsis'
         SVGText = 
@@ -751,7 +751,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 36
           end>
         IconName = 'Timer'
         SVGText = 
@@ -783,7 +783,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 36
           end>
         IconName = 'FramedPicture'
         SVGText = 
@@ -909,7 +909,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 36
           end>
         IconName = 'Scissors'
         SVGText = 
@@ -979,7 +979,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 36
           end>
         IconName = 'Sun'
         SVGText = 
@@ -1102,7 +1102,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 36
           end>
         IconName = 'Gear8Teeth'
         SVGText = 
@@ -1690,7 +1690,7 @@ object Icons: TIcons
       item
         MultiResBitmap = <
           item
-            Size = 136
+            Size = 36
           end>
         IconName = 'FullScreen_SVGrepo_505892'
         SVGText = 
@@ -1899,32 +1899,32 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'Edit'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 36.000000000000000000
+            SourceRect.Bottom = 36.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'reverse'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 36.000000000000000000
+            SourceRect.Bottom = 36.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'play'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 36.000000000000000000
+            SourceRect.Bottom = 36.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Diagram'
-            SourceRect.Right = 109.000000000000000000
-            SourceRect.Bottom = 109.000000000000000000
+            SourceRect.Right = 36.000000000000000000
+            SourceRect.Bottom = 36.000000000000000000
           end>
       end
       item
@@ -1947,16 +1947,16 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'OpenFileFolder'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 36.000000000000000000
+            SourceRect.Bottom = 36.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Save'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 36.000000000000000000
+            SourceRect.Bottom = 36.000000000000000000
           end>
       end
       item
@@ -1971,16 +1971,16 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'GlobeWithMeridians'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 36.000000000000000000
+            SourceRect.Bottom = 36.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Plus'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 36.000000000000000000
+            SourceRect.Bottom = 36.000000000000000000
           end>
       end
       item
@@ -2003,8 +2003,8 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'Home'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 36.000000000000000000
+            SourceRect.Bottom = 36.000000000000000000
           end>
       end
       item
@@ -2019,8 +2019,8 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'Info'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 36.000000000000000000
+            SourceRect.Bottom = 36.000000000000000000
           end>
       end
       item
@@ -2035,56 +2035,56 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'CopyAction'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 36.000000000000000000
+            SourceRect.Bottom = 36.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'PasteAction'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 36.000000000000000000
+            SourceRect.Bottom = 36.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'FlipHorizontally'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 36.000000000000000000
+            SourceRect.Bottom = 36.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'FlipVertically'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 36.000000000000000000
+            SourceRect.Bottom = 36.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'ThoughtEllipsis'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 36.000000000000000000
+            SourceRect.Bottom = 36.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Timer'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 36.000000000000000000
+            SourceRect.Bottom = 36.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'FramedPicture'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 36.000000000000000000
+            SourceRect.Bottom = 36.000000000000000000
           end>
       end
       item
@@ -2099,16 +2099,16 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'Scissors'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 36.000000000000000000
+            SourceRect.Bottom = 36.000000000000000000
           end>
       end
       item
         Layers = <
           item
             Name = 'Sun'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 36.000000000000000000
+            SourceRect.Bottom = 36.000000000000000000
           end>
       end
       item
@@ -2131,8 +2131,8 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'Gear8Teeth'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 36.000000000000000000
+            SourceRect.Bottom = 36.000000000000000000
           end>
       end
       item
@@ -2251,8 +2251,8 @@ object Icons: TIcons
         Layers = <
           item
             Name = 'FullScreen_SVGrepo_505892'
-            SourceRect.Right = 136.000000000000000000
-            SourceRect.Bottom = 136.000000000000000000
+            SourceRect.Right = 36.000000000000000000
+            SourceRect.Bottom = 36.000000000000000000
           end>
       end
       item
