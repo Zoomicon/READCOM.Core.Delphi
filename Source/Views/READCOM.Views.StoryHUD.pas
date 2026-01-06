@@ -113,6 +113,7 @@ interface
       FUseStoryTimerChanged: TBooleanPropertyChangedEvent;
 
       {EditMode}
+      procedure DoSetEditMode(const Value: Boolean); virtual; //always does side-effects, doesn't fire events
       procedure SetEditMode(const Value: Boolean); virtual;
       {StructureVisible}
       procedure SetStructureVisible(const Value: Boolean); virtual;
@@ -177,7 +178,8 @@ implementation
     btnNextTheme.Visible := false; //TODO: if themes that support all platforms are used, enable again
     {$ENDIF}
 
-    FEditMode := false;
+    DoSetEditMode(false); //does side-effects
+
     FMultiViewOpenedWidth := MultiView.Width;
     FTargetsVisible := false;
 
@@ -188,14 +190,22 @@ implementation
 
   {$region 'EditMode'}
 
+  /// Effectively sets EditMode
+  /// Always does side-effects (irrespective of current FEditMode value and without firing events)
+  procedure TStoryHUD.DoSetEditMode(const Value: Boolean);
+  begin
+    FEditMode := Value;
+    btnToggleEditMode.IsPressed := Value; //don't use "Pressed", need to use "IsPressed"
+
+    scrollButtonsEdit.Visible := Value;
+  end;
+
+  /// Sets EditMode (effective only if Value has changed)
   procedure TStoryHUD.SetEditMode(const Value: Boolean);
   begin
     if (Value <> FEditMode) then
     begin
-      FEditMode := Value;
-      btnToggleEditMode.IsPressed := Value; //don't use "Pressed", need to use "IsPressed"
-
-      scrollButtonsEdit.Visible := Value;
+      DoSetEditMode(Value);
 
       if Assigned(FEditModeChanged) then
         FEditModeChanged(Self, Value);
