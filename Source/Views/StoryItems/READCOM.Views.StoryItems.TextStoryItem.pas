@@ -60,9 +60,13 @@ interface
       FLastMemoSize: TSizeF;
       //FLastFontSize: Single;
 
+      procedure DblClick; override;
+
       //procedure Loaded; override;
       procedure MemoResized(Sender: TObject);
       procedure MemoChangeTracking(Sender: TObject);
+
+      {Outlining}
       procedure ForceRenderMemoOutlineToImage;
 
       {Z-Order}
@@ -77,6 +81,7 @@ interface
 
       {EditMode}
       procedure SetEditMode(const Value: Boolean); override;
+      procedure ToggleMemoEnabled(Sender: TObject);
 
       {Text}
       function GetText: String;
@@ -200,11 +205,12 @@ implementation
           StyledSettings := []; //don't overload any TextSetting with those from Style
 
           //TextStoryItem-related
-          ReadOnly := not DEFAULT_EDITABLE;
+          Editable := DEFAULT_EDITABLE; //this will call UpdateMemoReadOnly
 
           //Listeners//
           OnResized := MemoResized;
           OnChangeTracking := MemoChangeTracking;
+          OnDblClick := ToggleMemoEnabled; //used to disable the Memo (acts only in EditMode)
         end;
 
       //FLastFontSize := Memo.Font.Size;
@@ -216,6 +222,24 @@ implementation
     Text := DEFAULT_TEXT;
     ForegroundColor := DEFAULT_FOREGROUND_COLOR;
   end;
+
+  {$endregion}
+
+  {$region 'Transparency'}
+
+  procedure TTextStoryItem.MemoApplyStyleLookup(Sender: TObject);
+  begin
+    inherited;
+
+    //make TMemo transparent
+    var Obj := Memo.FindStyleResource('background');
+    if Assigned(Obj) And (Obj is TActiveStyleObject) Then
+       TActiveStyleObject(Obj).Source := Nil;
+  end;
+
+  {$endregion}
+
+  {$region 'Font fit'}
 
   procedure SetFontSizeToFit(const AMemo: TMemo; var LastFontFitSize: TSizeF); //TODO: add logging
   //const
@@ -275,237 +299,237 @@ implementation
 
   end;
 
-procedure SetFontSizeToFit0(const AMemo: TMemo);
-const
-  Offset = 4; //The diference between ContentBounds and ContentLayout //TODO: info coming from https://stackoverflow.com/a/21993017/903783 - need to verify
-begin
-  with AMemo do
+(*
+  procedure SetFontSizeToFit0(const AMemo: TMemo);
+  const
+    Offset = 4; //The diference between ContentBounds and ContentLayout //TODO: info coming from https://stackoverflow.com/a/21993017/903783 - need to verify
   begin
-    //set default font size
-    Font.Size := 12;
-
-    if (ContentBounds.Height <> 0) then //must check, else first while will loop for ever since ContentBounds.Height is 0 on load
+    with AMemo do
     begin
-      //make font bigger
-      while (ContentBounds.Height + Offset < Height) do //using WordWrap, not checking for Width
-        with Font do
-          Size := Size + 1;
+      //set default font size
+      Font.Size := 12;
 
-      //make font smaller
-      while (ContentBounds.Height + Offset > Height) do //using WordWrap, not checking for Width
-        with Font do
-          Size := Size - 1;
+      if (ContentBounds.Height <> 0) then //must check, else first while will loop for ever since ContentBounds.Height is 0 on load
+      begin
+        //make font bigger
+        while (ContentBounds.Height + Offset < Height) do //using WordWrap, not checking for Width
+          with Font do
+            Size := Size + 1;
+
+        //make font smaller
+        while (ContentBounds.Height + Offset > Height) do //using WordWrap, not checking for Width
+          with Font do
+            Size := Size - 1;
+      end;
     end;
   end;
-end;
 
-procedure SetFontSizeToFit3(const Memo: TMemo);
-const
-  Margin = 5.0;  // Padding for better fitting
-  InitStep = 1.0;
-  MinStep = 0.05;
-  MaxStep = 10.0;
-  InitStepAdjust = 0.1;
-  MinStepAdjust = 0.05;
-  MaxStepAdjust = 0.2;
-begin
-  Log('SetFontSizeToFit %p', [@Memo]);
+  procedure SetFontSizeToFit2(const Memo: TMemo);
+  const
+    Margin = Single(5.0);
+    InitStep = Single(1.0);
+    MinStep = Single(0.05);
+    MaxStep = Single(10.0);
+    InitStepAdjust = Single(0.1);
+    MinStepAdjust = Single(0.05);
+    MaxStepAdjust = Single(0.2);
+  begin
+    Log('SetFontSizeToFit %p', [@Memo]);
 
-  try
-    Memo.RecalcEnabled;
-    if Memo.Text = '' then Exit;
+    try
+      if Memo.Text = '' then
+        Exit;
 
-    var MaxWidth := Memo.AbsoluteWidth;
-    var MaxHeight := Memo.AbsoluteHeight;
+      var MaxWidth := Memo.Width; //TODO: should we use Memo.Width here?
+      var MaxHeight := Memo.Height; //TODO: should we use Memo.Height here?
 
-    var TestFontSize := Memo.Font.Size;
-    var Step := InitStep;
-    var IsFirstLoop := True;
-    var PrevDirection := 0;
-    var PrevHeightDiff := 0.0;
-
-    while True do
-    begin
-      // Temporarily set the test font size
-      Memo.Font.Size := TestFontSize;
-
-      // Measure text dimensions using Memo's ContentBounds
-      var TextWidth := Memo.ContentBounds.Width;
-      var TextHeight := Memo.ContentBounds.Height;
-
-      Log('Measured Text: Width=%.2f, Height=%.2f | MaxWidth=%.2f, MaxHeight=%.2f',
-          [TextWidth, TextHeight, MaxWidth, MaxHeight]);
-
-      // Check if text fits within bounds
-      var HeightDiff := Abs(TextHeight - MaxHeight);
-      var Direction: Integer;
-      if TextHeight > MaxHeight then
-        Direction := -1  // Shrink font size
-      else if TextHeight < (MaxHeight - Margin) then
-        Direction := +1  // Increase font size
-      else
-        Break; // Stop when within margin range
-
-      // Adjust font size step
-      TestFontSize := TestFontSize + (Step * Direction);
-
-      // Step adjustment logic
-      if IsFirstLoop then
-        IsFirstLoop := False
-      else
+      // Ensure Memo.Canvas is valid before using it
+      if not Assigned(Memo.Canvas) then
       begin
-        var StepAdjust := EnsureRange(HeightDiff / MaxHeight, MinStepAdjust, MaxStepAdjust);
-        if PrevDirection <> Direction then
-        begin
-          Step := Step * (1.0 - StepAdjust);
-          if Step < MinStep then Break;
-        end
-        else if (HeightDiff >= PrevHeightDiff) and (Step < MaxStep) then
-          Step := Min(Step * (1.0 + StepAdjust), MaxStep);
+        Log('Memo.Canvas is NIL!');
+        Exit;
       end;
 
-      // Update previous values
-      PrevDirection := Direction;
-      PrevHeightDiff := HeightDiff;
-    end;
-
-    //Memo.Font.Size := TestFontSize;  // Apply final font size
-
-  finally
-    Log('SetFontSizeToFit %p EXIT', [@Memo]);
-  end;
-end;
-
-procedure SetFontSizeToFit2(const Memo: TMemo);
-const
-  Margin = Single(5.0);
-  InitStep = Single(1.0);
-  MinStep = Single(0.05);
-  MaxStep = Single(10.0);
-  InitStepAdjust = Single(0.1);
-  MinStepAdjust = Single(0.05);
-  MaxStepAdjust = Single(0.2);
-begin
-  Log('SetFontSizeToFit %p', [@Memo]);
-
-  try
-    if Memo.Text = '' then
-      Exit;
-
-    var MaxWidth := Memo.Width; //TODO: should we use Memo.Width here?
-    var MaxHeight := Memo.Height; //TODO: should we use Memo.Height here?
-
-    // Ensure Memo.Canvas is valid before using it
-    if not Assigned(Memo.Canvas) then
-    begin
-      Log('Memo.Canvas is NIL!');
-      Exit;
-    end;
-
-    var Layout := TTextLayoutManager.DefaultTextLayout.Create(Memo.Canvas);
-    try
-      with Layout do
-      begin
-        BeginUpdate;
-        try
-          Log('Initializing Layout Font...');
-
-          // Check if Font exists before assignment
-          if Assigned(Font) then
-          begin
-            BeginUpdate;
-            Font.Assign(Memo.Font);
-            EndUpdate;
-
-            // Explicitly set essential font properties
-            //Font.Size := Memo.Font.Size;
-            //Font.Family := Memo.Font.Family;
-            //Font.Style := Memo.Font.Style;
-
-            Log('Layout Font Assigned: Size=%d, Family=%s',
-                [round(Font.Size), String(Font.Family)]);
-          end
-          else
-            Log('Layout.Font is NIL!');
-
-          HorizontalAlign := Memo.TextAlign;
-          VerticalAlign := TTextAlign.Center;
-
-          Padding := Memo.Padding;
-          MaxSize := PointF(MaxWidth, MaxHeight); // Setting explicit bounds
-          WordWrap := Memo.WordWrap;
-
-          Log('Set Text Before Font Assignment...');
-          Text := Memo.Text; // Force initialization of layout text
-        finally
-          EndUpdate;
-        end;
-
-        var PrevDirection: Integer := 0;
-        var PrevHeightDiff: Single := 0.0;
-        var Step: Single := InitStep;
-        var IsFirstLoop := true;
-
-        while True do
+      var Layout := TTextLayoutManager.DefaultTextLayout.Create(Memo.Canvas);
+      try
+        with Layout do
         begin
-          Log('Updating Layout Text...');
-          //Text := Memo.Text; // Ensure updates
-
-          var LTextHeight := Layout.TextHeight;
-          var HeightDiff := Abs(LTextHeight - MaxHeight);
-
-          Log('Current TextHeight: %.2f, Target MaxHeight: %.2f', [LTextHeight, MaxHeight]);
-
-          // Determine direction based on current height
-          var Direction: Integer;
-          if LTextHeight > MaxHeight then
-            Direction := -1 // Decrease font size
-          else if LTextHeight < (MaxHeight - Margin) then
-            Direction := +1 // Increase font size
-          else
-            Break; // Stop when inside range
-
-          // Apply offset using direction
           BeginUpdate;
-          Font.Size := Font.Size + (Step * Direction);
-          EndUpdate;
+          try
+            Log('Initializing Layout Font...');
 
-          // Step adjustment
-          if IsFirstLoop then
-            IsFirstLoop := false
-          else
-          begin
-            var StepAdjust := EnsureRange(HeightDiff / MaxHeight, MinStepAdjust, MaxStepAdjust);
-            if PrevDirection <> Direction then
+            // Check if Font exists before assignment
+            if Assigned(Font) then
             begin
-              Step := Step * (1.0 - StepAdjust); // Reduce step to prevent oscillation
-              if (Step < MinStep) then
-                Break; // Exit if step gets too small
+              BeginUpdate;
+              Font.Assign(Memo.Font);
+              EndUpdate;
+
+              // Explicitly set essential font properties
+              //Font.Size := Memo.Font.Size;
+              //Font.Family := Memo.Font.Family;
+              //Font.Style := Memo.Font.Style;
+
+              Log('Layout Font Assigned: Size=%d, Family=%s',
+                  [round(Font.Size), String(Font.Family)]);
             end
-            else if (HeightDiff >= PrevHeightDiff) and (Step < MaxStep) then
-              Step := Min(Step * (1.0 + StepAdjust), MaxStep); // Increase step if we're not making enough progress
+            else
+              Log('Layout.Font is NIL!');
+
+            HorizontalAlign := Memo.TextAlign;
+            VerticalAlign := TTextAlign.Center;
+
+            Padding := Memo.Padding;
+            MaxSize := PointF(MaxWidth, MaxHeight); // Setting explicit bounds
+            WordWrap := Memo.WordWrap;
+
+            Log('Set Text Before Font Assignment...');
+            Text := Memo.Text; // Force initialization of layout text
+          finally
+            EndUpdate;
           end;
 
-          // Update previous values for next iteration
-          PrevDirection := Direction;
-          PrevHeightDiff := HeightDiff;
+          var PrevDirection: Integer := 0;
+          var PrevHeightDiff: Single := 0.0;
+          var Step: Single := InitStep;
+          var IsFirstLoop := true;
+
+          while True do
+          begin
+            Log('Updating Layout Text...');
+            //Text := Memo.Text; // Ensure updates
+
+            var LTextHeight := Layout.TextHeight;
+            var HeightDiff := Abs(LTextHeight - MaxHeight);
+
+            Log('Current TextHeight: %.2f, Target MaxHeight: %.2f', [LTextHeight, MaxHeight]);
+
+            // Determine direction based on current height
+            var Direction: Integer;
+            if LTextHeight > MaxHeight then
+              Direction := -1 // Decrease font size
+            else if LTextHeight < (MaxHeight - Margin) then
+              Direction := +1 // Increase font size
+            else
+              Break; // Stop when inside range
+
+            // Apply offset using direction
+            BeginUpdate;
+            Font.Size := Font.Size + (Step * Direction);
+            EndUpdate;
+
+            // Step adjustment
+            if IsFirstLoop then
+              IsFirstLoop := false
+            else
+            begin
+              var StepAdjust := EnsureRange(HeightDiff / MaxHeight, MinStepAdjust, MaxStepAdjust);
+              if PrevDirection <> Direction then
+              begin
+                Step := Step * (1.0 - StepAdjust); // Reduce step to prevent oscillation
+                if (Step < MinStep) then
+                  Break; // Exit if step gets too small
+              end
+              else if (HeightDiff >= PrevHeightDiff) and (Step < MaxStep) then
+                Step := Min(Step * (1.0 + StepAdjust), MaxStep); // Increase step if we're not making enough progress
+            end;
+
+            // Update previous values for next iteration
+            PrevDirection := Direction;
+            PrevHeightDiff := HeightDiff;
+          end;
         end;
+
+        Memo.BeginUpdate;
+        Memo.Font.Size := Layout.Font.Size;
+        Memo.EndUpdate;
+
+      finally
+        Layout.Free;
+      end;
+    finally
+      Log('SetFontSizeToFit %p EXIT', [@Memo]);
+    end;
+  end;
+
+  procedure SetFontSizeToFit3(const Memo: TMemo);
+  const
+    Margin = 5.0;  // Padding for better fitting
+    InitStep = 1.0;
+    MinStep = 0.05;
+    MaxStep = 10.0;
+    InitStepAdjust = 0.1;
+    MinStepAdjust = 0.05;
+    MaxStepAdjust = 0.2;
+  begin
+    Log('SetFontSizeToFit %p', [@Memo]);
+
+    try
+      Memo.RecalcEnabled;
+      if Memo.Text = '' then Exit;
+
+      var MaxWidth := Memo.AbsoluteWidth;
+      var MaxHeight := Memo.AbsoluteHeight;
+
+      var TestFontSize := Memo.Font.Size;
+      var Step := InitStep;
+      var IsFirstLoop := True;
+      var PrevDirection := 0;
+      var PrevHeightDiff := 0.0;
+
+      while True do
+      begin
+        // Temporarily set the test font size
+        Memo.Font.Size := TestFontSize;
+
+        // Measure text dimensions using Memo's ContentBounds
+        var TextWidth := Memo.ContentBounds.Width;
+        var TextHeight := Memo.ContentBounds.Height;
+
+        Log('Measured Text: Width=%.2f, Height=%.2f | MaxWidth=%.2f, MaxHeight=%.2f',
+            [TextWidth, TextHeight, MaxWidth, MaxHeight]);
+
+        // Check if text fits within bounds
+        var HeightDiff := Abs(TextHeight - MaxHeight);
+        var Direction: Integer;
+        if TextHeight > MaxHeight then
+          Direction := -1  // Shrink font size
+        else if TextHeight < (MaxHeight - Margin) then
+          Direction := +1  // Increase font size
+        else
+          Break; // Stop when within margin range
+
+        // Adjust font size step
+        TestFontSize := TestFontSize + (Step * Direction);
+
+        // Step adjustment logic
+        if IsFirstLoop then
+          IsFirstLoop := False
+        else
+        begin
+          var StepAdjust := EnsureRange(HeightDiff / MaxHeight, MinStepAdjust, MaxStepAdjust);
+          if PrevDirection <> Direction then
+          begin
+            Step := Step * (1.0 - StepAdjust);
+            if Step < MinStep then Break;
+          end
+          else if (HeightDiff >= PrevHeightDiff) and (Step < MaxStep) then
+            Step := Min(Step * (1.0 + StepAdjust), MaxStep);
+        end;
+
+        // Update previous values
+        PrevDirection := Direction;
+        PrevHeightDiff := HeightDiff;
       end;
 
-      Memo.BeginUpdate;
-      Memo.Font.Size := Layout.Font.Size;
-      Memo.EndUpdate;
+      //Memo.Font.Size := TestFontSize;  // Apply final font size
 
     finally
-      Layout.Free;
+      Log('SetFontSizeToFit %p EXIT', [@Memo]);
     end;
-  finally
-    Log('SetFontSizeToFit %p EXIT', [@Memo]);
   end;
-end;
-
-//TODO: move into FMX Memo helper - see old method there to replace
-
+  *)
+  //TODO: move into FMX Memo helper - see old method there to replace
 
   (*
   procedure TTextStoryItem.Loaded; //this gets called multiple times when you have an inherited frame, maybe use SetParent instead
@@ -569,6 +593,10 @@ end;
 
     //ForceRenderMemoOutlineToImage; //TODO: doesn't seem to work
   end;
+
+  {$endregion}
+
+  {$region 'Font outline'}
 
   //text outlining effect
   procedure TTextStoryItem.ForceRenderMemoOutlineToImage;
@@ -712,7 +740,22 @@ end;
   begin
     Memo.ReadOnly := not (IsEditable or IsEditMode);
     Memo.HitTest := not Memo.ReadOnly; //TODO: should maybe have a mode that swiches between Editable, Selectable and Read-Only/Inactive (so that it's draggable)
-    //Memo.Enabled := not Memo.ReadOnly; //this greys out the item, don't use
+  end;
+
+  procedure TTextStoryItem.ToggleMemoEnabled(Sender: TObject);
+  begin
+    if EditMode then //only when in Edit mode
+    begin
+      Memo.Enabled := not Memo.Enabled; //toggle Memo's enabled condition (text editing)
+      AreaSelector.Visible := not Memo.Enabled; //show AreaSelector when not editing text
+    end;
+  end;
+
+  procedure TTextStoryItem.DblClick; //TODO: this doesn't seem to always fire when Memo is disabled and in EditMode: AreaSelector is interfering. One way to get it to fire is to click once to hide AreaSelector, then right click to show Options popup, then ESC/[X] to close popup and immediately double-click to enable the text editing
+  begin
+    inherited;
+
+    ToggleMemoEnabled(Self); //acts only in EditMode
   end;
 
   {$endregion}
@@ -748,6 +791,8 @@ end;
   begin
     inherited;
     UpdateMemoReadOnly;
+
+    Memo.Enabled := not Value; //enter EditMode without text editing enabled 
   end;
 
   {$endregion}
@@ -897,16 +942,6 @@ end;
     end;
 
     result := Self;
-  end;
-
-  procedure TTextStoryItem.MemoApplyStyleLookup(Sender: TObject);
-  begin
-    inherited;
-
-    //make TMemo transparent
-    var Obj := Memo.FindStyleResource('background');
-    if Assigned(Obj) And (Obj is TActiveStyleObject) Then
-       TActiveStyleObject(Obj).Source := Nil;
   end;
 
   {$endregion}

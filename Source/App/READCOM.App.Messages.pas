@@ -16,7 +16,7 @@ var
   URL_HELP: String = 'https://github.com/Zoomicon/READCOM_App/wiki';
   URL_READCOM: String = 'https://www.read-com-eu.uma.es';
 
-  URL_GALLERY: String = 'https://raw.githubusercontent.com/zoomicon/READCOM_Gallery/master/Gallery/';
+  URL_GALLERY: String = 'https://raw.githubusercontent.com/Zoomicon/READCOM_Gallery/master/Gallery/';
 
   SAVED_STATE_FILENAME: String = 'SavedState.readcom';
 
