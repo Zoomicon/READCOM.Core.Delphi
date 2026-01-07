@@ -63,6 +63,7 @@ interface
       //procedure Loaded; override;
       procedure MemoResized(Sender: TObject);
       procedure MemoChangeTracking(Sender: TObject);
+      procedure ForceRenderMemoOutlineToImage;
 
       {Z-Order}
       function GetBackIndex: Integer; override;
@@ -155,12 +156,10 @@ implementation
   {$region 'Used units'}
   uses
     IOUtils, //for TFile
+    System.Math, //for EnsureRange
     //
     FMX.Styles.Objects, //for TActiveStyleObject //TODO: move the transparency setting code to FMX.Helpers
-
-    System.Math, //for MaxSingle (TEMP!)
-    FMX.TextLayout, //TODO: TEMP!
-
+    FMX.TextLayout, //for TTextLayoutManager
     //
     //Zoomicon.Helpers.RTL.StreamHelpers, //for TStream.RealAllText
     Zoomicon.Helpers.FMX.Memo.MemoHelpers, //for TMemo.SetFontSizeToFit
@@ -557,6 +556,8 @@ end;
     //Memo.SetFontSizeToFit(FLastMemoSize);
     //Memo.SetFontSizeToFit(FLastFontSize);
     SetFontSizeToFit(Memo, FLastMemoSize);
+
+    //ForceRenderMemoOutlineToImage; //TODO: doesn't seem to work
   end;
 
   procedure TTextStoryItem.MemoChangeTracking(Sender: TObject);
@@ -565,6 +566,99 @@ end;
     //Memo.SetFontSizeToFit(FLastMemoSize);
     //Memo.SetFontSizeToFit(FLastFontSize);
     SetFontSizeToFit(Memo, FLastMemoSize);
+
+    //ForceRenderMemoOutlineToImage; //TODO: doesn't seem to work
+  end;
+
+  //text outlining effect
+  procedure TTextStoryItem.ForceRenderMemoOutlineToImage;
+  begin
+    // Schedule AFTER memo repaint
+    TThread.ForceQueue(nil,
+      procedure
+
+        procedure RenderMemoOutlineToImage(AMemo: TMemo; AGlyph: TMediaDisplay;
+                                           AOutlineColor: TAlphaColor;
+                                           AScale: Single;
+                                           AOffset: Single);
+        begin
+          // 1. Capture memo without caret/selection
+          var SavedFocus := AMemo.Root.Focused;
+          AMemo.Root.SetFocused(nil);
+
+          var SrcBmp: TBitmap;
+          try
+            SrcBmp := AMemo.MakeScreenshot;
+          finally
+            AMemo.Root.SetFocused(SavedFocus);
+          end;
+
+          // 2. Scale the screenshot
+          var NewW := Round(SrcBmp.Width * AScale);
+          var NewH := Round(SrcBmp.Height * AScale);
+
+          var ScaledBmp := TBitmap.Create(NewW, NewH);
+          ScaledBmp.BitmapScale := SrcBmp.BitmapScale;
+          ScaledBmp.Clear(TAlphaColorRec.Null);
+
+          ScaledBmp.Canvas.BeginScene;
+          try
+            ScaledBmp.Canvas.DrawBitmap(
+              SrcBmp,
+              RectF(0, 0, SrcBmp.Width, SrcBmp.Height),
+              RectF(0, 0, NewW, NewH),
+              1, True
+            );
+          finally
+            ScaledBmp.Canvas.EndScene;
+          end;
+
+          // 3. Recolor non-transparent pixels using FMX Map/Unmap
+          var Data: TBitmapData;
+          if ScaledBmp.Map(TMapAccess.ReadWrite, Data) then
+          try
+            for var Y := 0 to ScaledBmp.Height - 1 do
+              for var X := 0 to ScaledBmp.Width - 1 do
+              begin
+                var C := Data.GetPixel(X, Y);
+                var A := TAlphaColorRec(C).A;
+                if A > 0 then
+                  Data.SetPixel(X, Y,
+                    (A shl 24) or (AOutlineColor and $00FFFFFF));
+              end;
+          finally
+            ScaledBmp.Unmap(Data);
+          end;
+
+          // 4. Set Bitmap
+          AGlyph.Bitmap := ScaledBmp; //do not use Assign, it needs to create a TImage Presenter first (done at SetBitmap)
+
+          //AGlyph.BringToFront; //TEST: doesn't seem to do anything (say show other color text)
+
+          // 5. Apply offset + scaling behavior
+          AGlyph.WrapMode := TImageWrapMode.Stretch;
+
+          with TImage(AGlyph.Presenter).BitmapMargins do
+          begin
+            Left   := -AOffset;
+            Top    := -AOffset;
+            Right  := -AOffset;
+            Bottom := -AOffset;
+          end;
+
+          SrcBmp.Free;
+          ScaledBmp.Free;
+        end;
+
+      begin
+        RenderMemoOutlineToImage(
+          Memo,
+          Glyph,
+          TAlphaColorRec.Black,
+          1.12,   // scale
+          2.0     // offset
+        );
+      end);
   end;
 
   {$endregion}
@@ -809,6 +903,7 @@ end;
   begin
     inherited;
 
+    //make TMemo transparent
     var Obj := Memo.FindStyleResource('background');
     if Assigned(Obj) And (Obj is TActiveStyleObject) Then
        TActiveStyleObject(Obj).Source := Nil;
