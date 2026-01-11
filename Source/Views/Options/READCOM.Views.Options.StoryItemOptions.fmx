@@ -1,11 +1,11 @@
 object StoryItemOptions: TStoryItemOptions
-  Size.Width = 478.000000000000000000
+  Size.Width = 480.000000000000000000
   Size.Height = 118.000000000000000000
   Size.PlatformDefault = False
   object Background: TRectangle
     Align = Contents
     Fill.Color = claLightgoldenrodyellow
-    Size.Width = 478.000000000000000000
+    Size.Width = 480.000000000000000000
     Size.Height = 118.000000000000000000
     Size.PlatformDefault = False
   end
@@ -26,7 +26,7 @@ object StoryItemOptions: TStoryItemOptions
   end
   object Layout: TFlowLayout
     Align = MostTop
-    Size.Width = 478.000000000000000000
+    Size.Width = 480.000000000000000000
     Size.Height = 116.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 16
@@ -46,9 +46,31 @@ object StoryItemOptions: TStoryItemOptions
         StaysPressed = True
         Align = Client
         Anchors = []
-        Hint = 'Toggle Visible'#13#10#13#10'Sets/unsets the Visibility of the StoryPoint'
+        Hint = 
+          'Toggle Visible'#13#10#13#10'Sets/unsets the Visibility of the Active Story' +
+          'Item'
         Images = Icons.SVGIconImageList
         ImageIndex = 47
+        Margins.Left = 4.000000000000000000
+        Margins.Top = 4.000000000000000000
+        Margins.Right = 4.000000000000000000
+        Margins.Bottom = 4.000000000000000000
+        Size.Width = 50.000000000000000000
+        Size.Height = 50.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'actiontoolbutton'
+        Text = 'Is Visible'
+        OnClick = actionToggleVisibleExecute
+      end
+      object btnToggleCrop: TSpeedButton
+        StaysPressed = True
+        Align = Client
+        Anchors = []
+        Hint = 
+          'Toggle Crop Children'#13#10#13#10'Sets/unsets the visual cropping of child' +
+          ' StoryItems that exceed the Active StoryItem'#39's bounds'
+        Images = Icons.SVGIconImageList
+        ImageIndex = 49
         Margins.Left = 4.000000000000000000
         Margins.Top = 4.000000000000000000
         Margins.Right = 4.000000000000000000
@@ -127,7 +149,7 @@ object StoryItemOptions: TStoryItemOptions
         Margins.Left = 8.000000000000000000
         Margins.Top = 14.000000000000000000
         Margins.Right = 8.000000000000000000
-        Size.Width = 166.000000000000000000
+        Size.Width = 104.000000000000000000
         Size.Height = 30.000000000000000000
         Size.PlatformDefault = False
         OnChange = txtIDChange
@@ -142,7 +164,7 @@ object StoryItemOptions: TStoryItemOptions
         Margins.Top = 4.000000000000000000
         Margins.Right = 4.000000000000000000
         Margins.Bottom = 4.000000000000000000
-        Position.X = 418.000000000000000000
+        Position.X = 414.000000000000000000
         Position.Y = 4.000000000000000000
         Size.Width = 50.000000000000000000
         Size.Height = 50.000000000000000000
@@ -326,27 +348,23 @@ object StoryItemOptions: TStoryItemOptions
       Text = 'Load'
       ImageIndex = 6
       OnExecute = actionLoadExecute
-      ImageIndex = 6
     end
     object actionSave: TAction
       Category = 'File'
       Text = 'Save'
       ImageIndex = 7
       OnExecute = actionSaveExecute
-      ImageIndex = 7
     end
     object actionAdd: TAction
       Category = 'File'
       Text = 'Add'
       ImageIndex = 10
-      ImageIndex = 10
     end
     object actionLoadUrl: TAction
       Category = 'File'
       Text = 'Load'
-      ImageIndex = 6
+      ImageIndex = 48
       OnExecute = actionLoadUrlExecute
-      ImageIndex = 6
     end
   end
 end

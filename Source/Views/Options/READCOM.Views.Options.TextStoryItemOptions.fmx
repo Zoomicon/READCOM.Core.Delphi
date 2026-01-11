@@ -1,8 +1,8 @@
 inherited TextStoryItemOptions: TTextStoryItemOptions
-  Size.Width = 516.000000000000000000
+  Size.Width = 478.000000000000000000
   Size.Height = 180.000000000000000000
   inherited Background: TRectangle
-    Size.Width = 516.000000000000000000
+    Size.Width = 478.000000000000000000
     Size.Height = 180.000000000000000000
   end
   inherited AddDialog: TOpenDialog
@@ -15,26 +15,20 @@ inherited TextStoryItemOptions: TTextStoryItemOptions
     Left = 316
   end
   inherited Layout: TFlowLayout
-    Size.Width = 516.000000000000000000
+    Size.Width = 478.000000000000000000
     Size.Height = 174.000000000000000000
     inherited LayoutStoryItemMain: TFlowLayout
-      Size.Width = 512.000000000000000000
+      Size.Width = 473.000000000000000000
       TabOrder = 14
-      inherited txtID: TEdit
-        Size.Width = 259.000000000000000000
-      end
-      inherited btnClose: TSpeedButton
-        Position.X = 453.000000000000000000
-      end
     end
     inherited LayoutStoryItemButtons: TFlowLayout
-      Size.Width = 512.000000000000000000
+      Size.Width = 473.000000000000000000
       TabOrder = 13
     end
     object LayoutTextStoryItemButtons: TFlowLayout
       Align = Top
       Position.Y = 116.000000000000000000
-      Size.Width = 581.000000000000000000
+      Size.Width = 473.000000000000000000
       Size.Height = 58.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 12
@@ -61,7 +55,7 @@ inherited TextStoryItemOptions: TTextStoryItemOptions
       end
       object LayoutHorzAlign: TFlowLayout
         Align = Contents
-        Size.Width = 192.000000000000000000
+        Size.Width = 174.000000000000000000
         Size.Height = 58.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 1
@@ -134,7 +128,7 @@ inherited TextStoryItemOptions: TTextStoryItemOptions
       end
       object LayoutTextStyle: TFlowLayout
         Align = Contents
-        Size.Width = 262.000000000000000000
+        Size.Width = 241.000000000000000000
         Size.Height = 58.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 0
@@ -220,18 +214,6 @@ inherited TextStoryItemOptions: TTextStoryItemOptions
       Justify = Left
       JustifyLastLine = Left
       FlowDirection = LeftToRight
-    end
-  end
-  inherited ActionList: TActionList
-    Left = 528
-    inherited actionLoad: TAction
-      ImageIndex = 6
-    end
-    inherited actionSave: TAction
-      ImageIndex = 7
-    end
-    inherited actionAdd: TAction
-      ImageIndex = 10
     end
   end
 end

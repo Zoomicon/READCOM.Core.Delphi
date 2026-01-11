@@ -1,7 +1,7 @@
 //Description: READ-COM StoryItem View
 //Author: George Birbilis (http://zoomicon.com)
 
-//TODO: double-clicking to open in the IDE can't show Design pane, asks for TCustomManipulator. Can add its unit to the project by referencing its file in "modules" subfolder of BOSS package manager. Upon building Delphi will remove it again since it's defined in another package though (Zoomicon.Manipulation.FMX)
+//TODO: double-clicking to open in the IDE can't show Design pane, asks for TCustomManipulator. Could add its unit to the project by referencing its file in "modules" subfolder of BOSS package manager. But upon building Delphi will remove it again since it's defined in another package though (Zoomicon.Manipulation.FMX)
 
 unit READCOM.Views.StoryItems.StoryItem;
 
@@ -226,6 +226,10 @@ interface
       function IsHidden: Boolean; virtual;
       procedure SetHidden(const Value: Boolean); virtual;
 
+      {CropStoryItems}
+      function IsCropStoryItems: Boolean;
+      procedure SetCropStoryItems(const Value: Boolean);
+
       {Snapping}
       function IsSnapping: Boolean; virtual;
       procedure SetSnapping(const Value: Boolean); virtual;
@@ -253,7 +257,7 @@ interface
       procedure SetFactoryCapacity(const Value: Integer); virtual;
 
       {TargetsVisible}
-      function GetTargetsVisible: Boolean; virtual;
+      function IsTargetsVisible: Boolean; virtual;
       procedure SetTargetsVisible(const Value: Boolean); virtual;
 
       {Options}
@@ -368,11 +372,12 @@ interface
         DEFAULT_STORYPOINT = false;
         DEFAULT_FOREGROUND_COLOR = TAlphaColorRec.Null; //claNull
         DEFAULT_BACKGROUND_COLOR = TAlphaColorRec.Null; //claNull
+        DEFAULT_HIDDEN = false;
+        DEFAULT_CROP_STORYITEMS = false;
         DEFAULT_SNAPPING = false;
         DEFAULT_ANCHORED = true;
         DEFAULT_FLIPPED_HORIZONTALLY = false;
         DEFAULT_FLIPPED_VERTICALLY = false;
-        DEFAULT_HIDDEN = false;
         DEFAULT_FACTORY_CAPACITY = 0;
         DEFAULT_TARGETS_VISIBLE = false;
 
@@ -399,6 +404,7 @@ interface
       property FlippedHorizontally: Boolean read IsFlippedHorizontally write setFlippedHorizontally stored false default DEFAULT_FLIPPED_HORIZONTALLY; //Scale.X stores related info //Note: default isn't really needed when using stored false
       property FlippedVertically: Boolean read IsFlippedVertically write setFlippedVertically stored false default DEFAULT_FLIPPED_VERTICALLY; //Scale.Y stores related info //Note: default isn't really needed when using stored false
       property Hidden: Boolean read IsHidden write SetHidden default DEFAULT_HIDDEN;
+      property CropStoryItems: Boolean read IsCropStoryItems write SetCropStoryItems default DEFAULT_CROP_STORYITEMS;
       property Snapping: Boolean read IsSnapping write SetSnapping default DEFAULT_SNAPPING;
       property Anchored: Boolean read IsAnchored write SetAnchored default DEFAULT_ANCHORED;
       property Tags: String read GetTags write SetTags; //default '' (implied, not allows to use '')
@@ -406,7 +412,7 @@ interface
       property UrlAction: String read GetUrlAction write SetUrlAction; //default '' (implied, not allows to use '')
       property UrlActionTarget: String read GetUrlActionTarget write SetUrlActionTarget; //default '' (implied, not allows to use '')
       property FactoryCapacity: Integer read GetFactoryCapacity write SetFactoryCapacity default DEFAULT_FACTORY_CAPACITY;
-      property TargetsVisible: Boolean read GetTargetsVisible write SetTargetsVisible stored false default DEFAULT_TARGETS_VISIBLE; //TODO: not using concept of explicit targets now, but since anchored items with Tags serve as targets could use that property to highlight them (as hint for user). Maybe in that case add the Targets visible toggle button again
+      property TargetsVisible: Boolean read IsTargetsVisible write SetTargetsVisible stored false default DEFAULT_TARGETS_VISIBLE; //TODO: not using concept of explicit targets now, but since anchored items with Tags serve as targets could use that property to highlight them (as hint for user). Maybe in that case add the Targets visible toggle button again
 
       {$endregion}
 
@@ -1589,6 +1595,20 @@ end;
 
   {$endregion}
 
+  {$region 'CropStoryItems'}
+
+  function TStoryItem.IsCropStoryItems: Boolean;
+  begin
+    Result := ClipChildren;
+  end;
+
+  procedure TStoryItem.SetCropStoryItems(const Value: Boolean);
+  begin
+    ClipChildren := Value;
+  end;
+
+  {$endregion}
+
   {$region 'Snapping'}
 
   function TStoryItem.IsSnapping: Boolean;
@@ -1769,7 +1789,7 @@ end;
 
   {$region 'TargetsVisible'}
 
-  function TStoryItem.GetTargetsVisible: Boolean;
+  function TStoryItem.IsTargetsVisible: Boolean;
   begin
     Result := FTargetsVisible;
   end;

@@ -1,20 +1,22 @@
 inherited ImageStoryItemOptions: TImageStoryItemOptions
-  Size.Width = 481.000000000000000000
-  Size.Height = 177.000000000000000000
+  Size.Width = 474.000000000000000000
+  Size.Height = 176.000000000000000000
   inherited Background: TRectangle
-    Size.Width = 481.000000000000000000
-    Size.Height = 177.000000000000000000
+    Size.Width = 474.000000000000000000
+    Size.Height = 176.000000000000000000
   end
   inherited OpenDialog: TOpenDialog
     Left = 324
   end
   inherited Layout: TFlowLayout
-    Size.Width = 481.000000000000000000
+    Size.Width = 474.000000000000000000
     Size.Height = 188.000000000000000000
     inherited LayoutStoryItemMain: TFlowLayout
+      Size.Width = 470.000000000000000000
       TabOrder = 14
     end
     inherited LayoutStoryItemButtons: TFlowLayout
+      Size.Width = 470.000000000000000000
       TabOrder = 13
     end
     object LayoutImageStoryItemBreak: TFlowLayoutBreak
@@ -26,7 +28,7 @@ inherited ImageStoryItemOptions: TImageStoryItemOptions
     object LayoutImageStoryItemButtons: TFlowLayout
       Align = Top
       Position.Y = 116.000000000000000000
-      Size.Width = 581.000000000000000000
+      Size.Width = 470.000000000000000000
       Size.Height = 58.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 12
@@ -50,21 +52,11 @@ inherited ImageStoryItemOptions: TImageStoryItemOptions
     end
   end
   inherited ActionList: TActionList
-    inherited actionLoad: TAction
-      ImageIndex = 6
-    end
-    inherited actionSave: TAction
-      ImageIndex = 7
-    end
-    inherited actionAdd: TAction
-      ImageIndex = 10
-    end
     object TakePhotoFromCameraAction: TTakePhotoFromCameraActionEx
       Category = 'Media Library'
       ImageIndex = 11
       OnDidFinishTaking = TakePhotoFromCameraActionDidFinishTaking
       RequestPermission = True
-      ImageIndex = 11
     end
   end
 end

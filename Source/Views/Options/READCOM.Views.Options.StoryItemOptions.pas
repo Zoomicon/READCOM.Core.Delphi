@@ -35,10 +35,11 @@ type
     SaveDialog: TSaveDialog;
     AddDialog: TOpenDialog;
     btnToggleVisible: TSpeedButton;
-    txtID: TEdit;
+    btnToggleCrop: TSpeedButton;
     btnToggleHome: TSpeedButton;
     btnToggleStoryPoint: TSpeedButton;
     btnToggleCollectable: TSpeedButton;
+    txtID: TEdit;
     btnToggleAnchored: TSpeedButton;
     btnToggleTags: TSpeedButton;
     btnToggleUrlAction: TSpeedButton;
@@ -54,10 +55,11 @@ type
     btnLoadUrl: TSpeedButton;
     actionLoadUrl: TAction;
     procedure actionToggleVisibleExecute(Sender: TObject);
-    procedure txtIDChange(Sender: TObject);
+    procedure actionToggleCropExecute(Sender: TObject);
     procedure actionToggleHomeExecute(Sender: TObject);
     procedure actionToggleStoryPointExecute(Sender: TObject);
     procedure actionToggleCollectableExecute(Sender: TObject);
+    procedure txtIDChange(Sender: TObject);
     procedure actionToggleSnappingExecute(Sender: TObject);
     procedure actionToggleAnchoredExecute(Sender: TObject);
     procedure actionChangeTagsExecute(Sender: TObject);
@@ -146,10 +148,12 @@ begin
   with FStoryItem do
   begin
     btnToggleVisible.IsPressed := not Hidden;
-    txtID.Text := ID;
+    btnToggleCrop.IsPressed := CropStoryItems;
     btnToggleHome.IsPressed := Home;
     btnToggleStoryPoint.IsPressed := StoryPoint;
     btnToggleCollectable.IsPressed := (CollectableTarget <> '');
+    txtID.Text := ID;
+    //
     btnToggleSnapping.IsPressed := Snapping;
     btnToggleAnchored.IsPressed := Anchored;
     btnToggleTags.IsPressed := (Tags <> '');
@@ -184,7 +188,14 @@ procedure TStoryItemOptions.actionToggleVisibleExecute(Sender: TObject);
 begin
   StoryItem.Hidden := not btnToggleVisible.IsPressed;
   if StoryItem.Hidden and Assigned(FPopup) then
-    HidePopup;
+    HidePopup; //TODO: is this working?
+end;
+
+//--- Crop ---
+
+procedure TStoryItemOptions.actionToggleCropExecute(Sender: TObject);
+begin
+  StoryItem.CropStoryItems := btnToggleCrop.IsPressed;
 end;
 
 //--- ID ---

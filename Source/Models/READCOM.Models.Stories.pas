@@ -106,6 +106,10 @@ interface
       function IsBorderVisible: Boolean;
       procedure SetBorderVisible(const Value: Boolean);
 
+      {CropStoryItems}
+      function IsCropStoryItems: Boolean;
+      procedure SetCropStoryItems(const Value: Boolean);
+
       {Root}
       function IsRoot: Boolean;
 
@@ -194,7 +198,7 @@ interface
       procedure SetFactoryCapacity(const Value: Integer);
 
       {TargetsVisible}
-      function GetTargetsVisible: Boolean;
+      function IsTargetsVisible: Boolean;
       procedure SetTargetsVisible(const Value: Boolean);
 
       {Options}
@@ -211,9 +215,10 @@ interface
 
       {$region '--- Properties ---'}
 
-      property Hidden: Boolean read IsHidden write SetHidden; //default false
       property ID: String read GetID write SetID; //default ''
       property Active: Boolean read IsActive write SetActive; //default false
+      property Hidden: Boolean read IsHidden write SetHidden; //default false
+      property CropStoryItems: Boolean read IsCropStoryItems write SetCropStoryItems; //default false
       property Home: Boolean read IsHome write SetHome; //default false
       property StoryPoint: Boolean read IsStoryPoint write SetStoryPoint; //default false
       property Collectable: Boolean read IsCollectable; //stored false
@@ -236,7 +241,7 @@ interface
       property View: TControl read GetView;
       property EditMode: Boolean read IsEditMode write SetEditMode; //stored false //default false
       property ParentEditMode: Boolean read IsParentEditMode; //stored false
-      property TargetsVisible: Boolean read GetTargetsVisible write SetTargetsVisible; //default false //TODO: Hint on Tags Matching?
+      property TargetsVisible: Boolean read IsTargetsVisible write SetTargetsVisible; //default false //TODO: Hint on Tags Matching?
       property BorderVisible: Boolean read IsBorderVisible write SetBorderVisible; //stored false default false
       //
       property ParentStoryItem: IStoryItem read GetParentStoryItem write SetParentStoryItem; //stored false //default nil
