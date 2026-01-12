@@ -26,8 +26,10 @@ type
     btnCamera: TSpeedButton;
     LayoutImageStoryItemBreak: TFlowLayoutBreak;
     LayoutImageStoryItemButtons: TFlowLayout;
+    btnToggleLooping: TSpeedButton;
     //procedure actionCameraExecute(Sender: TObject);
     procedure TakePhotoFromCameraActionDidFinishTaking(Image: TBitmap);
+    procedure btnToggleLoopingClick(Sender: TObject);
 
   protected
     //procedure DoCameraDidFinish(Image: TBitmap);
@@ -59,10 +61,6 @@ implementation
   begin
     inherited;
     //TMessageManager.DefaultManager.SubscribeToMessage(TMessageDidFinishTakingImageFromLibrary, DoMessageDidFinishTakingImageFromLibrary); //see region 'TakePhotoViaCameraService'
-
-    //Resize to not include LayoutImageStoryItemButtons and its break item if Camera button isn't visible (on platforms that don't support it - currently only mobile ones do), since Camera buttons is the only extra button for ImageStoryItem at this point
-    if not btnCamera.Visible then
-      Height := Height - LayoutImageStoryItemButtons.Height - 5; //note: don't subtract LayoutImageStoryItemBreak.Height
   end;
 
   {$ENDREGION}
@@ -94,6 +92,8 @@ implementation
   procedure TImageStoryItemOptions.SetImageStoryItem(const Value: IImageStoryItem);
   begin
     inherited SetStoryItem(Value); //don't call overriden SetStoryItem, would do infinite loop
+
+    btnToggleLooping.IsPressed := ImageStoryItem.Looping; //don't use "Pressed"
   end;
 
   {$endregion}
@@ -145,6 +145,17 @@ implementation
       ShowMessage('This device does not support the camera service');
   end;
   *)
+  {$endregion}
+
+  {$region 'Looping (for Animation)'}
+
+  procedure TImageStoryItemOptions.btnToggleLoopingClick(Sender: TObject);
+  begin
+    inherited;
+
+    ImageStoryItem.Looping := btnToggleLooping.IsPressed; //don't use "Pressed", need to use "IsPressed"
+  end;
+
   {$endregion}
 
 end.

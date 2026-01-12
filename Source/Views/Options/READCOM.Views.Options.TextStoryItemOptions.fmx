@@ -216,4 +216,18 @@ inherited TextStoryItemOptions: TTextStoryItemOptions
       FlowDirection = LeftToRight
     end
   end
+  inherited ActionList: TActionList
+    inherited actionLoad: TAction
+      ImageIndex = 6
+    end
+    inherited actionSave: TAction
+      ImageIndex = 7
+    end
+    inherited actionAdd: TAction
+      ImageIndex = 10
+    end
+    inherited actionLoadUrl: TAction
+      ImageIndex = 48
+    end
+  end
 end

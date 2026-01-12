@@ -62,7 +62,8 @@ interface
 
     TImageStoryItem = class abstract(TStoryItem, IImageStoryItem, IStoryItem, IClipboardEnabled, IStoreable)
     private
-      FDummyImage: TImage; //for compatibility with older saved content
+      //for compatibility with older saved content
+      FDummyImage: TImage;
 
     //--- Methods ---
 
@@ -77,6 +78,10 @@ interface
       {SVGText}
       function GetSVGText: String;
       procedure SetSVGText(const Value: String);
+
+      {Looping}
+      function IsLooping: Boolean; virtual;
+      procedure SetLooping(const Value: Boolean); virtual;
 
       {Options}
       function GetOptions: IStoryItemOptions; override;
@@ -101,9 +106,15 @@ interface
     //--- Properties ---
 
     published
-      property Image: TImage read GetImage write SetImage stored GetStoreBitmap default nil;
-      property SVGText: String read GetSVGText write SetSVGText;
-      property AutoSize default true;
+      const
+        DEFAULT_IMAGE = nil;
+        DEFAULT_AUTOSIZE = true;
+        DEFAULT_LOOPING = true;
+
+      property Image: TImage read GetImage write SetImage stored GetStoreBitmap default DEFAULT_IMAGE;
+      property SVGText: String read GetSVGText write SetSVGText; //default '' is implied
+      property AutoSize default DEFAULT_AUTOSIZE;
+      property Looping: Boolean read IsLooping write SetLooping default DEFAULT_LOOPING;
     end;
 
     {$region 'Backwards compatibility'}
@@ -146,6 +157,9 @@ implementation
     SetGlyphZorder;
 
     FDummyImage := TImage.Create(Self);
+
+    AutoSize := DEFAULT_AUTOSIZE;
+    Looping := DEFAULT_LOOPING;
   end;
 
   procedure TImageStoryItem.Reset;
@@ -157,6 +171,9 @@ implementation
 
     FreeAndNil(FDummyImage);
     FDummyImage := TImage.Create(Self);
+
+    AutoSize := DEFAULT_AUTOSIZE;
+    Looping := DEFAULT_LOOPING;
   end;
 
   {$endregion}
@@ -330,6 +347,20 @@ implementation
   procedure TImageStoryItem.SetSVGText(const Value: String);
   begin
     Glyph.SVGText := Value;
+  end;
+
+  {$endregion}
+
+  {$region 'Looping'}
+
+  function TImageStoryItem.IsLooping: Boolean;
+  begin
+    result := Glyph.Looping;
+  end;
+
+  procedure TImageStoryItem.SetLooping(const Value: Boolean);
+  begin
+    Glyph.Looping := Value;
   end;
 
   {$endregion}

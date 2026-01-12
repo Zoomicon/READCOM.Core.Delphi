@@ -92,7 +92,7 @@ begin
 
   if Assigned(Value) then
   begin
-    btnToggleEditable.IsPressed := Value.Editable; //Toggle Editable button
+    btnToggleEditable.IsPressed := Value.Editable; //Toggle Editable button //don't use "Pressed"
     SetButtonsFromHorzAlign;                       //Toggle HorzAlign buttons
     SetButtonsFromFontStyle;                       //Toggle FontStyle buttons
   end;
@@ -112,7 +112,7 @@ begin
 
   var LTextStoryItem := TextStoryItem;
   if Assigned(LTextStoryItem) then
-    LTextStoryItem.Editable := btnToggleEditable.IsPressed;
+    LTextStoryItem.Editable := btnToggleEditable.IsPressed; //don't use "Pressed"
 end;
 
 {$endregion}
@@ -128,11 +128,11 @@ begin
 
   var LHorzAlign := TTextAlign.Center;
 
-  if btnToggleAlignLeft.IsPressed then
+  if btnToggleAlignLeft.IsPressed then //don't use "Pressed"
     LHorzAlign := TTextAlign.Leading
-  else if btnToggleAlignCenter.IsPressed then
+  else if btnToggleAlignCenter.IsPressed then //don't use "Pressed"
     LHorzAlign := TTextAlign.Center
-  else if btnToggleAlignRight.IsPressed then
+  else if btnToggleAlignRight.IsPressed then //don't use "Pressed"
     LHorzAlign := TTextAlign.Trailing;
 
   LTextStoryItem.HorzAlign := LHorzAlign;
@@ -146,13 +146,13 @@ begin
   var LHorzAlign := LTextStoryItem.HorzAlign;
 
   if LHorzAlign = TTextAlign.Leading then
-    btnToggleAlignLeft.IsPressed := true
+    btnToggleAlignLeft.IsPressed := true //don't use "Pressed"
 
   else if LHorzAlign = TTextAlign.Center then
-    btnToggleAlignCenter.IsPressed := true
+    btnToggleAlignCenter.IsPressed := true //don't use "Pressed"
 
   else if LHorzAlign = TTextAlign.Trailing then
-    btnToggleAlignRight.IsPressed := true;
+    btnToggleAlignRight.IsPressed := true; //don't use "Pressed"
 end;
 
 {$endregion}
@@ -165,7 +165,7 @@ begin
   if not Assigned(LTextStoryItem) then exit;
 
   with LTextStoryItem.Font do
-    if Button.IsPressed then
+    if Button.IsPressed then //don't use "Pressed"
       Style := Style + [StyleChange]
     else
       Style := Style - [StyleChange];
@@ -178,10 +178,10 @@ begin
 
   var LFontStyle := LTextStoryItem.Font.Style;
 
-  btnToggleBold.IsPressed := (TFontStyle.fsBold in LFontStyle);
-  btnToggleItalic.IsPressed := (TFontStyle.fsItalic in LFontStyle);
-  btnToggleUnderline.IsPressed := (TFontStyle.fsUnderline in LFontStyle);
-  btnToggleStrikeout.IsPressed := (TFontStyle.fsStrikeout in LFontStyle);
+  btnToggleBold.IsPressed := (TFontStyle.fsBold in LFontStyle); //don't use "Pressed"
+  btnToggleItalic.IsPressed := (TFontStyle.fsItalic in LFontStyle); //don't use "Pressed"
+  btnToggleUnderline.IsPressed := (TFontStyle.fsUnderline in LFontStyle); //don't use "Pressed"
+  btnToggleStrikeout.IsPressed := (TFontStyle.fsStrikeout in LFontStyle); //don't use "Pressed"
 end;
 
 procedure TTextStoryItemOptions.btnToggleBoldClick(Sender: TObject);

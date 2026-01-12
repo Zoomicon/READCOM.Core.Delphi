@@ -282,7 +282,7 @@ implementation
     {$ENDIF}
 
     //sync the toggle button state too (in case SetFullScreen was called directly - or via TStoryHUD's FullScreen property - and not from the btnToggleFullscreenClick event handler)
-    btnToggleFullscreen.IsPressed := Value; //don't use "Pressed :=" //don't use ":= FullScreen", seems to not immediately reflect the result
+    btnToggleFullscreen.IsPressed := Value; //don't use "Pressed" //don't use ":= FullScreen", seems to not immediately reflect the result
   end;
 
   {$endregion}
@@ -300,7 +300,7 @@ implementation
 
   procedure TStoryHUD.btnToggleEditModeClick(Sender: TObject);
   begin
-    EditMode := not EditMode; //don't use "btnToggleEditMode.Pressed", returns inconsistent values (note: IsPressed is different from Pressed)
+    EditMode := btnToggleEditMode.IsPressed; //don't use "Pressed"
   end;
 
   {$endregion}
@@ -311,22 +311,22 @@ implementation
 
   procedure TStoryHUD.btnToggleStructureVisibleClick(Sender: TObject);
   begin
-    StructureVisible := not StructureVisible; //don't use "btnToggleStructureVisible.Pressed", returns inconsistent values
+    StructureVisible := btnToggleStructureVisible.IsPressed; //don't use "Pressed"
   end;
 
   procedure TStoryHUD.btnToggleTargetsVisibleClick(Sender: TObject);
   begin
-    TargetsVisible := not TargetsVisible; //don't use "btnToggleTargetsVisible.Pressed", returns inconsistent values
+    TargetsVisible := btnToggleTargetsVisible.IsPressed; //don't use "Pressed"
   end;
 
   procedure TStoryHUD.btnToggleUseStoryTimerClick(Sender: TObject);
   begin
-    UseStoryTimer := not UseStoryTimer; //don't use "btnToggleUseStoryTimer.Pressed", returns inconsistent values
+    UseStoryTimer := btnToggleUseStoryTimer.IsPressed; //don't use "Pressed"
   end;
 
   procedure TStoryHUD.btnToggleFullscreenClick(Sender: TObject);
   begin
-    FullScreen := btnToggleFullscreen.IsPressed; //Note: don't use Pressed
+    FullScreen := btnToggleFullscreen.IsPressed; //Note: don't use "Pressed"
   end;
 
   {$endregion}

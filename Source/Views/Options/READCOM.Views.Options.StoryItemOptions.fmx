@@ -80,7 +80,7 @@ object StoryItemOptions: TStoryItemOptions
         Size.PlatformDefault = False
         StyleLookup = 'actiontoolbutton'
         Text = 'Is Visible'
-        OnClick = actionToggleVisibleExecute
+        OnClick = actionToggleCropExecute
       end
       object btnToggleHome: TSpeedButton
         StaysPressed = True
@@ -348,16 +348,19 @@ object StoryItemOptions: TStoryItemOptions
       Text = 'Load'
       ImageIndex = 6
       OnExecute = actionLoadExecute
+      ImageIndex = 6
     end
     object actionSave: TAction
       Category = 'File'
       Text = 'Save'
       ImageIndex = 7
       OnExecute = actionSaveExecute
+      ImageIndex = 7
     end
     object actionAdd: TAction
       Category = 'File'
       Text = 'Add'
+      ImageIndex = 10
       ImageIndex = 10
     end
     object actionLoadUrl: TAction
@@ -365,6 +368,7 @@ object StoryItemOptions: TStoryItemOptions
       Text = 'Load'
       ImageIndex = 48
       OnExecute = actionLoadUrlExecute
+      ImageIndex = 48
     end
   end
 end

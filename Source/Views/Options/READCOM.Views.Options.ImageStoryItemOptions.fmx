@@ -35,6 +35,26 @@ inherited ImageStoryItemOptions: TImageStoryItemOptions
       Justify = Left
       JustifyLastLine = Left
       FlowDirection = LeftToRight
+      object btnToggleLooping: TSpeedButton
+        StaysPressed = True
+        Align = Client
+        Anchors = []
+        Hint = 
+          'Toggle Looping Animation'#13#10#13#10'Sets/unsets the looping of animated ' +
+          'image content'
+        Images = Icons.SVGIconImageList
+        ImageIndex = 50
+        Margins.Left = 4.000000000000000000
+        Margins.Top = 4.000000000000000000
+        Margins.Right = 4.000000000000000000
+        Margins.Bottom = 4.000000000000000000
+        Size.Width = 50.000000000000000000
+        Size.Height = 50.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'actiontoolbutton'
+        Text = 'Is Visible'
+        OnClick = btnToggleLoopingClick
+      end
       object btnCamera: TSpeedButton
         Action = TakePhotoFromCameraAction
         Align = Client
@@ -52,11 +72,24 @@ inherited ImageStoryItemOptions: TImageStoryItemOptions
     end
   end
   inherited ActionList: TActionList
+    inherited actionLoad: TAction
+      ImageIndex = 6
+    end
+    inherited actionSave: TAction
+      ImageIndex = 7
+    end
+    inherited actionAdd: TAction
+      ImageIndex = 10
+    end
+    inherited actionLoadUrl: TAction
+      ImageIndex = 48
+    end
     object TakePhotoFromCameraAction: TTakePhotoFromCameraActionEx
       Category = 'Media Library'
       ImageIndex = 11
       OnDidFinishTaking = TakePhotoFromCameraActionDidFinishTaking
       RequestPermission = True
+      ImageIndex = 11
     end
   end
 end

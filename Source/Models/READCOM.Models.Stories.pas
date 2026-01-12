@@ -313,9 +313,15 @@ interface
       function GetSVGText: String;
       procedure SetSVGText(const Value: String);
 
+      {Looping}
+      function IsLooping: Boolean;
+      procedure SetLooping(const Value: Boolean);
+
       //--- Properties ---
       property Image: TImage read GetImage write SetImage; //stored StoreBitmap //default nil
       property SVGText: String read GetSVGText write SetSVGText; //stored FStoreSVG;
+
+      property Looping: Boolean read IsLooping write SetLooping; //default true //for Animation
     end;
 
     IImageStoryItemOptions = interface(IStoryItemOptions)

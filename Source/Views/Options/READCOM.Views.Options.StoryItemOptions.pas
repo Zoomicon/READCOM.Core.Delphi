@@ -147,18 +147,18 @@ begin
 
   with FStoryItem do
   begin
-    btnToggleVisible.IsPressed := not Hidden;
-    btnToggleCrop.IsPressed := CropStoryItems;
-    btnToggleHome.IsPressed := Home;
-    btnToggleStoryPoint.IsPressed := StoryPoint;
-    btnToggleCollectable.IsPressed := (CollectableTarget <> '');
+    btnToggleVisible.IsPressed := not Hidden; //don't use "Pressed"
+    btnToggleCrop.IsPressed := CropStoryItems; //don't use "Pressed"
+    btnToggleHome.IsPressed := Home; //don't use "Pressed"
+    btnToggleStoryPoint.IsPressed := StoryPoint; //don't use "Pressed"
+    btnToggleCollectable.IsPressed := (CollectableTarget <> ''); //don't use "Pressed"
     txtID.Text := ID;
     //
-    btnToggleSnapping.IsPressed := Snapping;
-    btnToggleAnchored.IsPressed := Anchored;
-    btnToggleTags.IsPressed := (Tags <> '');
-    btnToggleUrlAction.IsPressed := (UrlAction <> '') or (UrlActionTarget <> '');
-    btnToggleFactory.IsPressed := (FactoryCapacity <> 0);
+    btnToggleSnapping.IsPressed := Snapping; //don't use "Pressed"
+    btnToggleAnchored.IsPressed := Anchored; //don't use "Pressed"
+    btnToggleTags.IsPressed := (Tags <> ''); //don't use "Pressed"
+    btnToggleUrlAction.IsPressed := (UrlAction <> '') or (UrlActionTarget <> ''); //don't use "Pressed"
+    btnToggleFactory.IsPressed := (FactoryCapacity <> 0); //don't use "Pressed"
 
     {$IF DEFINED(ANDROID) OR DEFINED(IOS)}
     btnLoad.Visible := false; //TODO: implement some simple Load file dialog for mobile devices (flat list of documents). Should have some button to delete files too
@@ -186,7 +186,7 @@ end;
 
 procedure TStoryItemOptions.actionToggleVisibleExecute(Sender: TObject);
 begin
-  StoryItem.Hidden := not btnToggleVisible.IsPressed;
+  StoryItem.Hidden := not btnToggleVisible.IsPressed; //don't use "Pressed"
   if StoryItem.Hidden and Assigned(FPopup) then
     HidePopup; //TODO: is this working?
 end;
@@ -209,7 +209,7 @@ end;
 
 procedure TStoryItemOptions.actionToggleHomeExecute(Sender: TObject);
 begin
-  StoryItem.Home := btnToggleHome.IsPressed;
+  StoryItem.Home := btnToggleHome.IsPressed; //don't use "Pressed"
 end;
 
 //--- StoryPoint ---
@@ -230,7 +230,7 @@ begin
       begin
         var LCollectableTarget := Trim(AValues[0]);
         StoryItem.CollectableTarget := LCollectableTarget;
-        btnToggleCollectable.IsPressed := (LCollectableTarget <> '');
+        btnToggleCollectable.IsPressed := (LCollectableTarget <> ''); //don't use "Pressed"
       end;
     end
   );
@@ -245,14 +245,14 @@ end;
 
 procedure TStoryItemOptions.actionToggleAnchoredExecute(Sender: TObject);
 begin
-  StoryItem.Anchored := btnToggleAnchored.IsPressed;
+  StoryItem.Anchored := btnToggleAnchored.IsPressed; //don't use "Pressed"
 end;
 
 //--- Snapping (Magnet) ---
 
 procedure TStoryItemOptions.actionToggleSnappingExecute(Sender: TObject);
 begin
-  StoryItem.Snapping := btnToggleSnapping.IsPressed;
+  StoryItem.Snapping := btnToggleSnapping.IsPressed; //don't use "Pressed"
 end;
 
 //--- Tags ---
@@ -266,7 +266,7 @@ begin
       begin
         var LTags := Trim(AValues[0]);
         StoryItem.Tags := LTags;
-        btnToggleTags.IsPressed := (LTags <> '');
+        btnToggleTags.IsPressed := (LTags <> ''); //don't use "Pressed"
       end;
     end
   );
@@ -296,7 +296,7 @@ begin
             begin
               var LUrlActionTarget := Trim(AValues[0]);
               StoryItem.SetUrlActionTarget(LUrlActionTarget);
-              btnToggleUrlAction.IsPressed := (LUrlAction <> '') or (LUrlActionTarget <> ''); //a target with an empty action should mean to remove the target item
+              btnToggleUrlAction.IsPressed := (LUrlAction <> '') or (LUrlActionTarget <> ''); //a target with an empty action should mean to remove the target item //don't use "Pressed"
             end;
           end
         );
@@ -323,7 +323,7 @@ begin
         var LFactoryCapacity: Integer := 0;
         TryStrToInt(AValues[0], LFactoryCapacity); //ignoring any parsing error, will default to 0 (non-factory behaviour)
         StoryItem.SetFactoryCapacity(LFactoryCapacity);
-        btnToggleFactory.IsPressed := (LFactoryCapacity <> 0);
+        btnToggleFactory.IsPressed := (LFactoryCapacity <> 0); //don't use "Pressed"
       end;
     end
   );
