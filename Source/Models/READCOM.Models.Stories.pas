@@ -60,6 +60,7 @@ interface
       procedure Reset;
 
       {ID}
+      function GetIDpath(const FromStoryItem: IStoryItem = nil): String; //default is RootStoryItem
       function GetID: String;
       procedure SetID(const Value: String);
 

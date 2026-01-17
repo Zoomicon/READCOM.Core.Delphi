@@ -55,8 +55,6 @@ interface
     protected
       var
         UI: TStoryForm;
-        //
-        FNavigationHistory: TStack<IStoryItem>;
         FStoryMode: TStoryMode;
 
       class var
@@ -65,10 +63,6 @@ interface
     public
       {Initialization}
       constructor Create(AUI: TStoryForm); reintroduce;
-      destructor Destroy; override;
-
-      {Navigation History}
-      procedure ClearNavigationHistory;
 
       {Refresh any structure view}
       procedure RefreshStructure;
@@ -158,57 +152,57 @@ interface
       ZoomFrame: TZoomFrame;
       StoryTimer: TTimer;
 
-      //Initialiation
+      {Life-time management}
       procedure FormCreate(Sender: TObject);
       procedure FormDestroy(Sender: TObject);
       procedure FormShow(Sender: TObject);
 
-      //State saving
+      {State saving}
       procedure FormSaveState(Sender: TObject);
 
-      //Keyboard
+      {Keyboard}
       procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
 
-      //File actions
+      {File actions}
       procedure HUDactionNewExecute(Sender: TObject);
       procedure HUDactionLoadExecute(Sender: TObject);
       procedure HUDactionSaveExecute(Sender: TObject);
 
-      //Light-Dark mode
+      {Light-Dark mode}
       procedure HUDactionNextThemeExecute(Sender: TObject);
 
-      //Navigation actions
+      {Navigation actions}
       procedure HUDactionHomeExecute(Sender: TObject);
       procedure HUDactionPreviousExecute(Sender: TObject);
       procedure HUDactionNextExecute(Sender: TObject);
       procedure StoryTimerTimer(Sender: TObject);
 
-      //Add actions
+      {Add actions}
       procedure HUDactionAddExecute(Sender: TObject);
       procedure HUDactionAddImageStoryItemExecute(Sender: TObject);
       procedure HUDactionAddTextStoryItemExecute(Sender: TObject);
 
-      //Edit actions
+      {Edit actions}
       procedure HUDactionDeleteExecute(Sender: TObject);
       procedure HUDactionCutExecute(Sender: TObject);
       procedure HUDactionCopyExecute(Sender: TObject);
       procedure HUDactionPasteExecute(Sender: TObject);
 
-      //Flip actions
+      {Flip actions}
       procedure HUDactionFlipHorizontallyExecute(Sender: TObject);
       procedure HUDactionFlipVerticallyExecute(Sender: TObject);
 
-      //Color actions
+      {Color actions}
       procedure HUDcomboForeColorChange(Sender: TObject);
       procedure HUDcomboBackColorChange(Sender: TObject);
 
-      //Options action
+      {Options action}
       procedure HUDactionOptionsExecute(Sender: TObject);
 
-      //Scaling
+      {Scaling}
       procedure FormResize(Sender: TObject);
 
-      //Keyboard
+      {Keyboard}
       procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
 
     protected
@@ -334,40 +328,8 @@ implementation
   begin
     inherited Create(AUI); //the form is the owner for life-time management of the Story object
     Name := 'Story'; //displayed in Object Debugger
-
-    FNavigationHistory := TStack<IStoryItem>.Create;
-
     UI := AUI;
   end;
-
-  destructor TStory.Destroy;
-  begin
-    try
-      ClearNavigationHistory; //MUST do before FreeAndNil(FNavigationHistory) else it does Clear which try to release IStoryItem references that point to already freed StoryItems
-
-      FreeAndNil(FNavigationHistory);
-    except //TODO: even though we do ClearNavigationHistory it still seems to have issue
-      On E: Exception do
-        Log(E);
-    end;
-
-    inherited; //must do last
-  end;
-
-  {$region 'Navigation History'}
-
-  procedure TStory.ClearNavigationHistory;
-  begin
-    with FNavigationHistory do
-    begin
-      for var i := 0 to Count - 1 do
-        List[i] := nil;  // List is the protected dynamic array
-
-      Clear; //if interface refs are stale (objects have already been deleted, this will fails, so need to nil them first)
-    end;
-  end;
-
-  {$endregion}
 
   {$region 'Refresh any structure view'}
 
@@ -495,23 +457,14 @@ implementation
     var LCollectableTargetStoryItem := StoryItem.CollectableTargetStoryItem; //TODO: change so that Collectables specify ID path for where they get collected at
     if not Assigned(LCollectableTargetStoryItem) then exit;
 
-    var LNewParent: IStoryItem;
     if (StoryItem.ParentStoryItem.View <> LCollectableTargetStoryItem.View) then //if item not in backpack //WARNING: do not compare interface references, they can differ)
     begin
-      LNewParent := LCollectableTargetStoryItem; //move to collectable's target
+      if not StoryItem.Anchored then //anchored items can't get be placed back once collected (they do get unanchored so that they can get easily managed in the parent container they're placed into)
+        StoryItem.CollectableTarget := ActiveStoryItem.GetIDpath; //get ID path from RootStoryItem
+
+      StoryItem.ParentStoryItem := LCollectableTargetStoryItem; //move to collectable's target
       StoryItem.Anchored := false; //make moveable (will remain so after we place object back into a scene - collectables that weren't moveable before adding to the backpack could be for example items stuck somewhere that we unstack and collected and can place back freely where we wish)
-    end
-    else
-      if (not FNavigationHistory.IsEmpty) then
-      begin
-        var LPreviousActiveStoryPoint := FNavigationHistory.Pop;
-        if not Assigned(LPreviousActiveStoryPoint) then exit; //if we had started with the CollectableTarget as ActiveStoryItem this will end up nil
-
-        LNewParent := LPreviousActiveStoryPoint; //move item to previously ActiveStoryItem (before backpack was shown)
-        ActiveStoryItem := LPreviousActiveStoryPoint; //this should push to navigation history
-      end;
-
-    StoryItem.ParentStoryItem := LNewParent;
+    end;
 
     UI.UpdateStructureView; //TODO: if we fully handle reparenting events that will not be needed (will update automatically)
   end;
@@ -606,12 +559,7 @@ implementation
 
   procedure TStory.SetActiveStoryItem(const Value: IStoryItem);
   begin
-    if (ActiveStoryItem <> Value) then
-    begin
-      if (StoryMode <> EditMode) then
-        FNavigationHistory.Push(ActiveStoryItem); //TODO: should make sure if StoryPoints can be self-deleted they get removed from navigation history
-      TStoryItem.ActiveStoryItem := Value;
-    end;
+    TStoryItem.ActiveStoryItem := Value; //setter will check if ActiveStoryItem=Value and do nothing
   end;
 
   procedure TStory.ActivateRootStoryItem;
@@ -1002,8 +950,6 @@ implementation
 
   procedure TStoryForm.SetRootStoryItemView(const Value: TStoryItem);
   begin
-    Story.ClearNavigationHistory;
-
     //Remove old story
     var TheRootStoryItemView := RootStoryItemView;
     if Assigned(TheRootStoryItemView) and

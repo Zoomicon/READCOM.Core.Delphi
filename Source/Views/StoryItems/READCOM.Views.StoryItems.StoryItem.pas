@@ -279,8 +279,9 @@ interface
       //procedure Paint; override; //TODO: not doing any custom drawing like target lines
 
       {ID}
-      function GetID: String; inline;
-      procedure SetID(const Value: String); inline;
+      function GetIDpath(const FromStoryItem: IStoryItem = nil): String; //default is RootStoryItem
+      function GetID: String; virtual;
+      procedure SetID(const Value: String); virtual;
 
       {Audio}
       function HasAudioStoryItems: boolean;
@@ -720,6 +721,41 @@ implementation
   *)
 
   {$region 'ID'}
+
+  function TStoryItem.GetIDpath(const FromStoryItem: IStoryItem = nil): String; //default is RootStoryItem
+  begin
+    //Case 1: root boundary (FromStoryItem=nil AND ParentStoryItem=nil)
+    if (not Assigned(FromStoryItem)) and (not Assigned(ParentStoryItem)) then
+    begin
+      Result := '/';
+      Exit;
+    end;
+
+    //Case 2: explicit ancestor boundary (same underlying node)
+    if Assigned(FromStoryItem) and Assigned(ParentStoryItem) and
+       (FromStoryItem.View = ParentStoryItem.View) then
+    begin
+      Result := ID; //relative boundary: no slash
+      Exit;
+    end;
+
+    //Case 3: no parent and no boundary: not a descendant
+    if not Assigned(ParentStoryItem) then
+    begin
+      Result := '';
+      Exit;
+    end;
+
+    //Case 4: normal recursion
+    var LParentPath := ParentStoryItem.GetIDpath(FromStoryItem);
+
+    if LParentPath = '' then
+      Result := '' //not a descendant
+    else if LParentPath = '/' then
+      Result := '/' + ID //root: absolute path
+    else
+      Result := LParentPath + '/' + ID; //relative or absolute continuation
+  end;
 
   function TStoryItem.GetID: String;
   begin
