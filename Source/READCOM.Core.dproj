@@ -195,12 +195,12 @@
         <DCCReference Include="fmx.dcp"/>
         <DCCReference Include="SVGIconImageListFMX.dcp"/>
         <DCCReference Include="Zoomicon.Media.FMX.dcp"/>
-        <DCCReference Include="Zoomicon.ZUI.FMX.dcp"/>
         <DCCReference Include="Zoomicon.Generics.dcp"/>
         <DCCReference Include="Zoomicon.Helpers.FMX.dcp"/>
         <DCCReference Include="Zoomicon.Helpers.RTL.dcp"/>
         <DCCReference Include="Zoomicon.Introspection.FMX.dcp"/>
         <DCCReference Include="Zoomicon.Manipulation.FMX.dcp"/>
+        <DCCReference Include="Zoomicon.ZUI.FMX.dcp"/>
         <DCCReference Include="Resources\READCOM.Resources.Icons.pas">
             <Form>Icons</Form>
             <DesignClass>TDataModule</DesignClass>
