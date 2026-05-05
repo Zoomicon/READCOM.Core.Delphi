@@ -434,12 +434,13 @@ begin
     var options := Self;
     with popup do
     begin
+      Stored := False; //don't serialize the popup with its PlacementTarget (the TStoryItem / view)
       Width := options.Width;
       Height := options.Height;
       options.Align := TAlignLayout.Client;
       AddObject(options);
       PlacementTarget := FStoryItem.View;
-      Placement := TPlacement.Center; //show to center of form
+      Placement := TPlacement.Center; //show at center of PlacementTarget
       //DragWithParent := true; //don't use, will move with cursor (at Delphi 11)
       //PlacementTarget := (component as TControl);
       //PlacementRectangle:= TBounds.Create(RectF(0, 0, Width, Height));
@@ -465,7 +466,9 @@ begin
   if Assigned(FPopup) then
   begin
     FPopup.IsOpen := false;
-    //FreeAndNil(FPopup); //TODO: maybe should do to save resources
+    // Keep the popup instance around so the user can keep working in the options UI.
+    // We free it in Destroy, and it is marked Stored := False when created.
+    //FreeAndNil(FPopup); //maybe should do to save resources
   end;
 end;
 

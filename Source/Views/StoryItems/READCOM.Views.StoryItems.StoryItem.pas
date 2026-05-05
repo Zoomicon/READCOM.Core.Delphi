@@ -2701,9 +2701,10 @@ end;
   end;
 
   /// Save to Binary Stream
-  procedure TStoryItem.SaveReadComBin(const Stream: TStream); //also called by SaveToString (and thus by SaveReadCom too), so we only need to do any saving preActions/postActions once here
-  begin
-    if Assigned(FOptions) then FOptions.HidePopup; //Must hide options popup else the TCustomPopupForm FMX is using gets serialized with the StoryItem //Note: don't use Options property to avoid constructing popup
+procedure TStoryItem.SaveReadComBin(const Stream: TStream); //also called by SaveToString (and thus by SaveReadCom too), so we only need to do any saving preActions/postActions once here
+begin
+    // Options popup is marked Stored := False, so we don't need to hide/close it before streaming.
+    // Keeping it open allows continuing to work from the options UI after saving.
 
     var wasActive := Active;
     try
