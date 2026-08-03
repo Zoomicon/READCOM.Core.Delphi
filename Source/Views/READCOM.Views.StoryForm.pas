@@ -431,14 +431,15 @@ implementation
   begin
     var activeItem := ActiveStoryItem;
     result :=
-      Assigned(activeItem)
-      and ( (TagsMatching = TagsMatching_Skip) or //skip Tags Matching
-            ((StoryMode = EditMode) and UI.FShiftDown) or //in Edit mode only, SHIFT key held down bypasses tags-matched check and forces proceeding to NextStoryPoint
-            (activeItem.TagsMatched) ); //also checking if Tags are matched (all moveables with Tags are over non-moveables with same Tags and vice-versa) to proceed
+      Assigned(activeItem) and
+      ( (TagsMatching = TagsMatching_Skip) or //skip Tags Matching
+        ((StoryMode = EditMode) and UI.FShiftDown) or //in Edit mode only, SHIFT key held down bypasses tags-matched check and forces proceeding to NextStoryPoint
+        (activeItem.TagsMatched) ); //also checking if Tags are matched (all moveables with Tags are over non-moveables with same Tags and vice-versa) to proceed
 
     if (TagsMatching <> TagsMatching_Skip) and //not showing prompt if skipped Tags Matching
        (TagsMatching <> TagsMatching_Silent_Prompt) and //not showing prompt if set to Silent prompting
-       ((not result) or (TagsMatching = TagsMatching_OkFail_Prompt)) //showing prompt by default only if failed to match tags, or if set to show open/close lock
+       ( (not result) or
+         (TagsMatching = TagsMatching_OkFail_Prompt)) //showing prompt by default only if failed to match tags, or if set to show open/close lock
     then
       begin
       TLockFrame.ShowModal(UI); //warn user that they can't proceed (till Tags are matched)
@@ -649,15 +650,18 @@ implementation
        else
           //either bypassing Tags Matcing, or Tags are Matched, navigate to Url
           if not Assigned(LTargetStoryItem) then //no target found, use RootStoryItem
-            UI.LoadFromUrl(Url) //when using RootStoryItem, use the StoryForm's loading method (shows wait prompt etc.)
+          begin
+            UI.LoadFromUrl(Url); //when using RootStoryItem, use the StoryForm's loading method (shows wait prompt etc.)
+            exit; //NOTE: making sure we don't do anything after this
+          end
           else
           begin
-            LTargetStoryItem.LoadFromUrl(Url, {CreateNew:=}true); //TODO: should update to fire notifications for showing/hiding wait prompt etc. (even better should show loading prompt as item's image - can use that with ContentSource property too to fetch remote content - but see what other side-effects the form's LoadFromURL does)
-            if LTargetStoryItem.StoryPoint then
-            begin
+            LTargetStoryItem := LTargetStoryItem.ReplaceWithUrl(Url);            
+              
+            if Assigned(LTargetStoryItem) and
+               LTargetStoryItem.StoryPoint
+            then
               LTargetStoryItem.Active := true;
-              //ActivateHomeStoryItem; //assuming the loaded content had a HomeStoryItem
-            end;
           end
       end
 
@@ -1087,8 +1091,8 @@ implementation
     end
 
     else
-      if HUD.StructureVisible //Clear StructureView selection (ONLY WHEN StructureView is visible)
-         and Assigned(StructureView) //when app is getting destroyed this will return nil
+      if HUD.StructureVisible and //Clear StructureView selection (ONLY WHEN StructureView is visible)
+         Assigned(StructureView) //when app is getting destroyed this will return nil
       then
         StructureView.SelectedObject := nil;
 

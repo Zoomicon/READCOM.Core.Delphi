@@ -75,10 +75,10 @@ interface
         FStory: IStory;
 
         //TODO: maybe move to IStory so that we don't have many class variables and maybe also be able to have side-by-side stories by passing them different context (IStory)
-        FIgnoreActiveStoryItemChanges: Boolean; //=False
         FActiveStoryItem: IStoryItem; //=nil
+        FHomeStoryItem: IStoryItem;       
         FOnActiveStoryItemChanged: TNotifyEvent;
-        FHomeStoryItem: IStoryItem;
+        FIgnoreHomeAndActiveStoryItemChanges: Boolean; //=False
 
     {$endregion}
 
@@ -303,6 +303,9 @@ interface
       procedure AddFromString(const Data: String); virtual;
       procedure Add(const Filepath: String); overload; virtual;
       procedure Add(const Filepaths: array of String); overload; virtual;
+      //
+      procedure ReplaceWith(const NewStoryItem: IStoryItem); virtual;     
+      function ReplaceWithUrl(const Url: String): IStoryItem; virtual;
       //
       function GetLoadFilesFilter: String; virtual;
       class function LoadNew(const Stream: TStream; const ContentFormat: String = EXT_READCOM): TStoryItem; overload; virtual;
@@ -1077,7 +1080,7 @@ end;
 
   class procedure TStoryItem.SetActiveStoryItem(const Value: IStoryItem);
   begin
-    if FIgnoreActiveStoryItemChanges or
+    if FIgnoreHomeAndActiveStoryItemChanges or //Important (used while loading content subtree into existing StoryItem)
        (Value = FActiveStoryItem) //this also covers the case where (FActiveStoryItem=nil) and (Value=nil)
     then exit;
 
@@ -1119,7 +1122,9 @@ end;
     end;
 
   begin
-    if FIgnoreActiveStoryItemChanges or (Value = IsActive) then exit; //Important (used while loading content subtree into existing StoryItem)
+    if FIgnoreHomeAndActiveStoryItemChanges or //Important (used while loading content subtree into existing StoryItem)
+       (Value = IsActive)
+    then exit;
     //TODO: maybe also check csLoading to not fire change events and have story find the active storyitem after loading and zoom to it?
 
     if (Value) then //make active
@@ -1165,13 +1170,52 @@ end;
       parentItem.Active := true;
   end;
 
+  procedure TStoryItem.ReplaceWith(const NewStoryItem: IStoryItem);
+  begin
+    if not Assigned(NewStoryItem) then
+      exit;
+    
+    var LParentStoryItem := ParentStoryItem;
+    if not Assigned(LParentStoryItem) then
+      exit;
+    
+    var LNewView := NewStoryItem.View;
+    var LParentView := LParentStoryItem.View;
+    if Assigned(LParentView) then
+    begin
+      var LIndex := Self.Index;
+      LParentView.RemoveObject(LIndex);
+      if (LIndex >= 0) then
+        LParentView.InsertObject(LIndex, LNewView)
+      else
+        LParentView.AddObject(LNewView);
+    end;
+
+    Free; //dispose this instance
+  end;
+
+  function TStoryItem.ReplaceWithUrl(const Url: String): IStoryItem;
+  begin
+    try
+      FIgnoreHomeAndActiveStoryItemChanges := true;
+    
+      result := TStoryItem(LoadFromUrl(Url, {CreateNew:=}true)) as IStoryItem; //TODO: should update to fire notifications for showing/hiding wait prompt etc. (even better should show loading prompt as item's image - can use that with ContentSource property too to fetch remote content - but see what other side-effects the form's LoadFromURL does)
+    finally
+      FIgnoreHomeAndActiveStoryItemChanges := false;
+    end;
+    
+    if Assigned(result) then
+      Self.ReplaceWith(result); //replace old item with the newly loaded one in the visual hierarchy
+  end;  
+
   procedure TStoryItem.ActiveChanged;
   begin
     if Assigned(FOnActiveChanged) then
       FOnActiveChanged(Self);
 
-    if (not Assigned(ActiveStoryItem) or IsActive)
-       and Assigned(FOnActiveStoryItemChanged) then //fire class-level event only for the now active StoryItem, or if none is set to active
+    if (not Assigned(ActiveStoryItem) or IsActive) and
+       Assigned(FOnActiveStoryItemChanged)
+    then //fire class-level event only for the now active StoryItem, or if none is set to active
       FOnActiveStoryItemChanged(Self);
   end;
 
@@ -1245,7 +1289,9 @@ end;
 
   procedure TStoryItem.SetHome(const Value: Boolean);
   begin
-    if (Value = IsHome) then exit; //Important
+    if FIgnoreHomeAndActiveStoryItemChanges or //Important (used while loading content subtree into existing StoryItem)
+       (Value = IsHome)
+    then exit; //Important
 
     if (Value) then //make Home
       begin
@@ -1264,7 +1310,9 @@ end;
 
   class procedure TStoryItem.SetHomeStoryItem(const Value: IStoryItem);
   begin
-    if (Value = FHomeStoryItem) then exit;
+    if FIgnoreHomeAndActiveStoryItemChanges or //Important (used while loading content subtree into existing StoryItem)
+       (Value = FHomeStoryItem)
+    then exit;
 
     if Assigned(Value) then //note the Home (starting) StoryItem is not necesserily a StoryPoint //TODO: decide on this
       Value.Home := true //this will also deactivate the HomeStoryItem if any
@@ -1722,9 +1770,9 @@ end;
         function(StoryItem: IStoryItem): Boolean
         begin
           with StoryItem do
-            Result := (Tags <> '') //SetTags already has trimmed Tags string, so this checks if any Tags are available
-                      and (Anchored = AnchoredValue) //select only StoryItems with given Anchored state
-                      and (FactoryCapacity = 0); //don't select Factories (FactoryCapacity > 0), else anchored Factories (that haven't yet produced all their clones) with a Tag would be treated as Targets for tag matching (riddle solution checking). Also non-anchored Factories with a Tag would be mistreated as unmatched moveables (when the last clone is generated they are no logger a factory and they can be moved to a target)
+            Result := (Tags <> '') and //SetTags already has trimmed Tags string, so this checks if any Tags are available
+                      (Anchored = AnchoredValue) and //select only StoryItems with given Anchored state
+                      (FactoryCapacity = 0); //don't select Factories (FactoryCapacity > 0), else anchored Factories (that haven't yet produced all their clones) with a Tag would be treated as Targets for tag matching (riddle solution checking). Also non-anchored Factories with a Tag would be mistreated as unmatched moveables (when the last clone is generated they are no logger a factory and they can be moved to a target)
         end
       );
     end;
@@ -2100,13 +2148,15 @@ end;
           if (CollectableTarget <> '') and Assigned(FStory) then //TODO: maybe use not IsEmpty instead of <> '' everywhere
             FStory.Collect(Self)
 
-          else if (HasUrlAction
-              and Assigned(FStory)
-              and (FStory.StoryMode <> TStoryMode.EditMode) //make sure we don't do UrlActions of child items when editing a story //should we use EditMode property instead? it doesn't seem to check StoryMode, but seems to store to local storable field (//TODO THAT EDITMODE PROPERTY IS FOR BEING ABLE TO DISABLE CHILDREN THAT ARE DEEPER INSIDE, SHOULD CHANGE THAT LOGIC ANYWAY AND DISABLE SUBTREES UNDER NESTED STORYPOINTS WHEN WE ARE AT SOME ANCESTOR STORYPOINT)
+          else
+            if (HasUrlAction and
+              Assigned(FStory) and
+              (FStory.StoryMode <> TStoryMode.EditMode) //make sure we don't do UrlActions of child items when editing a story //should we use EditMode property instead? it doesn't seem to check StoryMode, but seems to store to local storable field (//TODO THAT EDITMODE PROPERTY IS FOR BEING ABLE TO DISABLE CHILDREN THAT ARE DEEPER INSIDE, SHOULD CHANGE THAT LOGIC ANYWAY AND DISABLE SUBTREES UNDER NESTED STORYPOINTS WHEN WE ARE AT SOME ANCESTOR STORYPOINT)
               {and //TODO: should have URLs clickable only for children of ActiveStoryItem (and for itself if it's the RootStoryItem maybe) //in non-EditMode should disable HitTest though at everything that isn't the current StoryItem or direct child of the ActiveStoryItem apart from the TextStoryItems maybe (could maybe just disble HitTest at all siblings of ActiveStoryItem and have everything under ActiveStoryItem HitTest-enabled)
               ((Assigned(LParent) and LParent.Active) or
-              ((not Assigned(LParent)) and Active))}) then //only when ParentStoryItem is the ActiveStoryItem //assuming short-circuit evaluation //if no LParent then it's the RootStoryItem, allowing it to have URLAction too
-            FStory.DoUrlAction(FUrlAction, FUrlActionTarget, Self); //TODO: if child item has a UrlAction it should consume the click event, currently it seems parent StoryItem will play its AudioStoryItem(s) even while navigating say to NextStoryPoint (when a child ImageStoryItem with '+' urlAction was clicked)
+              ((not Assigned(LParent)) and Active))})
+            then //only when ParentStoryItem is the ActiveStoryItem //assuming short-circuit evaluation //if no LParent then it's the RootStoryItem, allowing it to have URLAction too
+              FStory.DoUrlAction(FUrlAction, FUrlActionTarget, Self); //TODO: if child item has a UrlAction it should consume the click event, currently it seems parent StoryItem will play its AudioStoryItem(s) even while navigating say to NextStoryPoint (when a child ImageStoryItem with '+' urlAction was clicked)
       end;
     end;
 
@@ -2204,7 +2254,7 @@ end;
       raise Exception.Create('Unknown Clipboard format');
 
     try
-      FIgnoreActiveStoryItemChanges := true; //ignore changes to ActiveStoryItem while loading children since "Active" is persisted property
+      FIgnoreHomeAndActiveStoryItemChanges := true; //ignore changes to ActiveStoryItem while loading children since "Active" is persisted property
 
       try
         var StoryItemFactory := StoryItemFactories.Get(FileExt);
@@ -2226,7 +2276,7 @@ end;
       end;
 
     finally
-      FIgnoreActiveStoryItemChanges := false; //restore value
+      FIgnoreHomeAndActiveStoryItemChanges := false; //restore value
     end;
   end;
 
@@ -2380,20 +2430,20 @@ end;
   var StoryItem: IStoryItem;
   begin
     try
-      FIgnoreActiveStoryItemChanges := true; //ignore changes to ActiveStoryItem while loading children since "Active" is persisted property
+      FIgnoreHomeAndActiveStoryItemChanges := true; //ignore changes to ActiveStoryItem while loading children since "Active" is persisted property
 
       if Supports(LoadFromString(Data, true), IStoryItem, StoryItem) then
         Add(StoryItem);
 
     finally
-      FIgnoreActiveStoryItemChanges := false; //restore value
+      FIgnoreHomeAndActiveStoryItemChanges := false; //restore value
     end;
   end;
 
   procedure TStoryItem.Add(const Filepath: String);
   begin
     try
-      FIgnoreActiveStoryItemChanges := true; //ignore changes to ActiveStoryItem while loading children since "Active" is persisted property
+      FIgnoreHomeAndActiveStoryItemChanges := true; //ignore changes to ActiveStoryItem while loading children since "Active" is persisted property
 
       var FileExt := ExtractFileExt(Filepath).ToLowerInvariant; //make file extension lower case
       try
@@ -2416,7 +2466,7 @@ end;
       end;
 
     finally
-      FIgnoreActiveStoryItemChanges := false; //restore value
+      FIgnoreHomeAndActiveStoryItemChanges := false; //restore value
     end;
   end;
 
@@ -2492,47 +2542,36 @@ end;
 
   /// Load from Binary Stream
   function TStoryItem.LoadReadComBin(const Stream: TStream; const CreateNew: Boolean = false): IStoryItem; //TODO: could make this return TObject to support loading any Delphi object stream
-  var Instance: TStoryItem;
+  var
+    Instance: TStoryItem;
+    LOldBoundsRect: TRectF;
   begin
     if CreateNew then
       Instance := nil //create new StoryItem
     else
     begin
       Instance := Self; //load state to this StoryItem //WARNING: this will only allow loading state from a saved instance of the same class
-      Reset; //clear state (including removing existing children)
+
+      LOldBoundsRect := Self.BoundsRect; //keep current bounds //better do before Reset, in case SetPropertyDefaults that it calls also resets bounds rect in the future
+      Reset; //clear state (including removing existing children) - will also set Active to DEFAULT_ACTIVE=false
     end;
 
-    var wasActive := Active;
-    try
-      if Assigned(Instance) then //only when replacing an object
-        ActiveStoryItem := ParentStoryItem; //deactivate (using Active := False doesn't seem to work and results in leaving garbage persistent dashed border)
+    var obj := Stream.ReadComponent(Instance, ReaderError);
 
-      FIgnoreActiveStoryItemChanges := true; //ignore changes to ActiveStoryItem while loading children since "Active" is persisted property //Note: must do after setting Active property
-
-      var LOldBoundsRect := Self.BoundsRect; //keep current bounds
-
-      var obj := Stream.ReadComponent(Instance, ReaderError);
-
-       //TODO: doesn't seem to work correctly, removed
-      if Assigned(Instance) //if replaced current StoryPoint's state (thus also loaded saved location and size)...
-         and (not IsShiftKeyPressed) //...and not SHIFT pressed...
-      then
-      begin
-        Align := TAlignLayout.Scale; //IMPORTANT: adjust when parent resizes (TODO: isn't this property storable? If we've chosen to not store it, need to always set it) //Note: we set it at Add, but when replacing instance no Add is done
+    if Assigned(Instance) //if replaced current StoryPoint's state (thus also loaded saved location and size)...
+    then
+    begin
+      Align := TAlignLayout.Scale; //IMPORTANT: adjust when parent resizes (TODO: isn't this property storable? If we've chosen to not store it, need to always set it) //Note: we set it at Add, but when replacing instance no Add is done
+      if (not IsShiftKeyPressed) then //when loading with Shift key pressed we use the content's bounds //Note: we used to also have Align's setting under this guard, was probably wrong
         BoundsRect := LOldBoundsRect; //...restore previous bounds
-      end;
-
-      if obj is TStoryItem then //at current implementation only supporting TStoryItems
-        Result := obj as IStoryItem //note that we have overriden ReadState so that it can set a custom Reader error handler to ignore specific deprecated properties, but that won't work by itself (so passing ErrorHandler here too via TStreamErrorHelper.CreateComponent method) if "CreateNew=true" is used, since we pass nil in that case so ReadState is called on TComponent, not on TStoryItem
-      else
-      begin
-        FreeAndNil(obj);
-        raise Exception.Create('Object is not a StoryItem');
-      end;
-
-    finally
-      FIgnoreActiveStoryItemChanges := false;
-      Active := wasActive; //must do after setting FIgnoreActiveStoryItemChanges to false
+    end;
+      
+    if obj is TStoryItem then //at current implementation only supporting TStoryItems
+      Result := obj as IStoryItem //note that we have overriden ReadState so that it can set a custom Reader error handler to ignore specific deprecated properties, but that won't work by itself (so passing ErrorHandler here too via TStreamErrorHelper.CreateComponent method) if "CreateNew=true" is used, since we pass nil in that case so ReadState is called on TComponent, not on TStoryItem
+    else
+    begin
+      FreeAndNil(obj);
+      raise Exception.Create('Object is not a StoryItem');
     end;
   end;
 

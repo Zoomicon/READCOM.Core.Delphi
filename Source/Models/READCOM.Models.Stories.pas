@@ -207,11 +207,13 @@ interface
 
       {IStoreable extensions}
       procedure Add(const StoryItem: IStoryItem); overload;
+      procedure ReplaceWith(const NewStoryItem: IStoryItem);
+      function ReplaceWithUrl(const Url: String): IStoryItem;      
       function LoadReadCom(const Stream: TStream; const CreateNew: Boolean = false): IStoryItem;
       function LoadReadComBin(const Stream: TStream; const CreateNew: Boolean = false): IStoryItem;
       procedure SaveReadCom(const Stream: TStream);
       procedure SaveReadComBin(const Stream: TStream);
-
+ 
       {$endregion}
 
       {$region '--- Properties ---'}
