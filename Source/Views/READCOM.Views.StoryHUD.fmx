@@ -55,7 +55,7 @@ object StoryHUD: TStoryHUD
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
-        StyleLookup = 'priortoolbutton'
+        StyleLookup = 'ellipseseditbutton'
       end
       object btnLoad: TSpeedButton
         Action = actionLoad
@@ -71,7 +71,7 @@ object StoryHUD: TStoryHUD
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
-        StyleLookup = 'actiontoolbutton'
+        StyleLookup = 'ellipseseditbutton'
       end
       object btnSave: TSpeedButton
         Action = actionSave
@@ -87,7 +87,7 @@ object StoryHUD: TStoryHUD
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
-        StyleLookup = 'actiontoolbutton'
+        StyleLookup = 'ellipseseditbutton'
       end
       object btnToggleStructureVisible: TSpeedButton
         StaysPressed = True
@@ -107,7 +107,7 @@ object StoryHUD: TStoryHUD
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
-        StyleLookup = 'bookmarkstoolbutton'
+        StyleLookup = 'ellipseseditbutton'
         Text = 'Structure'
         OnClick = btnToggleStructureVisibleClick
       end
@@ -148,7 +148,7 @@ object StoryHUD: TStoryHUD
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
-        StyleLookup = 'escapetoolbutton'
+        StyleLookup = 'ellipseseditbutton'
         Text = 'Edit'
         OnClick = btnToggleEditModeClick
       end
@@ -169,7 +169,7 @@ object StoryHUD: TStoryHUD
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
-        StyleLookup = 'playtoolbutton'
+        StyleLookup = 'ellipseseditbutton'
         Text = 'Story Timer'
         OnClick = btnToggleUseStoryTimerClick
       end
@@ -188,7 +188,7 @@ object StoryHUD: TStoryHUD
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
-        StyleLookup = 'playtoolbutton'
+        StyleLookup = 'ellipseseditbutton'
         Text = 'Fullscreen'
         OnClick = btnToggleFullscreenClick
       end
@@ -206,7 +206,7 @@ object StoryHUD: TStoryHUD
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
-        StyleLookup = 'actiontoolbutton'
+        StyleLookup = 'ellipseseditbutton'
       end
       object btnAbout: TSpeedButton
         Action = actionAbout
@@ -222,7 +222,7 @@ object StoryHUD: TStoryHUD
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
-        StyleLookup = 'infotoolbutton'
+        StyleLookup = 'ellipseseditbutton'
       end
     end
     object scrollButtonsEdit: TVertScrollBoxWithArrows
@@ -248,7 +248,7 @@ object StoryHUD: TStoryHUD
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
-        StyleLookup = 'additembutton'
+        StyleLookup = 'ellipseseditbutton'
       end
       object btnAddImageStoryItem: TSpeedButton
         Action = actionAddImageStoryItem
@@ -264,7 +264,7 @@ object StoryHUD: TStoryHUD
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
-        StyleLookup = 'actiontoolbutton'
+        StyleLookup = 'ellipseseditbutton'
       end
       object btnAddTextStoryItem: TSpeedButton
         Action = actionAddTextStoryItem
@@ -280,7 +280,7 @@ object StoryHUD: TStoryHUD
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
-        StyleLookup = 'actiontoolbutton'
+        StyleLookup = 'ellipseseditbutton'
       end
       object btnDelete: TSpeedButton
         Action = actionDelete
@@ -311,7 +311,7 @@ object StoryHUD: TStoryHUD
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
-        StyleLookup = 'actiontoolbutton'
+        StyleLookup = 'ellipseseditbutton'
       end
       object btnCopy: TSpeedButton
         Action = actionCopy
@@ -327,7 +327,7 @@ object StoryHUD: TStoryHUD
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
-        StyleLookup = 'actiontoolbutton'
+        StyleLookup = 'ellipseseditbutton'
       end
       object btnPaste: TSpeedButton
         Action = actionPaste
@@ -343,7 +343,7 @@ object StoryHUD: TStoryHUD
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
-        StyleLookup = 'actiontoolbutton'
+        StyleLookup = 'ellipseseditbutton'
       end
       object btnFlipHorizontally: TSpeedButton
         Action = actionFlipHorizontally
@@ -359,7 +359,7 @@ object StoryHUD: TStoryHUD
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
-        StyleLookup = 'actiontoolbutton'
+        StyleLookup = 'ellipseseditbutton'
       end
       object btnFlipVertically: TSpeedButton
         Action = actionFlipVertically
@@ -375,7 +375,7 @@ object StoryHUD: TStoryHUD
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
-        StyleLookup = 'actiontoolbutton'
+        StyleLookup = 'ellipseseditbutton'
       end
       object comboForeColor: TComboColorBox
         Align = Top
@@ -426,7 +426,7 @@ object StoryHUD: TStoryHUD
         Size.Width = 44.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
-        StyleLookup = 'actiontoolbutton'
+        StyleLookup = 'ellipseseditbutton'
       end
     end
     object layoutButtonsNavigation: TLayout
