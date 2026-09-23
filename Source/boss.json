@@ -1,9 +1,10 @@
 {
 	"name": "READCOM.Core",
 	"description": "READ-COM Core",
-	"version": "21.2",
+	"version": "21.3",
 	"homepage": "",
 	"mainsrc": "",
+	"browsingpath": "",
 	"projects": [
 		"READCOM.Core.dproj"
 	],
@@ -13,7 +14,7 @@
 		"github.com/zoomicon/zoomicon.helpers.rtl.delphi": ">=4.0.0",
 		"github.com/zoomicon/zoomicon.introspection.fmx.delphi": ">=4.0.0",
 		"github.com/zoomicon/zoomicon.manipulation.fmx.delphi": ">=4.0.0",
-		"github.com/zoomicon/zoomicon.media.fmx.delphi": ">=9.0.0",
+		"github.com/zoomicon/zoomicon.media.fmx.delphi": ">=9.1.0",
 		"github.com/zoomicon/zoomicon.zui.fmx.delphi": ">=4.0.0"
 	}
 }
