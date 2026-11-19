@@ -2,7 +2,7 @@
     <PropertyGroup>
         <ProjectGuid>{FF9821BE-81C1-4425-80DD-76B6F8031B0D}</ProjectGuid>
         <MainSource>dclREADCOM.Core.dpk</MainSource>
-        <ProjectVersion>20.4</ProjectVersion>
+        <ProjectVersion>20.5</ProjectVersion>
         <FrameworkType>FMX</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
