@@ -24,10 +24,13 @@ interface
     FMX.Forms, FMX.Graphics, FMX.Dialogs,
     FMX.Layouts,
     FMX.ActnList,
+    FMX.MultiView, //TODO: needed? used in StoryHUD
+    FMX.Colors, //TODO: needed? used in StoryHUD
     //
     Zoomicon.Generics.Collections, //for TObjectListEx
     Zoomicon.Introspection.FMX.StructureView, //for TStructureView
     Zoomicon.ZUI.FMX.ZoomFrame, //for TZoomFrame
+    Zoomicon.Media.FMX.VertScrollBoxWithArrows, //TODO: needed? used in StoryHUD
     //
     READCOM.Models.Stories, //for IStory, IStoryItem
     READCOM.Views.StoryItems.StoryItem, //for TStoryItem
@@ -36,6 +39,7 @@ interface
 
   const //TODO: move to some READCOM.App.Settings as pre-initialized vars?
     OPENLOCK_DELAY = 800; //msec
+    RESIZE_ZOOM_DELAY = 100; //msec
     BACKPACK_ALPHA = 0.85;
 
   resourcestring
@@ -213,6 +217,9 @@ interface
       FShortcutCut, FShortcutCopy, FShortcutPaste: TShortCut;
       FTimerStarted: Boolean;
       FCheckedCommandLineActions: Boolean;
+      FZoomFrameScrollBoxResize: TNotifyEvent;
+      FResizeZoomTimer: TTimer;
+      FResizeZoomEnabled: Boolean;
 
       {Zooming}
       procedure StartInitialZoomTimer(const Delay: Cardinal = 100);
@@ -250,6 +257,9 @@ interface
       procedure CheckProperOrientation;
 
       {Scaling}
+      procedure ScheduleZoomAfterResize;
+      procedure ResizeZoomTimerTimer(Sender: TObject);
+      procedure ZoomFrameScrollBoxResize(Sender: TObject);
       procedure RootStoryItemViewResized(Sender: TObject);
 
       {Options}
@@ -911,11 +921,23 @@ implementation
 
     FTimerStarted := false;
     FCheckedCommandLineActions := false;
+    FResizeZoomEnabled := false;
 
     InitHUD;
     InitObjectDebugger(Self); //TODO: should move to Main and do only once for the Application.MainForm
 
     //ZoomFrame.ScrollBox.AniCalculations.AutoShowing := true; //fade the toolbars when not active //TODO: doesn't work with direct mouse drags near the bottom and right edges (scrollbars do show when scrolling e.g. with mousewheel) since there's other HUD content above them (the navigation and the edit sidebar panes)
+
+    FZoomFrameScrollBoxResize := ZoomFrame.ScrollBox.OnResize;
+    ZoomFrame.ScrollBox.OnResize := ZoomFrameScrollBoxResize;
+
+    FResizeZoomTimer := TTimer.Create(Self);
+    with FResizeZoomTimer do
+    begin
+      Enabled := false;
+      Interval := RESIZE_ZOOM_DELAY;
+      OnTimer := ResizeZoomTimerTimer;
+    end;
 
     Application.OnIdle := Idle;
 
@@ -938,7 +960,8 @@ implementation
 
   procedure TStoryForm.FormShow(Sender: TObject);
   begin
-    //NOP
+    if not StoryTimer.Enabled then
+      FResizeZoomEnabled := true; //no initial zoom is pending (for example, a new blank story)
   end;
 
   {$ENDREGION}
@@ -1121,6 +1144,10 @@ implementation
 
   procedure TStoryForm.StartInitialZoomTimer(const Delay: Cardinal = 100);
   begin
+    FResizeZoomEnabled := false;
+    if Assigned(FResizeZoomTimer) then
+      FResizeZoomTimer.Enabled := false;
+
     with StoryTimer do
     begin
       Enabled := false;
@@ -1525,6 +1552,7 @@ implementation
       with Story do
       begin
         ZoomToActiveStoryPointOrHome; //needed upon app first loading to ZoomTo Active StoryPoint or Home from loaded saved state
+        FResizeZoomEnabled := true;
         //ActivateHomeStoryItem; //apply the home //TODO: text doesn't render yet at this point
       end;
 
@@ -1567,8 +1595,31 @@ implementation
 
   procedure TStoryForm.FormResize(Sender: TObject);
   begin
-    Story.ZoomToActiveStoryPointOrHome; //keep the Active StoryPoint or Home in view
+    ScheduleZoomAfterResize;
     CheckProperOrientation;
+  end;
+
+  procedure TStoryForm.ScheduleZoomAfterResize;
+  begin
+    if not FResizeZoomEnabled or not Assigned(FResizeZoomTimer) then exit;
+
+    FResizeZoomTimer.Enabled := false;
+    FResizeZoomTimer.Enabled := true;
+  end;
+
+  procedure TStoryForm.ResizeZoomTimerTimer(Sender: TObject);
+  begin
+    FResizeZoomTimer.Enabled := false;
+    Story.ZoomToActiveStoryPointOrHome;
+  end;
+
+  procedure TStoryForm.ZoomFrameScrollBoxResize(Sender: TObject);
+  begin
+    if Assigned(FZoomFrameScrollBoxResize) then
+      FZoomFrameScrollBoxResize(Sender); //let TZoomFrame update its viewport size first
+
+    Story.ZoomToActiveStoryPointOrHome; //keep the Active StoryPoint or Home in view using the new viewport size
+    ScheduleZoomAfterResize; //repeat after any remaining alignment passes (for example StructureView changes)
   end;
 
   procedure TStoryForm.RootStoryItemViewResized(Sender: TObject); //TODO: this doesn't seem to get called (needed for AutoSize of RootStoryItemView to work)

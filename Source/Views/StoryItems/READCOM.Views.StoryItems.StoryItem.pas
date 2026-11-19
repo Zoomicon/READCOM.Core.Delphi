@@ -1149,7 +1149,7 @@ end;
     else //make inactive
       FActiveStoryItem := nil; //Note: since we would have exited if Value hadn't changed, if we've reached here this means we were the ActiveStoryItem
 
-    ActiveChanged; //fire change events
+    ActiveChanged; //fire change events (so that listener can zoom to the ActiveStoryPoint [if ActiveStoryItem is not a StoryPoint then nearest StoryPoint ancestor else RootStoryItem is to be used])
   end;
 
   function TStoryItem.IsRoot: Boolean;
